@@ -1,0 +1,23 @@
+{
+  "name": "dynamorse",
+  "version": "0.0.1",
+  "description": "Means to dynamically receive or generate streams of media.",
+  "main": "index.js",
+  "scripts": {
+    "test": "tape test/*Spec.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Streampunk/dynamorse.git"
+  },
+  "author": "Christine S MacNeill",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Streampunk/dynamorse/issues"
+  },
+  "homepage": "https://github.com/Streampunk/dynamorse#readme",
+  "dependencies": {
+    "seamless-immutable": "^4.1.1",
+    "tape": "^4.2.2"
+  }
+}
