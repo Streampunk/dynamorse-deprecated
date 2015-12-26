@@ -17,13 +17,15 @@ var fs = require('fs');
 var async = require('async');
 var RTPPacket = require('../model/RTPPacket.js');
 
-var pcapFile = '/Users/vizigoth/Documents/streampunk/nmi/phase1/examples/rtp-audio-l24-2chan-wav.pcap';
+var pcapFile = process.argv[2];
+//'/Users/vizigoth/Documents/streampunk/nmi/phase1/examples/rtp-video-rfc4175-1080i50-sync.pcap';
 
 var fd = 0;
 var justRead = 0;
 var globalHeader = new Buffer(24);
 var packetHeader = new Buffer(16);
 var packetCount = 0;
+var startTime = Date.now();
 
 async.waterfall([
   function (callback) {
@@ -43,6 +45,7 @@ async.waterfall([
     })
   },
   function (callback) {
+    startTime = Date.now();
     fs.read(fd, packetHeader, 0, 16, null, function (err, bytesRead) {
       if (err) return callback(err);
       justRead = bytesRead;
@@ -54,7 +57,7 @@ async.waterfall([
   function (len, callback) {
     // console.log('About to whilst.');
     async.whilst(
-      function() { return justRead > 0; },
+      function() { return justRead > 0 && packetCount < 5; },
       function (whilstback) {
         // console.log('Whilstback!', len, justRead);
         async.series([
@@ -63,7 +66,7 @@ async.waterfall([
             fs.read(fd, new Buffer(len), 0, len, null, function (err, br, buf) {
               // console.log('read', br);
               if (err) return packetback(err);
-              // console.log('Packet!', new RTPPacket(buf.slice(48)).getTimestamp());
+              console.log(JSON.stringify(buf.slice(42)));
               packetCount++;
               packetback();
             });
@@ -95,4 +98,4 @@ async.waterfall([
       callback();
     })
   }
-]);
+], function (err) { if (err) console.log(err); else console.log('Phew! ' + (Date.now() - startTime)); });

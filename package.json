@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Streampunk/dynamorse#readme",
   "dependencies": {
+    "highland": "^2.5.1",
     "seamless-immutable": "^4.1.1",
     "tape": "^4.2.2"
   }
