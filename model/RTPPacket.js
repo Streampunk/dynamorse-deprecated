@@ -149,46 +149,34 @@ RTPPacket.prototype.setSequenceNumber = function (s) {
   return s;
 }
 
-function bufferToInt(buffer, start) {
-  return (buffer[start] << 24) | (buffer[start + 1] << 16) |
-    (buffer[start + 2] << 8) | buffer[start + 3];
-}
-
-function intToBuffer(buffer, start, value) {
-  buffer[start]     = (value & 0xff000000) >> 24;
-  buffer[start + 1] = (value & 0x00ff0000) >> 16;
-  buffer[start + 2] = (value & 0x0000ff00) >> 8;
-  buffer[start + 3] = (value & 0x000000ff);
-}
-
 RTPPacket.prototype.getTimestamp = function () {
-  return bufferToInt(this.buffer, 4);
+  return this.buffer.readUInt32BE(4);
 }
 
 RTPPacket.prototype.setTimestamp = function (t) {
   if (typeof t !== 'number' || t < 0 || t > 0xffffffff)
     return new Error('Timestamp must be a 32-bit unsigned integer.');
   t = t|0;
-  intToBuffer(this.buffer, 4, t);
+  this.buffer.writeUInt32BE(t, 4);
   return t;
 }
 
 RTPPacket.prototype.getSyncSourceID = function () {
-  return bufferToInt(this.buffer, 8);
+  return this.buffer.readUInt32BE(8);
 }
 
 RTPPacket.prototype.setSyncSourceID = function (s) {
   if (typeof s !== 'number' || s < 0 || s > 0xffffffff)
     return new Error('Synchronization source identifiers must be 32-bit unsigned integers.');
   s = s|0;
-  intToBuffer(this.buffer, 8, s);
+  this.buffer.writeUInt32BE(s, 8);
   return s;
 }
 
 RTPPacket.prototype.getContributionSourceIDs = function () {
   var a = [];
   for ( var x = 0 ; x < this.getCSRCCount() ; x++ )
-    a.push(bufferToInt(this.buffer, 12 + (x * 4)));
+    a.push(this.buffer.readUInt32BE(12 + (x * 4)));
   return a;
 }
 
@@ -202,7 +190,7 @@ RTPPacket.prototype.setContributionSourceIDs = function (c) {
   c = c.map(function (x) { return x|0; });
   this.setCSRCCount(c.length);
   for ( var x = 0 ; x < c.length ; x++)
-    intToBuffer(this.buffer, 12 + x * 4, c[x]);
+    this.buffer.writeUInt32BE(c[x], 12 + x * 4);
   return c;
 }
 
@@ -210,10 +198,8 @@ RTPPacket.prototype.setContributionSourceIDs = function (c) {
 RTPPacket.prototype.getExtensions = function () {
   if (!this.getExtension()) return undefined;
   var extensionBase = 12 + this.getCSRCCount() * 4;
-  var profile = (this.buffer[extensionBase] << 8) |
-    this.buffer[extensionBase + 1];
-  var length = (this.buffer[extensionBase + 2] << 8) |
-    this.buffer[extensionBase + 3];
+  var profile = this.buffer.readUInt16BE(extensionBase);
+  var length  = this.buffer.readUInt16BE(extensionBase + 2);
   var extensionEnd = extensionBase + 4 + 4 * length;
   if (!profile === 0xbede)
     return {
@@ -237,11 +223,6 @@ RTPPacket.prototype.getExtensions = function () {
   return e;
 }
 
-function shortToBuffer (buffer, start, short) {
-  buffer[start]     = (short & 0xff00) >> 8;
-  buffer[start + 1] = (short & 0x00ff);
-}
-
 RTPPacket.prototype.setExtensions = function (x) {
   if (!x || typeof x !== 'object' )
     return new Error('Extensions can only be set using an object.');
@@ -258,8 +239,8 @@ RTPPacket.prototype.setExtensions = function (x) {
         x.length > 0 && x.length <= x.extensionData.length) ? x.length : x.extensionData.length;
     length = (length <= 65535) ? length : 65535;
     length = (length >= 0) ? length : 0;
-    shortToBuffer(this.buffer, extensionBase, x.profile);
-    shortToBuffer(this.buffer, extensionBase + 2, length);
+    this.buffer.writeUInt16BE(x.profile, extensionBase);
+    this.buffer.writeUInt16BE(length, extensionBase + 2);
     e.extensionData.copy(this.buffer, extensionBase, 0, length);
     this.setExtension(true);
     return x;
@@ -279,8 +260,8 @@ RTPPacket.prototype.setExtensions = function (x) {
       }
     });
     while ((position - extensionBase) % 4 !== 0) { this.buffer[poisiton++] = 0; }
-    shortToBuffer(this.buffer, extensionBase, x.profile);
-    shortToBuffer(this.buffer, extensionBase + 2, (position - extensionBase - 4) / 4);
+    this.buffer.writeUInt16BE(x.profile, extensionBase);
+    this.buffer.writeUInt16BE((position - extensionBase - 4) / 4, extensionBase + 2);
     this.setExtension(true);
     return x;
   }
@@ -291,8 +272,7 @@ RTPPacket.prototype.getPayloadStart = function() {
     return 12 + this.getCSRCCount() * 4;
   } else {
     var extensionBase = 12 + this.getCSRCCount() * 4
-    var length = (this.buffer[extensionBase + 2] << 8) |
-      this.buffer[extensionBase + 3];
+    var length = this.buffer.readUInt16BE(extensionBase + 2);
     return extensionBase + 4 + 4 * length;
   }
 }
@@ -305,6 +285,24 @@ RTPPacket.prototype.setPayload = function (p) {
   if (!p || !Buffer.isBuffer(p))
     return new Error('Cannot set the payload with anything other than a Buffer.');
   return p.copy(this.buffer, this.getPayloadStart());
+}
+
+RTPPacket.prototype.shrinkPayload = function (b) {
+  function byteToHex (x) {
+    var s = x.toString(16); return (s.length == 1) ? '0' + s : s; }
+  var shrunk = "<Buffer ";
+  var firstTen = b.slice(0, 10);
+  for ( var x = 0 ; x < firstTen.length ; x++ )
+    shrunk += byteToHex(firstTen[x]) + ' ';
+  shrunk += "... " + b.length + " bytes";
+  if (b.length > 10) {
+    shrunk += " ...";
+    var lastTen = b.slice((b.length < 20) ? 10 - b.length : -10);
+    for ( var x = 0 ; x < lastTen.length ; x++ )
+      shrunk += ' ' + byteToHex(lastTen[x]);
+  }
+  shrunk += '>';
+  return shrunk;
 }
 
 RTPPacket.prototype.toJSON = function () {
@@ -320,8 +318,8 @@ RTPPacket.prototype.toJSON = function () {
     syncSourceID : this.getSyncSourceID(),
     contributionSourceIDs : this.getContributionSourceIDs(),
     extensions : this.getExtensions(),
-    payload : this.getPayload()
-  }
+    payload : this.shrinkPayload(this.getPayload())
+  };
 }
 
 module.exports = RTPPacket;
