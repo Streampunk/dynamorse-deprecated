@@ -13,28 +13,13 @@
   limitations under the License.
 */
 
+var Format = require('../util/Format.js');
+
 /**
  * Dump a stream of [buffers]{@link Buffer} to the console.
  * @module bufferDump
  */
 
-function shrinkPayload (b) {
-  function byteToHex (x) {
-    var s = x.toString(16); return (s.length == 1) ? '0' + s : s; }
-  var shrunk = "<Buffer ";
-  var firstTen = b.slice(0, 10);
-  for ( var x = 0 ; x < firstTen.length ; x++ )
-    shrunk += byteToHex(firstTen[x]) + ' ';
-  shrunk += "... " + b.length + " bytes";
-  if (b.length > 10) {
-    shrunk += " ...";
-    var lastTen = b.slice((b.length < 15) ? 5 - b.length : -5);
-    for ( var x = 0 ; x < lastTen.length ; x++ )
-      shrunk += ' ' + byteToHex(lastTen[x]);
-  }
-  shrunk += '>';
-  return shrunk;
-}
 
 /**
  * Returns a counting highland stream buffer callback.
@@ -44,7 +29,7 @@ function shrinkPayload (b) {
 var bufferDump = module.exports = function () {
   var count = 0;
   function logNext(b) {
-    console.log(count, shrinkPayload(b));
+    console.log(count, Format.shrinkPayload(b));
     count++;
   }
   return logNext;

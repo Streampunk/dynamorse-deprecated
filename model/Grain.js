@@ -20,15 +20,26 @@ var Timecode = require('./Timecode.js');
 function Grain(buffers, ptpSync, ptpOrigin, timecode, flow_id,
     source_id, duration) {
 
-  this.buffers = buffers;
+  this.buffers = this.checkBuffers(buffers);
   this.ptpSync = this.checkTimestamp(ptpSync);
   this.ptpOrigin = this.checkTimestamp(ptpOrigin);
   this.timecode = this.checkTimecode(timecode);
   this.flow_id = this.uuidToBuffer(flow_id);
   this.source_id = this.uuidToBuffer(source_id);
-  this.duration = duration;
+  this.duration = this.checkDuration(duration);
   return this;
   //return immutable(this, { prototype : Grain.prototype });
+}
+
+Grain.prototype.checkBuffers = function (b) {
+  if (b === null || b === undefined) return [];
+  if (Buffer.isBuffer(b))
+    return [b];
+  if (Array.isArray(b)) {
+    b = b.filter(function (x) { return Buffer.isBuffer(x); });
+    return b;
+  }
+  return undefined;
 }
 
 Grain.prototype.uuidToBuffer = function (id) {
@@ -107,6 +118,27 @@ Grain.prototype.checkTimecode = function (t) {
 Grain.prototype.formatTimecode = function (t) {
   if (t === null || t === undefined) return undefined;
   return new Timecode(t).toString();
+}
+
+Grain.prototype.checkDuration = function (d) {
+  if (d === null || d === undefined) return undefined;
+  if (Buffer.isBuffer(d)) {
+    if (d.length < 8) {
+      d = Buffer.concat([new Buffer(8-t.length).fill(0), d], 8);
+    }
+    d = d.slice(-8);
+    if (d.readUInt32BE(0) === 0) d[3] = 0x01;
+    return d;
+  }
+  if (typeof d === 'string') {
+    var m = d.match(/^([0-9]+)\/([1-9][0-9]*)$/);
+    if (m === null) return undefined;
+    var b = new Buffer(8);
+    b.writeUInt32BE(+m[1], 4);
+    b.writeUInt32BE(+m[2], 0);
+    return b;
+  }
+  return undefined;
 }
 
 Grain.prototype.formatDuration = function (d) {
