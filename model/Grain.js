@@ -142,11 +142,13 @@ Grain.prototype.checkDuration = function (d) {
 }
 
 Grain.prototype.formatDuration = function (d) {
+  if (d === undefined || d === null) return undefined;
   return d.readUInt32BE(4) + '/' + d.readUInt32BE(0);
 }
 
 Grain.prototype.toJSON = function () {
   return {
+    payloadCount : Array.isArray(this.buffers) ? this.buffers.length : 0,
     ptpSyncTimestamp : this.formatTimestamp(this.ptpSync),
     ptpOriginTimestamp : this.formatTimestamp(this.ptpOrigin),
     timecode : this.formatTimecode(this.timecode),

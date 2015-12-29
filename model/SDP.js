@@ -166,4 +166,23 @@ SDP.prototype.toString = function () {
   return sdp;
 }
 
+SDP.prototype.getEncodingName = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.rtpmap)) {
+    var m = this.m[i].a.rtpmap[0].match(/[0-9]+\s(\w+)\/.*/);
+    if (m === null) {
+      return undefined;
+    } else {
+      return m[1];
+    }
+  }
+  return undefined;
+}
+
+SDP.isSDP = function (x) {
+  return x !== null &&
+    typeof x === 'object' &&
+    x.constructor === SDP.prototype.constructor;
+}
+
 module.exports = SDP;

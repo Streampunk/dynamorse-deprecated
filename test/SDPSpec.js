@@ -42,6 +42,7 @@ test('An audio SDP file is parsed', function (t) {
   t.equal(sdp.getExtMapReverse(0)['urn:ietf:params:rtp-hdrext:smpte-tc'], 2,
     'and does a correct reverse lookup on extmap.');
   t.equal(sdp.toString().trim(), audioSDP, 'and roundtrips.');
+  t.equal(sdp.getEncodingName(0), 'L24', 'retrieves correct encoding name.');
   t.end();
 });
 
@@ -72,5 +73,50 @@ test('A video SDP file is parsed', function(t) {
   t.equal(sdp.getExtMapReverse(0)['urn:x-ipstudio:rtp-hdrext:sync-timestamp'],
     7, 'does a correct reverse lookup on ext map.');
   t.equal(sdp.toString().trim(), videoSDP, 'and roundtrips.');
+  t.equal(sdp.getEncodingName(0), 'raw', 'retrieves correct encoding name.');
+  t.end();
+});
+
+var mixedSDP = `v=0
+o=- 0 0 IN IP4 127.0.0.1
+s=IP Studio AVCI RTP Test Stream
+c=IN IP4 239.255.1.1
+t=0 0
+a=tool:sbrtp_send
+m=video 5004 RTP/AVP 98
+a=rtpmap:98 H264/90000
+a=fmtp:98 profile-level-id=7a1029;packetization-mode=1
+a=ts-refclk:ptp=IEEE1588-2008:39-A7-94-FF-FE-07-CB-D0
+a=mediaclk:direct=1909987554
+a=extmap:2 urn:ietf:params:rtp-hdrext:smpte-tc 3600@90000/25
+a=extmap:7 urn:x-ipstudio:rtp-hdrext:sync-timestamp
+a=extmap:8 urn:x-ipstudio:rtp-hdrext:origin-timestamp
+a=extmap:9 urn:x-ipstudio:rtp-hdrext:flow-id
+a=extmap:10 urn:x-ipstudio:rtp-hdrext:source-id
+a=extmap:11 urn:x-ipstudio:rtp-hdrext:grain-flags
+a=extmap:12 urn:x-ipstudio:rtp-hdrext:grain-duration
+m=audio 5006 RTP/AVP 99
+i=Channels 1-2
+a=rtpmap:99 L16/48000/2
+a=ts-refclk:ptp=IEEE1588-2008:39-A7-94-FF-FE-07-CB-D0
+a=mediaclk:direct=1985293029
+a=extmap:2 urn:ietf:params:rtp-hdrext:smpte-tc 1920@48000/25
+a=extmap:7 urn:x-ipstudio:rtp-hdrext:sync-timestamp
+a=extmap:8 urn:x-ipstudio:rtp-hdrext:origin-timestamp
+a=extmap:9 urn:x-ipstudio:rtp-hdrext:flow-id
+a=extmap:10 urn:x-ipstudio:rtp-hdrext:source-id
+a=extmap:11 urn:x-ipstudio:rtp-hdrext:grain-flags
+a=extmap:12 urn:x-ipstudio:rtp-hdrext:grain-duration`;
+
+test('A mixed SDP file is parsed', function (t) {
+  var sdp = new SDP(mixedSDP);
+  t.deepEqual(sdp.getMediaHeaders(),
+    [ 'video 5004 RTP/AVP 98', 'audio 5006 RTP/AVP 99' ],
+    'has expected media headers.');
+  t.equal(sdp.getExtMapReverse(1)['urn:x-ipstudio:rtp-hdrext:grain-flags'],
+    11, 'does a correct reverse lookup on ext map.');
+  t.equal(sdp.toString().trim(), mixedSDP, 'and roundtrips.');
+  t.equal(sdp.getEncodingName(0), 'H264', 'has expected encoding name for video.');
+  t.equal(sdp.getEncodingName(1), 'L16', 'has expected encoding name for audio.');
   t.end();
 });
