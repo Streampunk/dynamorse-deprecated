@@ -65,6 +65,7 @@ test('An RTP packet with extensions', function (t) {
   testExtValue(2, [0x00, 0x08, 0x04, 0x08, 0x03, 0x05, 0x0a, 0x02]);
   testExtValue(7, [0x00, 0x00, 0x56, 0x40, 0x63, 0xf4, 0x1c, 0x9c, 0x38, 0x00]);
   testExtValue(9, [0x00, 0x00, 0x03, 0xe8, 0x00, 0x00, 0x61, 0xa8]);
+  t.equal(p.isStart(5), true, 'is marked as start.');
   t.end();
 });
 
@@ -83,6 +84,7 @@ test('An RTP packet with no extensions', function (t) {
   t.deepEqual(p.getContributionSourceIDs(), [], 'has no contribution soruce IDs.');
   t.equal(p.getExtensions(), undefined, 'has undefined extensions.');
   t.deepEqual(p.getPayload(), new Buffer([0x9d, 0x74]), 'has the expected payload.');
+  t.equal(p.isStart(5), false, 'is not marked as start.');
   t.end();
 });
 

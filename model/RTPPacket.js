@@ -35,6 +35,7 @@ function RTPPacket (b) {
   if (!Buffer.isBuffer(b))
     return new Error('RTP packet is created from a Javascript Buffer.');
 
+  this.extensions = undefined;
   this.buffer = b;
   return this;
 }
@@ -137,7 +138,7 @@ RTPPacket.prototype.setPayloadType = function(p) {
 }
 
 RTPPacket.prototype.getSequenceNumber = function () {
-  return (this.buffer[2] << 8) | this.buffer[3];
+  return this.buffer.readUInt16BE(2);
 }
 
 RTPPacket.prototype.setSequenceNumber = function (s) {
@@ -196,6 +197,7 @@ RTPPacket.prototype.setContributionSourceIDs = function (c) {
 
 // More extensive parsing of extensions requires SDP information
 RTPPacket.prototype.getExtensions = function () {
+  if (this.extensions !== undefined) return this.extensions;
   if (!this.getExtension()) return undefined;
   var extensionBase = 12 + this.getCSRCCount() * 4;
   var profile = this.buffer.readUInt16BE(extensionBase);
@@ -219,7 +221,7 @@ RTPPacket.prototype.getExtensions = function () {
       position += 1 + len;
     }
   }
-
+  this.extensions = e;
   return e;
 }
 
@@ -265,6 +267,22 @@ RTPPacket.prototype.setExtensions = function (x) {
     this.setExtension(true);
     return x;
   }
+}
+
+RTPPacket.prototype.isStart = function (grain_flags_id) {
+  var e = this.getExtensions();
+  if (typeof e === 'object' && Buffer.isBuffer(e['id' + grain_flags_id])) {
+    return (e['id' + grain_flags_id][0] & 0x80) !== 0;
+  }
+  return false;
+}
+
+RTPPacket.prototype.isEnd = function (grain_flags_id) {
+  var e = this.getExtensions();
+  if (typeof e === 'object' && Buffer.isBuffer(e['id' + grain_flags_id])) {
+    return (e['id' + grain_flags_id][0] & 0x40) !== 0;
+  }
+  return false;
 }
 
 RTPPacket.prototype.getPayloadStart = function() {

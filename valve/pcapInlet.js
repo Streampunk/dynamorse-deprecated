@@ -52,7 +52,7 @@ function pcapInlet(file) {
         // console.log(packetHeader);
         nextLen = packetHeader.readUInt32LE(8);
         packetEnd += (breakInHeader) ? 16 - leftOver.length : 16;
-        if (packetEnd + nextLen < b.length) {
+        if (packetEnd + nextLen <= b.length) {
           push(null, b.slice(packetEnd, packetEnd + nextLen));
           packets++;
           packetEnd += nextLen;
