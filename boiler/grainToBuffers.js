@@ -14,11 +14,14 @@
 */
 
 var H = require('highland');
-var pcap = require('../valve/pcapInlet.js');
-var rtp = require('../pipeline/rtpPacketLine.js');
-var extract = require('../pipeline/extractRTPPayload.js');
-var fileOut = require('../spigot/fileSpigot.js');
 
-var audioSource = '/Volumes/Ormiscraid/media/streampunk/examples/rtp-audio-l24-2chan-wav.pcap';
-
-pcap(audioSource).through(rtp()).through(extract()).pipe(fileOut('out.pcm'));
+module.exports = function () {
+  return H.pipeline(
+    H.map(function (x) {
+      if (Array.isArray(x.buffers)) {
+        return x.buffers; }
+      else {
+        return [];
+      }}),
+    H.sequence());
+}

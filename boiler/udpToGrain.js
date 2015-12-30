@@ -66,7 +66,7 @@ module.exports = function(sdp) {
         }
       } else { // sdp is available
         if (Buffer.isBuffer(x)) {
-          var rtp = new RTP(x.slice(42));
+          var rtp = new RTP(x);
           var nextCounter = (pushLines) ? rtp.getCompleteSequenceNumber() :
             rtp.getSequenceNumber();
           if (rtpCounter !== -2) {
@@ -74,8 +74,14 @@ module.exports = function(sdp) {
               push(new Error('Unexpected sequence number at wrap around.'));
             } else {
               if ((rtpCounter + 1) !== nextCounter) {
-                push(new Error('RTP sequence discontinuity. Expected ' +
-                  (rtpCounter + 1) + ', got ' + nextCounter + '.'));
+                if (pushLines && (nextCounter & 0xffff === 0xffff)) {
+                  // TODO remove this line when BBC bug is fixed
+                  push(new Error('Detected BBC wrap around bug.'));
+                  nextCounter = (rtpCounter & 0xffff0000) | 0xffff
+                } else {
+                  push(new Error('RTP sequence discontinuity. Expected ' +
+                    (rtpCounter + 1) + ', got ' + nextCounter + '.'));
+                }
               }
             }
           }
@@ -83,6 +89,7 @@ module.exports = function(sdp) {
           if (initState) {
             if (rtp.isStart(grain_flags_id)) {
               initState = false;
+              push(null, sdp);
             }
           }
           if (!initState) {

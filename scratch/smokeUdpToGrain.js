@@ -60,7 +60,8 @@ a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`;
 var sdp = new SDP(videoSDP);
 
 var count = 0;
-pcapInlet('d:/media/nmi-examples/rtp-video-rfc4175-1080i50-longer-sequence.pcap')
-  .through(udpToGrain(sdp))
-  .errors(function (e) { console.error(e); })
-  .each(function (x) { console.log(JSON.stringify(x, null, 2)); } );
+var doto = 0;
+pcapInlet('/Volumes/Ormiscraid/media/streampunk/examples/rtp-video-rfc4175-1080i50-sync.pcap')
+  .pipe(udpToGrain(sdp))
+  .errors(function (err, push) { console.error(err); })
+  .each(function (x) { console.log(count++ + ' ' + JSON.stringify(x, null, 2) ); } );

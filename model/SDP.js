@@ -179,6 +179,77 @@ SDP.prototype.getEncodingName = function (i) {
   return undefined;
 }
 
+SDP.prototype.getMedia = function (i) {
+  if (i >= this.m.length) return undefined;
+  var m = this.m[i].m.match(/(\w+)\s.*/)
+  if (m !== null) return m[1];
+  else return undefined;
+}
+
+SDP.prototype.getClockRate = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.rtpmap)) {
+    var m = this.m[i].a.rtpmap[0].match(/[0-9]+\s\w+\/([0-9]+).*/);
+    if (m === null) {
+      return undefined;
+    } else {
+      return +m[1];
+    }
+  }
+  return undefined;
+}
+
+// Returns number of audio channels for audio - needs converting to a number
+SDP.prototype.getEncodingParameters = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.rtpmap)) {
+    var m = this.m[i].a.rtpmap[0].match(/[0-9]+\s\w+\/[0-9]+\/(.*)/);
+    if (m === null) {
+      return undefined;
+    } else {
+      return m[1];
+    }
+  }
+  return undefined;
+
+}
+
+SDP.prototype.getPort = function (i) {
+  if (i >= this.m.length) return undefined;
+  var pm = this.m[i].m.match(/\w+\s([0-9]+)\s.*/);
+  if (pm !== null) return pm[1];
+  else return undefined;
+}
+
+SDP.prototype.getConnectionAddress = function (i) {
+  if (i >= this.m.length) return undefined;
+  var c = (this.m[i].c !== undefined) ? this.m[i].c : this.c;
+  if (c !== undefined) {
+    var cm = this.c.match(/\w+\s\w+\s([0-9\.]+).*/);
+    if (cm !== null) return cm[1];
+    else return undefined;
+  }
+  return undefined;
+}
+
+SDP.prototype.getConnectionTTL = function (i) {
+  if (i >= this.m.length) return undefined;
+  var c = (this.m[i].c !== undefined) ? this.m[i].c : this.c;
+  if (c !== undefined) {
+    var cm = this.c.match(/\w+\s\w+\s[0-9\.]+\/([0-9]+).*/);
+    if (cm !== null) return cm[1];
+    else return undefined;
+  }
+  return undefined;
+}
+
+SDP.prototype.getOriginUnicastAddress = function (i) {
+  if (i >= this.m.length) return undefined;
+  var m = this.o.match(/[^\s]+[0-9]+\s[0-9]+\s\w+\s\w+\s([0-9\.]+).*/);
+  if (m !== null) return m[1];
+  else return undefined;
+}
+
 SDP.isSDP = function (x) {
   return x !== null &&
     typeof x === 'object' &&
