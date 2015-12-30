@@ -37,11 +37,13 @@ module.exports = function(server, sdpOrAddress, port, netif, ttl) {
       if (initState) {
         if (port !== undefined && address !== undefined &&
             typeof port === 'number' && typeof address === 'string') {
+          console.log('About to bind', port);
           server.bind(port, function (err) {
             if (err) { push(err); push(null, H.nil); }
             server.addMembership(address, netif);
             if (typeof ttl === 'number') server.setMulticastTTL(ttl);
             initState = false;
+            console.log('Binding complete. Recalling.' , packetSender);
             packetSender(err, x, push, next);
           });
         } else {
@@ -52,8 +54,8 @@ module.exports = function(server, sdpOrAddress, port, netif, ttl) {
         if (Buffer.isBuffer(x)) {
           server.send(x, 0, x.length, port, address, function (err) {
             if (err) push(err);
-            else push(packetCounter++);
-          })
+            push(null, packetCounter++);
+          });
         }
         next();
       }

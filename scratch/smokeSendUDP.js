@@ -41,10 +41,10 @@ a=extmap:9 urn:x-ipstudio:rtp-hdrext:grain-duration
 a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`
 
 var mcastAddress = '224.1.1.1';
-var netif = '192.168.0.12';
+var netif = '127.0.0.1';
 var port = 8000;
 
-var pcapFile = '/Volumes/Ormiscraid/media/streampunk/examples/rtp-audio-l24-2chan.pcap';
+var pcapFile = '/Volumes/Ormiscraid/media/streampunk/examples/rtp-video-rfc4175-1080i50-sync.pcap';
 
 var server = dgram.createSocket('udp4');
 
@@ -52,8 +52,8 @@ var udpSource = pcapInlet(pcapFile)
   .through(udpSpigot(server, mcastAddress, port, netif))
   .errors(function (e) { console.error(e); });
 
-var udpSync = udpInlet(server, mcastAddress, port, netif)
-  .errors(function (e) { console.error(e); });
+// var udpSync = udpInlet(server, mcastAddress, port, netif)
+//   .errors(function (e) { console.error(e); });
 
-udpSync.each(H.log);
-udpSource.each(H.log);
+// udpSync.each(H.log);
+udpSource.doto(function (x) { if (x % 1000 === 0) console.log(x); }).done(server.close);
