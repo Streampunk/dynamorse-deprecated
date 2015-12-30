@@ -18,7 +18,7 @@ var H = require('highland');
 var SDP = require('../model/SDP');
 
 module.exports = function (client, sdpOrAddress, port, netif) {
-  var sdpStream = (SDP.isSDP(sdpOrAddress)) ? H([sdp]) : H();
+  var sdpStream = (SDP.isSDP(sdpOrAddress)) ? H([sdp]) : H([]);
   var address = sdpOrAddress;
   if (SDP.isSDP(sdpOrAddress)) {
     var sdp = sdpOrAddress;
