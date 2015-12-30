@@ -39,7 +39,7 @@ function pcapInlet(file) {
         packetEnd = 24;
       } else {
         if (!breakInHeader) {
-          push(null, Buffer.concat([leftOver, b], nextLen));
+          push(null, Buffer.concat([leftOver, b], nextLen).slice(42));
           packets++;
           packetEnd = nextLen - leftOver.length;
         }
@@ -53,7 +53,7 @@ function pcapInlet(file) {
         nextLen = packetHeader.readUInt32LE(8);
         packetEnd += (breakInHeader) ? 16 - leftOver.length : 16;
         if (packetEnd + nextLen <= b.length) {
-          push(null, b.slice(packetEnd, packetEnd + nextLen));
+          push(null, b.slice(packetEnd + 42, packetEnd + nextLen));
           packets++;
           packetEnd += nextLen;
           breakInHeader = false;

@@ -146,6 +146,12 @@ Grain.prototype.formatDuration = function (d) {
   return d.readUInt32BE(4) + '/' + d.readUInt32BE(0);
 }
 
+Grain.isSDP = function (x) {
+  return x !== null &&
+    typeof x === 'object' &&
+    x.constructor === Grain.prototype.constructor;
+}
+
 Grain.prototype.toJSON = function () {
   return {
     payloadCount : Array.isArray(this.buffers) ? this.buffers.length : 0,
