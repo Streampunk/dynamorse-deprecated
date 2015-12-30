@@ -55,5 +55,6 @@ var server = dgram.createSocket('udp4');
 var udpSync = udpInlet(server, mcastAddress, port, netif)
   .errors(function (e) { console.error(e); });
 
-udpSync.each(H.log);
+var count = 0;
+udpSync.each(function () { console.log(count++); });
 // udpSource.each(H.log);
