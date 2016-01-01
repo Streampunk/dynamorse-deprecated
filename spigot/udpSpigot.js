@@ -40,10 +40,13 @@ module.exports = function(server, sdpOrAddress, port, netif, ttl) {
           console.log('About to bind', port);
           server.bind(port, function (err) {
             if (err) { push(err); push(null, H.nil); }
-            server.addMembership(address, netif);
+            server.setBroadcast(true);
+            server.addMembership(address, netif, function (err) {
+              console.log(err);
+            });
             if (typeof ttl === 'number') server.setMulticastTTL(ttl);
             initState = false;
-            console.log('Binding complete. Recalling.' , packetSender);
+            console.log('Binding complete. Recalling.');
             packetSender(err, x, push, next);
           });
         } else {

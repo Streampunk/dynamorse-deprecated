@@ -41,7 +41,7 @@ a=extmap:9 urn:x-ipstudio:rtp-hdrext:grain-duration
 a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`
 
 var mcastAddress = '224.1.1.1';
-var netif = '127.0.0.1';
+var netif = '169.254.242.232';
 var port = 8000;
 
 var pcapFile = '/Volumes/Ormiscraid/media/streampunk/examples/rtp-video-rfc4175-1080i50-sync.pcap';
