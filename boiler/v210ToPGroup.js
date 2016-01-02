@@ -89,3 +89,19 @@ function valuesToV210(c, b) {
   b[14] = (c[10] >> 6) | (c[11] & 0x000f) << 4;
   b[15] = c[11] >> 4;
 }
+
+var v = new Buffer(16)
+var p = new Buffer(15)
+
+var c = new Uint16Array(12)
+
+function one() {
+  for ( var i = 0 ; i < 460800 ; i++ ) {
+    v210ToValues(v, c);
+    valuesToPGroup(c, p);
+  }
+}
+
+var d = Date.now();
+for ( var x = 0 ; x < 250 ; x++ ) { one() };
+console.log(Date.now() - d);
