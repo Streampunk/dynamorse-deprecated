@@ -1,0 +1,1 @@
+ffmpeg -f image2pipe -s 1920x1080 -vcodec v210 -frame_size 5529600 -i /Volumes/Ormiscraid/media/streampunk/recordings/fire60.v210.yuv -r 25 -c:v libx264 -b:v 5000k /Volumes/Ormiscraid/media/streampunk/recordings/fire60.mp4
