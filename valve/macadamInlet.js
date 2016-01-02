@@ -17,7 +17,7 @@
 var macadam = require('../../macadam');
 var H = require('highland');
 
-module.exports = function (deviceIndex, displayMode, pixelFormat) {
+module.exports = function (deviceIndex, displayMode, pixelFormat, stopper) {
   var c = new macadam.Capture(deviceIndex, displayMode, pixelFormat);
   var frameStream = H('frame', c);
   var errorStream = H('error', c);
@@ -25,6 +25,7 @@ module.exports = function (deviceIndex, displayMode, pixelFormat) {
     console.log('Stopping macadam capture.');
     if (c.listenType('frame') === 0) c.stop();
   });
+  stopper(c.stop.bind(c));
   c.start();
   return H.merge([errorStream, frameStream]);
 }

@@ -17,12 +17,15 @@ var macIn = require('../valve/macadamInlet.js');
 var macadam = require('../../macadam')
 var fs = require('fs');
 var count = 0;
-var ws = fs.createWriteStream('/Volumes/Ormiscraid/media/streampunk/recordings/fire60.v210');
-macIn(0, macadam.bmdModeHD1080i50, macadam.bmdFormat10BitYUV)
-  .take(25*60)
-  .each( function (x) {
+var ws = fs.createWriteStream('/Volumes/Ormiscraid/media/streampunk/recordings/fire100f.v210.yuv');
+var stopper = null;
+var w = macIn(0, macadam.bmdModeHD1080i50, macadam.bmdFormat10BitYUV, function (s) { stopper = s; })
+  .take(100)
+  .doto( function (x) {
     ws.write(x, function (err) {
+      if (err) throw err;
       console.log('Written', count++);
-      if (count === 25*60) ws.end(function () { console.log('Closed.'); });
     });
-  });
+  })
+  .errors(function (e) { console.log(e); })
+  .done(function () { stopper(); ws.close() });
