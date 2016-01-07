@@ -91,9 +91,15 @@ Grain.prototype.checkTimestamp = function (t) {
 var nineZeros = '000000000';
 
 Grain.prototype.formatTimestamp = function (t) {
-  if (t === null || t === undefined) return undefined
+  if (t === null || t === undefined) return undefined;
   var nanos = t.readUInt32BE(6).toString();
   return t.readUIntBE(0, 6) + ':' + nineZeros.slice(nanos.length) + nanos;
+}
+
+Grain.prototype.originAtRate = function (rate) {
+  var nanos = this.ptpOrigin.readUInt32BE(6);
+  var secs = this.ptpOrigin.readUIntBE(0, 6);
+  return Math.floor((secs * rate) + (nanos / (1000000000 / rate))); 
 }
 
 Grain.prototype.checkTimecode = function (t) {
@@ -146,7 +152,7 @@ Grain.prototype.formatDuration = function (d) {
   return d.readUInt32BE(4) + '/' + d.readUInt32BE(0);
 }
 
-Grain.isSDP = function (x) {
+Grain.isGrain = function (x) {
   return x !== null &&
     typeof x === 'object' &&
     x.constructor === Grain.prototype.constructor;

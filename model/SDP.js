@@ -24,7 +24,7 @@ var moreThanOne = {
 /**
  * Represents an SDP file defined according to RFC4566.
  * @constructor
- * @param [(string|Buffer)] sdp SDP data..
+ * @param [(string|Buffer)] sdp SDP data.
  */
 function SDP(sdp) {
   if (sdp == null || sdp == undefined) return {};
@@ -217,7 +217,14 @@ SDP.prototype.getEncodingParameters = function (i) {
 SDP.prototype.getPort = function (i) {
   if (i >= this.m.length) return undefined;
   var pm = this.m[i].m.match(/\w+\s([0-9]+)\s.*/);
-  if (pm !== null) return pm[1];
+  if (pm !== null) return +pm[1];
+  else return undefined;
+}
+
+SDP.prototype.getPayloadType = function (i) {
+  if (i >= this.m.length) return undefined;
+  var pm = this.m[i].m.match(/\w+\s[0-9]+\s[^\s]+\s([0-9]+)/);
+  if (pm !== null) return +pm[1];
   else return undefined;
 }
 
@@ -248,6 +255,15 @@ SDP.prototype.getOriginUnicastAddress = function (i) {
   var m = this.o.match(/[^\s]+[0-9]+\s[0-9]+\s\w+\s\w+\s([0-9\.]+).*/);
   if (m !== null) return m[1];
   else return undefined;
+}
+
+SDP.prototype.getClockOffset = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.mediaclk)) {
+    var om = this.m[i].a.mediaclk[0].match(/direct=([0-9]*).*/)
+    if (om !== null) return +om[1];
+  }
+  return undefined;
 }
 
 SDP.isSDP = function (x) {

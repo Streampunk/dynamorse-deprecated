@@ -133,7 +133,7 @@ RTPPacket.prototype.setPayloadType = function(p) {
   if (typeof p !== 'number' || p < 0 || p > 127)
     return new Error('Payload type must be a number between 0 and 127.');
   p = p|0;
-  this.buffer[1] = (this.buffer[1] & 0x7f) | p;
+  this.buffer[1] = (this.buffer[1] & 0x80) | p;
   return p;
 }
 
