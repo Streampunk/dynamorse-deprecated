@@ -120,6 +120,7 @@ module.exports = function (sdp, seq) {
               packet.setPayload(b.slice(o, o + t));
               o += t;
               push(null, packet);
+              // FIXME: probably won't work for compressed video
               tsAdjust = t / stride;
               packet = makePacket();
               remaining = 1432; // Slightly short so last header fits
@@ -135,7 +136,12 @@ module.exports = function (sdp, seq) {
         var endExt = { profile : 0xbede };
         endExt[lookup.grain_flags] = 0x40;
         packet.setExtensions(endExt);
-        packet.setPayload(b);
+        if (is4175) {
+          packet.setMarker(true);
+          // TODO
+        } else {
+          packet.setPayload(b);
+        }
         push(null, packet);
       }
       next();
