@@ -243,13 +243,13 @@ RTPPacket.prototype.setExtensions = function (x) {
     length = (length >= 0) ? length : 0;
     this.buffer.writeUInt16BE(x.profile, extensionBase);
     this.buffer.writeUInt16BE(length, extensionBase + 2);
-    e.extensionData.copy(this.buffer, extensionBase, 0, length);
+    x.extensionData.copy(this.buffer, extensionBase, 0, length);
     this.setExtension(true);
     return x;
   } else {
     var position = extensionBase + 4;
     Object.keys(x).forEach(function (k) {
-      var id = k.match(/id([1-9][1-4]?)/)
+      var id = k.match(/id([1-9][1-4]?)/);
       if (id) {
         id = +id[1];
         var buf = x[id];
@@ -302,7 +302,12 @@ RTPPacket.prototype.getPayload = function () {
 RTPPacket.prototype.setPayload = function (p) {
   if (!p || !Buffer.isBuffer(p))
     return new Error('Cannot set the payload with anything other than a Buffer.');
-  return p.copy(this.buffer, this.getPayloadStart());
+  var start = this.getPayloadStart();
+  var copied = p.copy(this.buffer, start);
+  if (this.buffer.length > start + copied) {
+    this.buffer = this.buffer.slice(0, start + copied);
+  }
+  return copied;
 }
 
 RTPPacket.prototype.shrinkPayload = Format.shrinkPayload;
