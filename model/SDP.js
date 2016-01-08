@@ -266,6 +266,35 @@ SDP.prototype.getClockOffset = function (i) {
   return undefined;
 }
 
+/**
+ * Calculates the number of bytes in an atomic unit of a grain to ensure that
+ * it fits within the sub-structure of the RTP packet. For audio, this is the
+ * per sample byte count for all samples, e.g. 6 bytes for 24-bit 2 channel
+ * audio. For video, this is the number of bytes per row.
+ * @param  {Number} i Index of the media item.
+ * @return {Number}   Stride bytes for the media.
+ */
+SDP.prototype.getStride = function (i) {
+  if (i >= this.m.length) return 1;
+  var media = this.m[i];
+  if (media.a.rtpmap[0].indexOf('raw') >= 0) {
+    // a=fmtp:96 sampling=YCbCr-4:2:2; width=1920; height=1080; depth=10; colorimetry=BT709-2
+    var fmtp = media.a.fmtp[0];
+    var wm = fmtp.match(/.*width=([0-9]+).*/)
+    var width = (wm) ? +wm[1] : 1920;
+    var dm = fmtp.match(/.*depth=([0-9]+).*/)
+    var depth = (dm) ? +dm[1] : 8;
+    var spp = (fmtp.indexOf('4:4:4') >= 0) ? 3 :
+      ((fmtp.indexOf('4:2:2') >= 0) ? 2 : 1.5);
+    return Math.ceil(width * spp * (depth / 8));
+  } else if (media.m.indexOf('audio')) {
+    var sm = media.a.rtpmap[0].match(/[0-9]+\sL([0-9]+)\/[0-9]+\/([0-9]+).*/);
+    return (+sm[1] / 8) * +sm[2];
+  } else {
+    return 1;
+  }
+}
+
 SDP.isSDP = function (x) {
   return x !== null &&
     typeof x === 'object' &&

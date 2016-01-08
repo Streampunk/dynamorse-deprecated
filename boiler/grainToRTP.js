@@ -16,15 +16,41 @@
 var RTPPacket = require('../model/RTPPacket.js');
 var RFC4175Packet = require('../model/RFC4175Packet.js');
 var SDP = require('../model/SDP.js');
-var Grain = require('../model/Grain.js');
+varå Grain = require('../model/Grain.js');
 var H = require('highland');
+
+var defaultExtMap = {
+  'urn:x-ipstudio:rtp-hdrext:origin-timestamp' : 1,
+  'urn:ietf:params:rtp-hdrext:smpte-tc' : 2,
+  'urn:x-ipstudio:rtp-hdrext:flow-id' : 3,
+  'urn:x-ipstudio:rtp-hdrext:source-id' : 4,
+  'urn:x-ipstudio:rtp-hdrext:grain-flags' : 5,
+  'urn:x-ipstudio:rtp-hdrext:sync-timestamp' : 7,
+  'urn:x-ipstudio:rtp-hdrext:grain-duration' : 9
+};
+
+function makeLookup (sdp) {
+  var revMap = (SDP.isSDP()) ? sdp.getExtMapReverse(0) : defaultExtMap;
+  revMap = (revMap) ? revMap : defaultExtMap;
+
+  var lookup = {};
+  Object.keys(revMap).each(function (x) {
+    var m = x.trim().match(/.*:([^\s]+)$/);
+    if (m) {
+      lookup[m[1].replace(/-/g, '_')] = 'id' + revMap[x];
+    }
+  });
+  return lookup;
+}
 
 module.exports = function (sdp, seq) {
   if (!seqStart) seq = Math.floor(Math.random() * 0xffffffff);
   var payloadType = (SDP.isSDP(sdp)) ? sdp.getPayloadType(0) : 0;
   var rtpTsOffset = (SDP.isSDP(sdp)) ? sdp.getClockOffset(0) : 0;
-  var isVideo = (SDP.isSDP(sdp)) ? (sdp.getMedia() === 'video') : false;
+  var is4175 = (SDP.isSDP(sdp)) ? (sdp.getEncodingName(0) === 'raw') : false;
   var clockRate = (SDP.isSDP(sdp)) ? sdp.getClockRate() : 48000;
+  var stride = (SDP.isSDP(sdp)) ? sdp.getStride(0) : 1;
+  var lookup = makeLookup(sdp);
   var syncSourceID = Math.floor(Math.random() * 0xffffffff);
   var initState = true;
   var tsAdjust = 0; // Per packet timestamp adjustment - for samples / fields
@@ -40,7 +66,12 @@ module.exports = function (sdp, seq) {
           sdp = x;
           payloadType = sdp.getPayloadType(0);
           rtpTsOffset = sdp.getClockOffset(0);
-          isVideo = (sdp.getMedia() === 'video');
+          is4175 = (sdp.getEncodingName(0) === 'raw');
+          clockRate = x.getClockRate(0)
+          stride = x.getStride(0);
+          lookup = makeLookup(x);
+        } else {
+          push(new Error('Received payload before SDP file. Discarding.'));
         }
       } else if (Grain.isGrain(x)) {
         if (initState) {
@@ -48,7 +79,7 @@ module.exports = function (sdp, seq) {
           initState = false;
         }
         function makePacket() {
-          var packet = (isVideo) ? new RFC4175Packet(new Buffer(1452)) :
+          var packet = (is4175) ? new RFC4175Packet(new Buffer(1452)) :
             new RTPPacket(new Buffer(1452));
           packet.setVersion(2);
           packet.setPadding(false);
@@ -67,13 +98,45 @@ module.exports = function (sdp, seq) {
 
         var packet = makePacket();
         // Add start header extensions
+        var startExt = { profile : 0xbede };
+        startExt[lookup.grain_flags] = 0x80;
+        startExt[lookup.origin_timestamp] = x.ptpOrigin;
+        startExt[lookup.sync_timestamp] = x.ptpSync;
+        startExt[lookup.grain_duration] = x.duration;
+        startExt[lookup.flow_id] = x.flow_id;
+        startExt[lookup.source_id] = s.source_id;
+        startExt[lookup.smpte_id] = s.timecode;
+        packet.setExtension(startExt);
+
         var remaining = 1452 - 12 - 80;
-        packet.setExtension(true);
-        for ( var i = 0 ; i < x.buffers.length ; x++ ) {
-
-
+        var i = 0, o = 0;
+        var b = x.buffers[i];
+        while (i < x.buffers.length) {
+          if (is4175) {
+            // TODO
+          } else {
+            var t = remaining - remaining % stride;
+            if ((b.length - o) >= t) {
+              packet.setPayload(b.slice(o, o + t));
+              o += t;
+              push(null, packet);
+              tsAdjust = t / stride;
+              packet = makePacket();
+              remaining = 1432; // Slightly short so last header fits
+            } else if (++i < x.buffers.length) {
+              b = Buffer.concat([b.slice(o), x.buffers[i]],
+                b.length + x.buffers[i].length - o);
+              o = 0;
+            } else {
+              b = b.slice(o);
+            }
+          }
         }
-        // Add end header extensions and mark for video
+        var endExt = { profile : 0xbede };
+        endExt[lookup.grain_flags] = 0x40;
+        packet.setExtensions(endExt);
+        packet.setPayload(b);
+        push(null, packet);
       }
       next();
     }
