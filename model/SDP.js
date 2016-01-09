@@ -270,14 +270,15 @@ SDP.prototype.getClockOffset = function (i) {
  * Calculates the number of bytes in an atomic unit of a grain to ensure that
  * it fits within the sub-structure of the RTP packet. For audio, this is the
  * per sample byte count for all samples, e.g. 6 bytes for 24-bit 2 channel
- * audio. For video, this is the number of bytes per row.
+ * audio. For video, this is the number of bytes per pixel, which may be a
+ * decimal value.
  * @param  {Number} i Index of the media item.
  * @return {Number}   Stride bytes for the media.
  */
 SDP.prototype.getStride = function (i) {
   if (i >= this.m.length) return 1;
   var media = this.m[i];
-  if (media.a.rtpmap[0].indexOf('raw') >= 0) {
+  if (media.a.rtpmap[0].indexOf('raw') >= 0 && Array.isArray(media.a.fmtp)) {
     // a=fmtp:96 sampling=YCbCr-4:2:2; width=1920; height=1080; depth=10; colorimetry=BT709-2
     var fmtp = media.a.fmtp[0];
     var wm = fmtp.match(/.*width=([0-9]+).*/)
@@ -286,13 +287,31 @@ SDP.prototype.getStride = function (i) {
     var depth = (dm) ? +dm[1] : 8;
     var spp = (fmtp.indexOf('4:4:4') >= 0) ? 3 :
       ((fmtp.indexOf('4:2:2') >= 0) ? 2 : 1.5);
-    return Math.ceil(width * spp * (depth / 8));
+    return Math.ceil(spp * (depth / 8));
   } else if (media.m.indexOf('audio')) {
     var sm = media.a.rtpmap[0].match(/[0-9]+\sL([0-9]+)\/[0-9]+\/([0-9]+).*/);
     return (+sm[1] / 8) * +sm[2];
   } else {
     return 1;
   }
+}
+
+SDP.prototype.getWidth = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.fmtp)) {
+    var wm = this.m[i].a.fmtp[0].match(/.*width=([0-9]+).*/);
+    if (wm) return +wm[1];
+  }
+  return undefined;
+}
+
+SDP.prototype.getHeight = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.fmtp)) {
+    var hm = this.m[i].a.fmtp[0].match(/.*height=([0-9]+).*/);
+    if (hm) return +hm[1];
+  }
+  return undefined;
 }
 
 SDP.isSDP = function (x) {
