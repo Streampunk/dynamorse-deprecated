@@ -29,6 +29,15 @@ var defaultExtMap = {
   'urn:x-ipstudio:rtp-hdrext:grain-duration' : 9
 };
 
+var fieldMap = {
+  '576i'  : { field1Start : 23, field1End : 310, field2Start : 336, field2End : 623 },
+  '720p'  : { field1Start : 26, field1End : 745 },
+  '1080i' : { field1Start : 21, field1End : 560, field2Start : 384, field2End : 1123 },
+  '1080p' : { field1Start : 42, field1End : 1121 },
+  '2160p' : { field1Start : 0, field1End : 2159 },
+  '4320p' : { field1Start : 0, field1End : 4319 }
+}
+
 function makeLookup (sdp) {
   var revMap = (SDP.isSDP()) ? sdp.getExtMapReverse(0) : defaultExtMap;
   revMap = (revMap) ? revMap : defaultExtMap;
@@ -48,6 +57,7 @@ module.exports = function (sdp, seq) {
   var payloadType = (SDP.isSDP(sdp)) ? sdp.getPayloadType(0) : 0;
   var rtpTsOffset = (SDP.isSDP(sdp)) ? sdp.getClockOffset(0) : 0;
   var is4175 = (SDP.isSDP(sdp)) ? (sdp.getEncodingName(0) === 'raw') : false;
+  var width = (SDP.isSDP(sdp)) ? sdp.getWidth(0) : undefined;
   var clockRate = (SDP.isSDP(sdp)) ? sdp.getClockRate() : 48000;
   var stride = (SDP.isSDP(sdp)) ? sdp.getStride(0) : 1;
   var lookup = makeLookup(sdp);
@@ -67,8 +77,9 @@ module.exports = function (sdp, seq) {
           payloadType = sdp.getPayloadType(0);
           rtpTsOffset = sdp.getClockOffset(0);
           is4175 = (sdp.getEncodingName(0) === 'raw');
-          clockRate = x.getClockRate(0)
-          stride = x.getStride(0);
+          width = sdp.getWidth(0);
+          clockRate = sdp.getClockRate(0)
+          stride = sdp.getStride(0);
           lookup = makeLookup(x);
         } else {
           push(new Error('Received payload before SDP file. Discarding.'));
@@ -78,6 +89,11 @@ module.exports = function (sdp, seq) {
           push(null, sdp);
           initState = false;
         }
+        var lineStatus = (is4175) ? {
+          width: width, stride: stride, lineNo: 21,
+          bytesPerLine: width * stride, linePos: 0,
+          fieldBreaks: fieldMap[height + 'i'], field : 1 // TODO determine i vs p
+        } : undefined;
         function makePacket() {
           var packet = (is4175) ? new RFC4175Packet(new Buffer(1452)) :
             new RTPPacket(new Buffer(1452));
@@ -93,6 +109,12 @@ module.exports = function (sdp, seq) {
           // Not updating audio timestamps as per pcaps
           packet.setTimestamp((x.originAtRate(clockRate) + rtpTsOffset + tsAdjust) >>> 0);
           packet.setSyncSourceID(syncSourceID);
+          if (is4175) {
+            lineStatus = packet.setLineData(lineStatus);
+            if (lineStatus.field == 2) {
+              tsAdjust = 1800; // TODO Find a frame rate adjust
+            }
+          }
           return packet;
         }
 
@@ -108,29 +130,25 @@ module.exports = function (sdp, seq) {
         startExt[lookup.smpte_id] = s.timecode;
         packet.setExtension(startExt);
 
-        var remaining = 1452 - 12 - 80;
+        var remaining = 1200;
         var i = 0, o = 0;
         var b = x.buffers[i];
         while (i < x.buffers.length) {
-          if (is4175) {
-            // TODO
+          var t = remaining - remaining % stride;
+          if ((b.length - o) >= t) {
+            packet.setPayload(b.slice(o, o + t));
+            o += t;
+            push(null, packet);
+            // FIXME: probably won't work for compressed video
+            if (!is4175) tsAdjust += t / stride;
+            packet = makePacket();
+            remaining = 1410; // Slightly short so last header fits
+          } else if (++i < x.buffers.length) {
+            b = Buffer.concat([b.slice(o), x.buffers[i]],
+              b.length + x.buffers[i].length - o);
+            o = 0;
           } else {
-            var t = remaining - remaining % stride;
-            if ((b.length - o) >= t) {
-              packet.setPayload(b.slice(o, o + t));
-              o += t;
-              push(null, packet);
-              // FIXME: probably won't work for compressed video
-              tsAdjust = t / stride;
-              packet = makePacket();
-              remaining = 1432; // Slightly short so last header fits
-            } else if (++i < x.buffers.length) {
-              b = Buffer.concat([b.slice(o), x.buffers[i]],
-                b.length + x.buffers[i].length - o);
-              o = 0;
-            } else {
-              b = b.slice(o);
-            }
+            b = b.slice(o);
           }
         }
         var endExt = { profile : 0xbede };
