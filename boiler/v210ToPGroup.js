@@ -93,7 +93,7 @@ function valuesToV210(c, b) {
 var v = new Buffer(16)
 var p = new Buffer(15)
 
-var c = new Uint16Array(12)
+var c = new Uint8Array(12)
 
 function one() {
   for ( var i = 0 ; i < 460800 ; i++ ) {
