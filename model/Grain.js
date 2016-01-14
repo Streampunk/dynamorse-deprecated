@@ -149,7 +149,7 @@ Grain.prototype.checkDuration = function (d) {
 
 Grain.prototype.formatDuration = function (d) {
   if (d === undefined || d === null) return undefined;
-  return d.readUInt32BE(0) + '/' + d.readUInt32BE(4);
+  return d.readUInt32BE(4) + '/' + d.readUInt32BE(0);
 }
 
 Grain.isGrain = function (x) {
