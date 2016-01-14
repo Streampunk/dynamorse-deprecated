@@ -99,7 +99,7 @@ Grain.prototype.formatTimestamp = function (t) {
 Grain.prototype.originAtRate = function (rate) {
   var nanos = this.ptpOrigin.readUInt32BE(6);
   var secs = this.ptpOrigin.readUIntBE(0, 6);
-  return Math.floor((secs * rate) + (nanos / (1000000000 / rate))); 
+  return Math.floor((secs * rate) + (nanos / (1000000000 / rate)));
 }
 
 Grain.prototype.checkTimecode = function (t) {
