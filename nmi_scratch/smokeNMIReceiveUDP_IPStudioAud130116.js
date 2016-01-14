@@ -57,5 +57,5 @@ var udpSync = udpInlet(server, mcastAddress, port, netif)
   .errors(function (e) { console.error(e); });
 
 var count = 0;
-udpSync.each(function () { count++; if (count % 100 == 0) console.log(Date.now(), count); });
+udpSync.each(function (x) { console.log(JSON.stringify(x)); });
 // udpSource.each(H.log);

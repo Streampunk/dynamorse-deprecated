@@ -60,8 +60,8 @@ a=extmap:7 urn:x-ipstudio:rtp-hdrext:sync-timestamp
 a=extmap:9 urn:x-ipstudio:rtp-hdrext:grain-duration
 a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-51-83`;
 
-var sdp = new SDP(audioSDP);
-var mcastAddress = '232.113.33.205';
+var sdp = new SDP(videoSDP);
+var mcastAddress = '232.26.187.26';
 var netif = '192.168.15.140';
 var port = 5000;
 

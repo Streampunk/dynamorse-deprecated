@@ -69,6 +69,7 @@ module.exports = function(sdp) {
           var rtp = new RTP(x);
           var nextCounter = (pushLines) ? rtp.getCompleteSequenceNumber() :
             rtp.getSequenceNumber();
+	  // console.log(pushLines, nextCounter);
           if (rtpCounter !== -2) {
             if (nextCounter === 0 && rtpCounter != (pushLines ? 0xffffffff : 0xffff)) {
               push(new Error('Unexpected sequence number at wrap around.'));
@@ -120,7 +121,8 @@ module.exports = function(sdp) {
             }
           }
         } else {
-          push(new Error('Unknown data type pushed through udp-to-grain.'));
+          console.log(x);
+          // push(new Error('Unknown data type pushed through udp-to-grain.'));
         }
       } // elsr => (sdp !== undefined)
       next();

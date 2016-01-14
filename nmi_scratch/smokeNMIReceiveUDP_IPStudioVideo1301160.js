@@ -18,11 +18,12 @@ var H = require('highland');
 var udpInlet = require('../funnel/udpInlet.js');
 var pcapInlet = require('../funnel/pcapInlet.js');
 var udpSpigot = require('../spout/udpSpigot.js');
+var udpToGrain = require('../valve/udpToGrain.js');
 
 var SDP = require('../model/SDP.js');
 var dgram = require('dgram');
 
-var audioSDP = `v=0
+var videoSDP = `v=0
 o=- 1452527308 1452527308 IN IP4 192.168.15.50
 s=IP Studio Stream
 t=0 0
@@ -45,7 +46,7 @@ var mcastAddress = '232.26.187.26';
 var netif = '192.168.15.140';
 var port = 5000;
 
-var pcapFile = '/Volumes/Ormiscraid/media/streampunk/examples/rtp-audio-l24-2chan.pcap';
+var pcapFile = '/Volumes/clarke/media/test/rtp-video-rfc4175-1080i50-sync.pcap';
 
 var server = dgram.createSocket('udp4');
 
@@ -53,9 +54,12 @@ var server = dgram.createSocket('udp4');
 //   .through(udpSpigot(server, mcastAddress, port, netif))
 //   .errors(function (e) { console.error(e); });
 
-var udpSync = udpInlet(server, mcastAddress, port, netif)
+var sdp = new SDP(videoSDP);
+
+var udpSync = pcapInlet(pcapFile)
+  .pipe(udpToGrain(sdp))
   .errors(function (e) { console.error(e); });
 
 var count = 0;
-udpSync.each(function () { count++; if (count % 100 == 0) console.log(Date.now(), count); });
+udpSync.each(function (x) { console.log(JSON.stringify(x, null, 2)); });
 // udpSource.each(H.log);
