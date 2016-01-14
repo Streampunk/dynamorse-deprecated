@@ -99,7 +99,7 @@ Grain.prototype.formatTimestamp = function (t) {
 Grain.prototype.originAtRate = function (rate) {
   var nanos = this.ptpOrigin.readUInt32BE(6);
   var secs = this.ptpOrigin.readUIntBE(0, 6);
-  return Math.floor((secs * rate) + (nanos / (1000000000 / rate))); 
+  return Math.floor((secs * rate) + (nanos / (1000000000 / rate)));
 }
 
 Grain.prototype.checkTimecode = function (t) {
@@ -149,7 +149,7 @@ Grain.prototype.checkDuration = function (d) {
 
 Grain.prototype.formatDuration = function (d) {
   if (d === undefined || d === null) return undefined;
-  return d.readUInt32BE(4) + '/' + d.readUInt32BE(0);
+  return d.readUInt32BE(0) + '/' + d.readUInt32BE(4);
 }
 
 Grain.isGrain = function (x) {
