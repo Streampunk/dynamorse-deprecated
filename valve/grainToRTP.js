@@ -16,7 +16,7 @@
 var RTPPacket = require('../model/RTPPacket.js');
 var RFC4175Packet = require('../model/RFC4175Packet.js');
 var SDP = require('../model/SDP.js');
-varå Grain = require('../model/Grain.js');
+var Grain = require('../model/Grain.js');
 var H = require('highland');
 
 var defaultExtMap = {
@@ -43,7 +43,7 @@ function makeLookup (sdp) {
   revMap = (revMap) ? revMap : defaultExtMap;
 
   var lookup = {};
-  Object.keys(revMap).each(function (x) {
+  Object.keys(revMap).forEach(function (x) {
     var m = x.trim().match(/.*:([^\s]+)$/);
     if (m) {
       lookup[m[1].replace(/-/g, '_')] = 'id' + revMap[x];
@@ -53,12 +53,12 @@ function makeLookup (sdp) {
 }
 
 module.exports = function (sdp, seq) {
-  if (!seqStart) seq = Math.floor(Math.random() * 0xffffffff);
+  if (!seq) seq = Math.floor(Math.random() * 0xffffffff);
   var payloadType = (SDP.isSDP(sdp)) ? sdp.getPayloadType(0) : 0;
   var rtpTsOffset = (SDP.isSDP(sdp)) ? sdp.getClockOffset(0) : 0;
   var is4175 = (SDP.isSDP(sdp)) ? (sdp.getEncodingName(0) === 'raw') : false;
   var width = (SDP.isSDP(sdp)) ? sdp.getWidth(0) : undefined;
-  var clockRate = (SDP.isSDP(sdp)) ? sdp.getClockRate() : 48000;
+  var clockRate = (SDP.isSDP(sdp)) ? sdp.getClockRate(0) : 48000;
   var stride = (SDP.isSDP(sdp)) ? sdp.getStride(0) : 1;
   var lookup = makeLookup(sdp);
   var syncSourceID = Math.floor(Math.random() * 0xffffffff);
@@ -126,8 +126,8 @@ module.exports = function (sdp, seq) {
         startExt[lookup.sync_timestamp] = x.ptpSync;
         startExt[lookup.grain_duration] = x.duration;
         startExt[lookup.flow_id] = x.flow_id;
-        startExt[lookup.source_id] = s.source_id;
-        startExt[lookup.smpte_id] = s.timecode;
+        startExt[lookup.source_id] = x.source_id;
+        startExt[lookup.smpte_id] = x.timecode;
         packet.setExtension(startExt);
 
         var remaining = 1200;

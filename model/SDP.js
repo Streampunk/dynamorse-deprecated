@@ -232,7 +232,7 @@ SDP.prototype.getConnectionAddress = function (i) {
   if (i >= this.m.length) return undefined;
   var c = (this.m[i].c !== undefined) ? this.m[i].c : this.c;
   if (c !== undefined) {
-    var cm = this.c.match(/\w+\s\w+\s([0-9\.]+).*/);
+    var cm = this.m[i].c.match(/\w+\s\w+\s([0-9\.]+).*/);
     if (cm !== null) return cm[1];
     else return undefined;
   }
@@ -243,7 +243,7 @@ SDP.prototype.getConnectionTTL = function (i) {
   if (i >= this.m.length) return undefined;
   var c = (this.m[i].c !== undefined) ? this.m[i].c : this.c;
   if (c !== undefined) {
-    var cm = this.c.match(/\w+\s\w+\s[0-9\.]+\/([0-9]+).*/);
+    var cm = this.m[i].c.match(/\w+\s\w+\s[0-9\.]+\/([0-9]+).*/);
     if (cm !== null) return cm[1];
     else return undefined;
   }

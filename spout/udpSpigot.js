@@ -38,6 +38,7 @@ module.exports = function(server, sdpOrAddress, port, netif, ttl) {
         if (port !== undefined && address !== undefined &&
             typeof port === 'number' && typeof address === 'string') {
           console.log('About to bind', port);
+          initState = false;
           server.bind(port, function (err) {
             if (err) { push(err); push(null, H.nil); }
             server.setBroadcast(true);
@@ -45,7 +46,6 @@ module.exports = function(server, sdpOrAddress, port, netif, ttl) {
               console.log(err);
             });
             if (typeof ttl === 'number') server.setMulticastTTL(ttl);
-            initState = false;
             console.log('Binding complete. Recalling.');
             packetSender(err, x, push, next);
           });

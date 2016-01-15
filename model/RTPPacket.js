@@ -170,6 +170,7 @@ RTPPacket.prototype.setSyncSourceID = function (s) {
   if (typeof s !== 'number' || s < 0 || s > 0xffffffff)
     return new Error('Synchronization source identifiers must be 32-bit unsigned integers.');
   s = s|0;
+  console.log(this.buffer.length);
   this.buffer.writeUInt32BE(s, 8);
   return s;
 }
