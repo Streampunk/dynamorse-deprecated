@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    RED.nodes.registerType('udp-to-grain',{
+        category: 'valve',
+        color: '#D8BFD8',
+        defaults: {
+            name: {value:""}
+        },
+        inputs:1,
+        outputs:1,
+        icon: "feed.png",
+        label: function() {
+            return this.name||"udp-to-grain";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="udp-to-grain">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="udp-to-grain">
+    <p>Convert a stream of many raw UDP payloads into a sequence of grains,
+    decoding RTP header extensions, RFC3190 and RFC4175 as it goes.</p>
+</script>

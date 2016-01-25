@@ -17,9 +17,13 @@
   },
   "homepage": "https://github.com/Streampunk/dynamorse#readme",
   "dependencies": {
+    "express": "^4.13.4",
     "highland": "^2.5.1",
+    "node-red": "^0.13.1",
+    "ole-doc": "^0.1.1",
     "seamless-immutable": "^4.1.1",
     "tape": "^4.2.2",
-    "uuid": "^2.0.1"
+    "uuid": "^2.0.1",
+    "xml2js": "^0.4.16"
   }
 }

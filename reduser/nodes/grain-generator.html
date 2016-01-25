@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    RED.nodes.registerType('grain-generator',{
+        category: 'funnel',
+        color: '#C0C0C0',
+        defaults: {
+            name: {value:""}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "serial.png",
+        label: function() {
+            return this.name||"grain-generator";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="grain-generator">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="grain-generator">
+    <p>Create a sequence of grain header information, with timing to a given frame
+    rate and identifiers such as <em>flow id</em> and <em>source id</em>.</p>
+</script>

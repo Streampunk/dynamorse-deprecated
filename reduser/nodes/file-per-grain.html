@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    RED.nodes.registerType('file-per-grain',{
+        category: 'funnel',
+        color: '#a6bbcf',
+        defaults: {
+            name: {value:""}
+        },
+        inputs:0,
+        outputs:1,
+        icon: "file.png",
+        label: function() {
+            return this.name||"file-per-grain";
+        }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="file-per-grain">
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+</script>
+
+<script type="text/x-red" data-help-name="file-per-grain">
+    <p>Reads individual files according to a glob pattern, where each file
+    represents the raw essence contained in a single grain.</p>
+</script>
