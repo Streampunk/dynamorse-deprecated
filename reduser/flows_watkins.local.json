@@ -1,1 +1,1 @@
-[{"type":"tab","id":"4704aa19.b8fb54","label":"Flow 1"},{"id":"d1325a5c.2ecda8","type":"inject","z":"4704aa19.b8fb54","name":"","topic":"","payload":"","payloadType":"date","repeat":"","crontab":"","once":false,"x":271.5,"y":278,"wires":[["a3052fb0.5cfad"]]},{"id":"a3052fb0.5cfad","type":"debug","z":"4704aa19.b8fb54","name":"","active":true,"console":"false","complete":"false","x":488.5,"y":302,"wires":[]}]
+[{"type":"tab","id":"4704aa19.b8fb54","label":"Flow 1"}]
