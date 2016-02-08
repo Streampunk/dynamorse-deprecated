@@ -19,7 +19,11 @@ var H = require('highland');
 
 module.exports = function() {
   var encoder = new codecadon.Encoder(0);
-  encoder.start(function() { console.log('Encoder exiting'); });
+
+  encoder.start();
+  encoder.on('exit', function() {
+    console.log('Encoder exiting');
+  });
 
   var grainMuncher = function (err, x, push, next) {
     if (err) {
@@ -30,15 +34,16 @@ module.exports = function() {
       push(null, H.nil);
     } else {
       if (Grain.isGrain(x)) {
-        encoder.encode (x.buffers, function(err, result) {
-          if (err) {
-            push(err);
-          } else if (result) {
-            push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
-                                 x.timecode, x.flow_id, x.source_id, x.duration));    
-          }
+        encoder.encode(x.buffers);
+        encoder.once('encoded', function(result) {
+          push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
+                               x.timecode, x.flow_id, x.source_id, x.duration));
           next();
-        })
+        });
+        encoder.once('error', function(err) {  
+          push (err);
+          next();
+        });    
       } else {
         next();
       }
