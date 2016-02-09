@@ -34,7 +34,6 @@ module.exports = function() {
       push(null, H.nil);
     } else {
       if (Grain.isGrain(x)) {
-        encoder.encode(x.buffers);
         encoder.once('encoded', function(result) {
           push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
                                x.timecode, x.flow_id, x.source_id, x.duration));
@@ -44,7 +43,9 @@ module.exports = function() {
           push (err);
           next();
         });    
+        encoder.encode(x.buffers);
       } else {
+        push(null, x);
         next();
       }
     }
