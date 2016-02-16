@@ -20,6 +20,9 @@ var H = require('highland');
 module.exports = function() {
   var encoder = new codecadon.Encoder(0);
 
+  var dstBufLen = 5184000; // needs to come from the encoder...
+  var dstBuf = new Buffer(dstBufLen);
+
   encoder.start();
   encoder.on('exit', function() {
     console.log('Encoder exiting');
@@ -34,16 +37,22 @@ module.exports = function() {
       push(null, H.nil);
     } else {
       if (Grain.isGrain(x)) {
-        encoder.once('encoded', function(result) {
-          push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
-                               x.timecode, x.flow_id, x.source_id, x.duration));
+        var numQueued = encoder.encode (x.buffers, dstBuf, function(err, result) {
+          if (err) {
+            push(err);
+          } else if (result) {
+            push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
+                                 x.timecode, x.flow_id, x.source_id, x.duration));
+            dstBuf = new Buffer(dstBufLen);
+          } else {
+            //console.log("empty result");
+          }
           next();
         });
-        encoder.once('error', function(err) {  
-          push (err);
-          next();
-        });    
-        encoder.encode(x.buffers);
+        if (numQueued < 4) { 
+          // don't queue ahead for gop encoder
+          //next(); 
+          }
       } else {
         push(null, x);
         next();
