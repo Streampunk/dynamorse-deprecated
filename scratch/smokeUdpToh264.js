@@ -68,7 +68,8 @@ pcapInlet('/Users/simon/OneDrive/Streampunk/nmi-examples/rtp-video-rfc4175-1080i
 //pcapInlet('/Users/simon/OneDrive/Streampunk/nmi-examples/rtp-video-rfc4175-1080i50-colour.pcap')
 //pcapInlet('/Volumes/Ormiscraid/media/streampunk/examples/rtp-video-rfc4175-1080i50-sync.pcap')
   .pipe(udpToGrain(sdp))
-  .pipe(grainEncoder())
+  .pipe(grainEncoder(sdp.getWidth(0), sdp.getHeight(0), '4175'))
   .errors(function (err, push) { console.error(err); })
   .each(function (x) { console.log(count++ + ' ' + JSON.stringify(x, null, 2) ); } )
   .done(function() { console.log('Done!');});
+  
