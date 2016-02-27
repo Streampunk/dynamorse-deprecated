@@ -1,1 +1,1 @@
-[{"type":"tab","id":"4704aa19.b8fb54","label":"Flow 1"},{"type":"tab","id":"85acd3d5.7a533","label":"Flow 2"}]
+[{"type":"tab","id":"4704aa19.b8fb54","label":"Flow 1"},{"type":"tab","id":"85acd3d5.7a533","label":"Flow 2"},{"id":"e573425b.1a8cc","type":"glob-in","z":"4704aa19.b8fb54","name":"William","folder":".","glob":"%n.raw","loop":false,"in":"23","out":"","wibble":"value1","x":216,"y":152,"wires":[[]]}]

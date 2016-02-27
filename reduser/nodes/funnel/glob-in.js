@@ -27,7 +27,17 @@ module.exports = function (RED) {
     };
     setImmediate(function() {
       next();
-    });
+      this.status({fill : "grey", shape : "ring", text : "Initialising"});
+    }.bind(this));
+    setTimeout(function () {
+      this.status({fill : "green", shape : "dot", text : "Reading"});
+    }.bind(this), 2000);
+    setTimeout(function () {
+      if (Math.random() > 0.3)
+        this.status({fill : "blue", shape : "dot", text : "Completed"});
+      else
+        this.status({fill : "red", shape : "dot", text : "Failed"});
+    }.bind(this), 5000);
   }
   RED.nodes.registerType("glob-in",GlobIn);
 }
