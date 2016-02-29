@@ -34,7 +34,8 @@ var settings = {
     userDir:"reduser",
     nodesDir: process.cwd() + "/reduser/nodes/",
     functionGlobalContext: { },    // enables global context
-    paletteCategories: ['subflows', 'funnel', 'valve', 'spout', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced']
+    paletteCategories: ['subflows', 'funnel', 'valve', 'spout', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
+    logging: { console : { level : "trace", audit : true } }
 };
 
 // Initialise the runtime with a server and settings
