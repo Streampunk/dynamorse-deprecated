@@ -14,14 +14,17 @@
 */
 
 var util = require('util');
+var Queue = require('fastqueue');
+var dgram = require('dgram');
 
 function Funnel (config) {
-  var queue = [];
+  var queue = new Queue;
   var wireCount = config.wires[0].length;
   var pending = config.wires[0];
   var node = this;
   var nodeStatus = "";
   var paused = false;
+  var soc = dgram.createSocket('udp4');
   function setStatus(fill, shape, text) {
     if (nodeStatus !== text) {
       node.status({ fill : fill, shape : shape, text: text});
@@ -39,13 +42,17 @@ function Funnel (config) {
     if (pending.indexOf(id) < 0) pending.push(id);
     if ((queue.length > 0) && (pending.length === wireCount)) {
       pending = [];
+      var payload = queue.shift();
+      var message = new Buffer(`punkd value=${payload}`)
+      soc.send(message, 0, message.length, 8765);
       node.send({
-        payload : queue.shift(),
+        payload : payload,
         error : null,
         pull : pull
       });
     }
     if (paused && queue.length < 0.5 * maxBuffer) {
+      node.log("Resuming.");
       paused = false;
       next();
     };
@@ -60,7 +67,7 @@ function Funnel (config) {
       });
     } else {
       if (queue.length <= maxBuffer) {
-        node.log(queue);
+        // node.log(queue);
         queue.push(val);
       } else {
         node.warn(`Dropping value ${val} from buffer as maximum length of ${maxBuffer} exceeded.`);
@@ -69,12 +76,14 @@ function Funnel (config) {
       if (pending.length === wireCount) {
         var payload = queue.shift();
         node.log(`Sending ${payload} with pending ${JSON.stringify(pending)}.`);
+        pending = [];
+        var message = new Buffer(`punkd value=${payload}`)
+        soc.send(message, 0, message.length, 8765);
         node.send({
           payload : payload,
           error : null,
           pull : pull
         });
-        pending = [];
       };
 
       if (queue.length >= maxBuffer) {
@@ -92,6 +101,7 @@ function Funnel (config) {
         work(push, next);
       } else {
         paused = true;
+        node.log("Pausing.");
       }
     }, 10);
   };
@@ -107,6 +117,13 @@ function Funnel (config) {
       setStatus('grey', 'ring', 'Closed');
     }
   }
+  setInterval(function () {
+    var usage = process.memoryUsage();
+    var message = new Buffer(`remember,type=rss value=${usage.rss}\n` +
+      `remember,type=heapTotal value=${usage.heapTotal}\n` +
+      `remember,type=heapUsed value=${usage.heapUsed}`);
+    soc.send(message, 0, message.length, 8765);
+  }, 1000);
 }
 
 module.exports = function (RED) {
