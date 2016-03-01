@@ -13,17 +13,30 @@
   limitations under the License.
 */
 
-module.exports = function (RED) {
-    function GlobOut (config) {
-      RED.nodes.createNode(this, config);
-      var node = this;
-      var waiting = true;
-      var lastMsg = null;
-      node.on('input', function (msg) {
-        // Transform message - perform action
-        msg.next();
-      });
-    }
-    RED.nodes.registerType("glob-out",GlobOut);
+var util = require('util');
+
+function Spout (config) {
+  var eachFn = function () { };
+  var node = this;
+  this.each = function (f) {
+    eachFn = f;
   }
-  
+  this.on('input', function (msg) {
+    setTimeout(function () {
+      eachFn(msg.payload);
+      msg.pull(node.id);
+    }, 100);
+  });
+}
+
+module.exports = function (RED) {
+  function GlobOut (config) {
+    Spout.call(this, config);
+    RED.nodes.createNode(this, config);
+    this.each(function (x) {
+      this.log(`Received ${x}.`);
+    }.bind(this));
+  }
+  util.inherits(GlobOut, Spout);
+  RED.nodes.registerType("glob-out",GlobOut);
+}

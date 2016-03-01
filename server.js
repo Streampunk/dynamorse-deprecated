@@ -30,21 +30,22 @@ var server = http.createServer(app);
 // Create the settings object - see default settings.js file for other options
 var settings = {
     httpAdminRoot:"/red",
-    httpNodeRoot: "/wibble",
+    httpNodeRoot: "/api",
     userDir:"reduser",
     nodesDir: process.cwd() + "/reduser/nodes/",
     functionGlobalContext: { },    // enables global context
-    paletteCategories: ['subflows', 'funnel', 'valve', 'spout', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced']
+    paletteCategories: ['subflows', 'funnel', 'valve', 'spout', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
+    logging: { console : { level : "trace", audit : true } }
 };
 
 // Initialise the runtime with a server and settings
 RED.init(server,settings);
 
 // Serve the editor UI from /red
-app.use(settings.httpAdminRoot,RED.httpAdmin);
+app.use(settings.httpAdminRoot, RED.httpAdmin);
 
 // Serve the http nodes UI from /api
-app.use(settings.httpNodeRoot,RED.httpNode);
+app.use(settings.httpNodeRoot, RED.httpNode);
 
 server.listen(8000);
 

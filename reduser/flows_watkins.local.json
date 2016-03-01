@@ -1,1 +1,1 @@
-[{"type":"tab","id":"4704aa19.b8fb54","label":"Flow 1"},{"type":"tab","id":"85acd3d5.7a533","label":"Flow 2"}]
+[{"type":"tab","id":"63d3663c.9c2c98","label":"Flow 1"},{"id":"74bba108.8b446","type":"glob-in","z":"63d3663c.9c2c98","name":"","folder":".","glob":"%n.raw","loop":false,"in":0,"out":9007199254740991,"maxBuffer":100,"x":201,"y":454,"wires":[["576c34a6.a893cc"]]},{"id":"576c34a6.a893cc","type":"glob-out","z":"63d3663c.9c2c98","name":"","x":465,"y":465,"wires":[]}]

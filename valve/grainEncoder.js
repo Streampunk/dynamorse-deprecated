@@ -17,33 +17,42 @@ var Grain = require('../model/Grain.js');
 var codecadon = require('../../codecadon');
 var H = require('highland');
 
-module.exports = function() {
-  var encoder = new codecadon.Encoder(0);
+module.exports = function(srcWidth, srcHeight, srcFmtCode) {
+  var encoder = new codecadon.Encoder('h264', 1280, 720);
 
-  encoder.start();
   encoder.on('exit', function() {
     console.log('Encoder exiting');
+    encoder.finish();
   });
+  encoder.on('error', function(err) {
+    console.log('Encoder error: ' + err);
+  });
+  var dstBufLen = encoder.start();
 
   var grainMuncher = function (err, x, push, next) {
     if (err) {
       push(err);
       next();
     } else if (x === H.nil) {
-      encoder.quit();
-      push(null, H.nil);
+      encoder.quit(function() {
+        push(null, H.nil);
+      });
     } else {
       if (Grain.isGrain(x)) {
-        encoder.once('encoded', function(result) {
-          push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
-                               x.timecode, x.flow_id, x.source_id, x.duration));
+        var dstBuf = new Buffer(dstBufLen);
+        var numQueued = encoder.encode (x.buffers, srcWidth, srcHeight, srcFmtCode, dstBuf, function(err, result) {
+          if (err) {
+            push(err);
+          } else if (result) {
+            push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
+                                 x.timecode, x.flow_id, x.source_id, x.duration));
+          }
           next();
         });
-        encoder.once('error', function(err) {  
-          push (err);
-          next();
-        });    
-        encoder.encode(x.buffers);
+        // allow a number of packets to queue ahead
+        if (numQueued < 2) { 
+          next(); 
+          }
       } else {
         push(null, x);
         next();

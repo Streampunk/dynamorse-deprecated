@@ -1,4 +1,5 @@
-/* Copyright 2016 Christine S. MacNeill
+<!--
+  Copyright 2016 Christine S. MacNeill
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -11,28 +12,33 @@
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
-*/
+-->
 
 <script type="text/javascript">
     RED.nodes.registerType('aac-dec',{
       category: 'valve',
       color: '#87A980',
       defaults: {
-        name: {value:""}
+        name: { value : "" },
+        maxBuffer : { value : 100 }
       },
       inputs:1,
       outputs:1,
-      icon: "feed.png",
+      icon: "valve.png",
       label: function() {
-        return this.name ||  "aac-dec";
+        return this.name || "aac-dec";
       }
     });
   </script>
 
   <script type="text/x-red" data-template-name="aac-dec">
     <div class="form-row">
-      <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+      <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
       <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+      <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> Maximum Buffer</label>
+      <input type="number" id="node-input-maxBuffer" placeholder="100">
     </div>
   </script>
 

@@ -18,6 +18,7 @@
   "homepage": "https://github.com/Streampunk/dynamorse#readme",
   "dependencies": {
     "express": "^4.13.4",
+    "fastqueue": "^0.1.0",
     "highland": "^2.5.1",
     "node-red": "^0.13.1",
     "ole-doc": "^0.1.1",
