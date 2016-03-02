@@ -14,18 +14,44 @@
 */
 
 var util = require('util');
+var redioactive = require('../../../util/Redioactive.js')
 
 function Spout (config) {
   var eachFn = function () { };
+  var doneFn = function () { };
   var node = this;
+  var nodeStatus = "";
+  function setStatus(fill, shape, text) {
+    if (nodeStatus !== text) {
+      node.status({ fill : fill, shape : shape, text: text});
+      nodeStatus = text;
+    }
+  }
   this.each = function (f) {
     eachFn = f;
-  }
+    setStatus('green', 'dot', 'consuming');
+  };
+  this.done = function (f) {
+    doneFn = f;
+  };
   this.on('input', function (msg) {
-    setTimeout(function () {
-      eachFn(msg.payload);
-      msg.pull(node.id);
-    }, 100);
+    if (msg.error) {
+      node.error(`Unhandled error ${msg.error.toString()}.`);
+      doneFn = function () { }
+      eachFn = null;
+      setStatus('red', 'dot', 'error');
+    } else if (redioactive.isEnd(msg.payload)) {
+      setStatus('grey', 'ring', 'done');
+      var execDone = doneFn;
+      doneFn = function () { }
+      eachFn = null;
+      execDone();
+    } else {
+      if (eachFn) {
+        eachFn(msg.payload);
+        setTimeout(function () { msg.pull(node.id); }, 0);
+      }
+    }
   });
 }
 
@@ -35,6 +61,9 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     this.each(function (x) {
       this.log(`Received ${x}.`);
+    }.bind(this));
+    this.done(function () {
+      this.log('Thank goodness that is over!');
     }.bind(this));
   }
   util.inherits(GlobOut, Spout);

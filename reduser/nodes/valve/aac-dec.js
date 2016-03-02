@@ -15,6 +15,7 @@
 
 var util = require('util');
 var Queue = require('fastqueue');
+var redioactive = require('../../../util/Redioactive.js');
 
 function Valve (config) {
   var queue = new Queue;
@@ -24,12 +25,12 @@ function Valve (config) {
   var nodeStatus = "";
   var paused = null;
   function setStatus(fill, shape, text) {
-    if (nodeStatus !== text) {
+    if (nodeStatus !== text && nodeStatus !== 'done') {
       node.status({ fill : fill, shape : shape, text: text});
       nodeStatus = text;
     }
   }
-  setStatus('grey', 'ring', 'Initialising');
+  setStatus('grey', 'ring', 'initialising');
   var maxBuffer = 10;
   if (config.maxBuffer && typeof config.maxBuffer === 'string')
     config.maxBuffer = +config.maxBuffer;
@@ -40,8 +41,16 @@ function Valve (config) {
     if (pending.indexOf(id) < 0) pending.push(id);
     if ((queue.length > 0) && (pending.length === wireCount)) {
       pending = [];
+      var payload = queue.shift();
+      if (redioactive.isEnd(payload)) {
+        work = function () { }
+        next = function () {
+          setStatus('grey', 'ring', 'done');
+        };
+        setStatus('grey', 'ring', 'done');
+      };
       node.send({
-        payload : queue.shift(),
+        payload : payload,
         error : null,
         pull : pull
       });
@@ -56,6 +65,7 @@ function Valve (config) {
   var push = function (err, val) {
     node.log(`Push received with value ${val}, queue length ${queue.length}, pending ${JSON.stringify(pending)}`);
     if (err) {
+      setStatus('red', 'dot', 'error');
       node.send({
         payload : null,
         error : err,
@@ -73,6 +83,13 @@ function Valve (config) {
         var payload = queue.shift();
         node.log(`Sending ${payload} with pending ${JSON.stringify(pending)}.`);
         pending = [];
+        if (redioactive.isEnd(payload)) {
+          work = function () { }
+          next = function () {
+            setStatus('grey', 'ring', 'done');
+          };
+          setStatus('grey', 'ring', 'done');
+        };
         node.send({
           payload : payload,
           error : null,
@@ -81,15 +98,17 @@ function Valve (config) {
       };
 
       if (queue.length >= maxBuffer) {
-        setStatus('red', 'dot', 'Overflow');
+        setStatus('red', 'dot', 'overflow');
       } else if (queue.length >= 0.75 * maxBuffer) {
         setStatus('yellow', 'dot', '75% full');
       } else {
-        setStatus('green', 'dot', 'Running');
+        setStatus('green', 'dot', 'running');
       }
     }
   };
   var next = function (msg) {
+    if (redioactive.isEnd(msg.payload))
+      return function () { }
     return function () {
       if (queue.length > 0.8 * maxBuffer) {
         paused = msg.pull;
@@ -111,12 +130,12 @@ function Valve (config) {
   };
   this.consume = function (cb) {
     work = cb;
-    setStatus('green', 'dot', 'Running');
+    setStatus('green', 'dot', 'running');
   }
   this.close = function (done) { // done is undefined :-(
-    setStatus('yellow', 'ring', 'Closing');
+    setStatus('yellow', 'ring', 'closing');
     next = function () {
-      setStatus('grey', 'ring', 'Closed');
+      setStatus('grey', 'ring', 'closed');
     }
   }
 }
@@ -128,8 +147,10 @@ module.exports = function (RED) {
     this.consume(function (err, x, push, next) {
       if (err) {
         push(err);
+      } else if (x === redioactive.end) {
+        push(null, redioactive.end);
       } else {
-        push(null, "it's a " + x);
+        push(/* x === 50 ? new Error('cock') : */ null, "it's a " + x);
       }
       next();
     });

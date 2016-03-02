@@ -6,7 +6,7 @@
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by appli cable law or agreed to in writing, software
+  Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -16,6 +16,7 @@
 var util = require('util');
 var Queue = require('fastqueue');
 var dgram = require('dgram');
+var redioactive = require('../../../util/Redioactive.js')
 
 function Funnel (config) {
   var queue = new Queue;
@@ -26,12 +27,12 @@ function Funnel (config) {
   var paused = false;
   var soc = dgram.createSocket('udp4');
   function setStatus(fill, shape, text) {
-    if (nodeStatus !== text) {
+    if (nodeStatus !== text && nodeStatus !== 'done') {
       node.status({ fill : fill, shape : shape, text: text});
       nodeStatus = text;
     }
   }
-  setStatus('grey', 'ring', 'Initialising');
+  setStatus('grey', 'ring', 'initialising');
   var maxBuffer = 10;
   if (config.maxBuffer && typeof config.maxBuffer === 'string')
     config.maxBuffer = +config.maxBuffer;
@@ -45,6 +46,13 @@ function Funnel (config) {
       var payload = queue.shift();
       var message = new Buffer(`punkd value=${payload}`)
       soc.send(message, 0, message.length, 8765);
+      if (redioactive.isEnd(payload)) {
+        work = function () { }
+        next = function () {
+          setStatus('grey', 'ring', 'done');
+        };
+        setStatus('grey', 'ring', 'done');
+      };
       node.send({
         payload : payload,
         error : null,
@@ -60,6 +68,7 @@ function Funnel (config) {
   var push = function (err, val) {
     node.log(`Push received with value ${val}, queue length ${queue.length}, pending ${JSON.stringify(pending)}`);
     if (err) {
+      setStatus('red', 'dot', 'error');
       node.send({
         payload : null,
         error : err,
@@ -79,6 +88,13 @@ function Funnel (config) {
         pending = [];
         var message = new Buffer(`punkd value=${payload}`)
         soc.send(message, 0, message.length, 8765);
+        if (redioactive.isEnd(payload)) {
+          work = function () { }
+          next = function () {
+            setStatus('grey', 'ring', 'done');
+          };
+          setStatus('grey', 'ring', 'done');
+        };
         node.send({
           payload : payload,
           error : null,
@@ -87,11 +103,11 @@ function Funnel (config) {
       };
 
       if (queue.length >= maxBuffer) {
-        setStatus('red', 'dot', 'Overflow');
+        setStatus('red', 'dot', 'overflow');
       } else if (queue.length >= 0.75 * maxBuffer) {
         setStatus('yellow', 'dot', '75% full');
       } else {
-        setStatus('green', 'dot', 'Running');
+        setStatus('green', 'dot', 'generating');
       }
     }
   };
@@ -103,18 +119,18 @@ function Funnel (config) {
         paused = true;
         node.log("Pausing.");
       }
-    }, 10);
+    }, 0);
   };
   var work = function () { };
   this.generator = function (cb) {
     work = cb;
-    setStatus('green', 'dot', 'Running');
+    setStatus('green', 'dot', 'generating');
     next();
   }
   this.close = function (done) { // done is undefined :-(
-    setStatus('yellow', 'ring', 'Closing');
+    setStatus('yellow', 'ring', 'closing');
     next = function () {
-      setStatus('grey', 'ring', 'Closed');
+      setStatus('grey', 'ring', 'closed');
     }
   }
   setInterval(function () {
@@ -133,8 +149,12 @@ module.exports = function (RED) {
     RED.nodes.createNode(this,config);
     this.count = 0;
     this.generator(function (push, next) {
-      push(null, this.count++);
-      next();
+      if (this.count < 10000) {
+        push(null, this.count++);
+        next();
+      } else {
+        push(null, redioactive.end);
+      }
     }.bind(this));
     this.on('close', this.close);
   }
