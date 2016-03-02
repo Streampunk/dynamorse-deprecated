@@ -15,6 +15,8 @@
 
 var Grain = require('../model/Grain.js');
 var udpToGrain = require('../valve/udpToGrain.js');
+var grainConcater = require('../valve/grainConcater.js');
+var grainScaleConverter = require('../valve/grainScaleConverter.js');
 var grainEncoder = require('../valve/grainEncoder.js');
 var pcapInlet = require('../funnel/pcapInlet.js');
 var codecadon = require('../../codecadon');
@@ -63,12 +65,26 @@ a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`;
 
 var sdp = new SDP(videoSDP);
 
+var srcWidth = sdp.getWidth(0);
+var srcHeight = sdp.getHeight(0);
+var srcFmtCode = '4175'
+
+var encWidth = 1280;
+var encHeight = 720;
+var encInFmtCode = '420P'
+var encFmtCode = 'h264'
+
 var count = 0;
 pcapInlet('/Users/simon/OneDrive/Streampunk/nmi-examples/rtp-video-rfc4175-1080i50-longer-sequence.pcap')
 //pcapInlet('/Users/simon/OneDrive/Streampunk/nmi-examples/rtp-video-rfc4175-1080i50-colour.pcap')
 //pcapInlet('/Volumes/Ormiscraid/media/streampunk/examples/rtp-video-rfc4175-1080i50-sync.pcap')
   .pipe(udpToGrain(sdp))
-  .pipe(grainEncoder(sdp.getWidth(0), sdp.getHeight(0), '4175'))
+  .pipe(grainConcater(srcWidth, srcHeight, srcFmtCode, 
+                      srcWidth, srcHeight, srcFmtCode))
+  .pipe(grainScaleConverter(srcWidth, srcHeight, srcFmtCode,
+                            encWidth, encHeight, encInFmtCode))
+  .pipe(grainEncoder(encWidth, encHeight, encInFmtCode,
+                     encWidth, encHeight, encFmtCode))
   .errors(function (err, push) { console.error(err); })
   .each(function (x) { console.log(count++ + ' ' + JSON.stringify(x, null, 2) ); } )
   .done(function() { console.log('Done!');});
