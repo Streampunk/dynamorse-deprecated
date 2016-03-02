@@ -18,13 +18,13 @@ var codecadon = require('../../codecadon');
 var grainProcessor = require('./grainProcessor.js');
 
 module.exports = function(srcWidth, srcHeight, srcFmtCode, dstWidth, dstHeight, dstFmtCode) {
-  var encoder = new codecadon.Encoder(dstFmtCode, dstWidth, dstHeight);
+  var scaleConverter = new codecadon.ScaleConverter(dstFmtCode, dstWidth, dstHeight);
 
-  encoder.doProcess = function(srcBuf, dstBuf, cb) {
-    return encoder.encode (srcBuf, srcWidth, srcHeight, srcFmtCode, dstBuf, function(err, result) {
+  scaleConverter.doProcess = function(srcBuf, dstBuf, cb) {
+    return scaleConverter.scaleConvert (srcBuf, srcWidth, srcHeight, srcFmtCode, dstBuf, function(err, result) {
       cb(err, result);            
     });
   };
 
-  return grainProcessor(encoder);
+  return grainProcessor(scaleConverter);
 }
