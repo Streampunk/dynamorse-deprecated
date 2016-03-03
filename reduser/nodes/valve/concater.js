@@ -13,18 +13,20 @@
   limitations under the License.
 */
 
+// Ready for some scriptorian magic :-)
+
+var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
-var redioactive = require('../../../util/Redioactive.js')
 
 module.exports = function (RED) {
-  function GlobIn (config) {
-    RED.nodes.createNode(this,config);
-    redioactive.Funnel.call(this, config);
-    this.generator(function (push, next) {
+  function Concater (config) {
+    RED.nodes.createNode(this, config);
+    redioactive.Valve.call(this, config);
+    this.consume(function (err, x, push, next) {
 
-    }.bind(this));
+    });
     this.on('close', this.close);
   }
-  util.inherits(GlobIn, redioactive.Funnel);
-  RED.nodes.registerType("glob-in",GlobIn);
-};
+  util.inherits(Concater, redioactive.Valve);
+  RED.nodes.registerType("concater", Concater);
+}

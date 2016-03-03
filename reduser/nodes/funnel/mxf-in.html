@@ -17,9 +17,10 @@
 <script type="text/javascript">
   RED.nodes.registerType('mxf-in',{
     category: 'funnel',
-    color: '#D8BFD8',
+    color: '#D79748',
     defaults: {
-      name: {value:""}
+      name: { value : ""},
+      maxBuffer : { value : 100, validate : RED.validators.number() }
     },
     inputs:0,
     outputs:3,
@@ -31,12 +32,17 @@
 </script>
 
 <script type="text/x-red" data-template-name="mxf-in">
+  <!-- Common to all funnel nodes -->
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> Maximum Buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="100">
   </div>
 </script>
 
 <script type="text/x-red" data-help-name="mxf-in">
-  <p>Description of mxf-in.</p>
+  <p>Read grains from a MXF file, creating one or more NMOS flows.</p>
 </script>

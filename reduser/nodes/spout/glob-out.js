@@ -22,7 +22,7 @@ module.exports = function (RED) {
     redioactive.Spout.call(this, config);
     this.each(function (x, next) {
       this.log(`Received ${x}.`);
-      setTimeout(next, 100);
+      next();
     }.bind(this));
     this.done(function () {
       this.log('Thank goodness that is over!');

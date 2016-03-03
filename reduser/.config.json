@@ -503,6 +503,42 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/aac-enc.js"
     },
+    "concater": {
+     "name": "concater",
+     "types": [
+      "concater"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/concater.js"
+    },
+    "converter": {
+     "name": "converter",
+     "types": [
+      "converter"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/converter.js"
+    },
+    "decoder": {
+     "name": "decoder",
+     "types": [
+      "decoder"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/decoder.js"
+    },
+    "encoder": {
+     "name": "encoder",
+     "types": [
+      "encoder"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/encoder.js"
+    },
     "grain-upd": {
      "name": "grain-upd",
      "types": [
@@ -511,24 +547,6 @@
      "enabled": true,
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/grain-upd.js"
-    },
-    "h264-dec": {
-     "name": "h264-dec",
-     "types": [
-      "h264-dec"
-     ],
-     "enabled": true,
-     "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/h264-dec.js"
-    },
-    "h264-enc": {
-     "name": "h264-enc",
-     "types": [
-      "h264-enc"
-     ],
-     "enabled": true,
-     "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/h264-enc.js"
     },
     "imagemagick": {
      "name": "imagemagick",

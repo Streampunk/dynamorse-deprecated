@@ -93,8 +93,8 @@ function Funnel (config) {
     };
   };
   var push = function (err, val) {
-    node.log(`Push received with value ${val}, queue length ${queue.length}, pending ${JSON.stringify(pending)}`);
-    if (err) {
+    setImmediate(function () { if (err) {
+      node.log(`Push received with value ${val}, queue length ${queue.length}, pending ${JSON.stringify(pending)}`);
       setStatus('red', 'dot', 'error');
       node.send({
         payload : null,
@@ -136,7 +136,7 @@ function Funnel (config) {
       } else {
         node.setStatus('green', 'dot', 'generating');
       }
-    }
+    } });
   };
   var workStart = null;
   var next = function () {

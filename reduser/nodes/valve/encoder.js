@@ -13,34 +13,20 @@
   limitations under the License.
 */
 
+// Ready for some scriptorian magic :-)
+
+var redioactive = require('../../../util/Redioactive.js');
+var util = require('util');
+
 module.exports = function (RED) {
-  function H264Decode (config) {
+  function Encoder (config) {
     RED.nodes.createNode(this, config);
-    var node = this;
-    var waiting = true;
-    var pendingMsg = null;
-    var next = function () {
-      if (pendingMsg) {
-        pendingMsg.next = next;
-        node.send(pendingMsg);
-        pendingMsg = null;
-        waiting = false;
-      } else {
-        waiting = true;
-      }
-    };
-    node.on('input', function (msg) {
-      // Transform message here
-      if (waiting) {
-        msg.next = next;
-        node.send(msg);
-        msg.next();
-        pendngMsg = null;
-        waiting = false;
-      } else {
-        pendingMsg = msg;
-      }
+    redioactive.Valve.call(this, config);
+    this.consume(function (err, x, push, next) {
+
     });
+    this.on('close', this.close);
   }
-  RED.nodes.registerType("h264-dec",H264Decode);
+  util.inherits(Encoder, redioactive.Valve);
+  RED.nodes.registerType("encoder", Encoder);
 }
