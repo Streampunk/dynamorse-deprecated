@@ -6,7 +6,7 @@
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by appli cable law or agreed to in writing, software
+  Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -17,17 +17,21 @@ var util = require('util');
 var redioactive = require('../../../util/Redioactive.js')
 
 module.exports = function (RED) {
-  function GlobOut (config) {
-    RED.nodes.createNode(this, config);
-    redioactive.Spout.call(this, config);
-    this.each(function (x, next) {
-      this.log(`Received ${x}.`);
-      setTimeout(next, 100);
+  function GlobIn (config) {
+    RED.nodes.createNode(this,config);
+    redioactive.Funnel.call(this, config);
+    this.log(JSON.stringify(config, null, 2));
+    this.count = 0;
+    this.generator(function (push, next) {
+      if (this.count < 100) {
+        push(null, this.count++);
+        setTimeout(next, 10);
+      } else {
+        push(null, redioactive.end);
+      }
     }.bind(this));
-    this.done(function () {
-      this.log('Thank goodness that is over!');
-    }.bind(this));
+    this.on('close', this.close);
   }
-  util.inherits(GlobOut, redioactive.Spout);
-  RED.nodes.registerType("glob-out",GlobOut);
-}
+  util.inherits(GlobIn, redioactive.Funnel);
+  RED.nodes.registerType("funnelOne",GlobIn);
+};

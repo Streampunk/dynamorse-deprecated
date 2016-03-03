@@ -14,20 +14,23 @@
 */
 
 var util = require('util');
-var redioactive = require('../../../util/Redioactive.js')
+var redioactive = require('../../../util/Redioactive.js');
 
 module.exports = function (RED) {
-  function GlobOut (config) {
+  function AACDecode (config) {
     RED.nodes.createNode(this, config);
-    redioactive.Spout.call(this, config);
-    this.each(function (x, next) {
-      this.log(`Received ${x}.`);
-      setTimeout(next, 100);
-    }.bind(this));
-    this.done(function () {
-      this.log('Thank goodness that is over!');
-    }.bind(this));
+    redioactive.Valve.call(this, config);
+    this.consume(function (err, x, push, next) {
+      if (err) {
+        push(err);
+      } else if (x === redioactive.end) {
+        push(null, redioactive.end);
+      } else {
+        push(/* x === 50 ? new Error('cock') : */ null, "it's a " + x);
+      }
+      next();
+    });
   }
-  util.inherits(GlobOut, redioactive.Spout);
-  RED.nodes.registerType("glob-out",GlobOut);
+  util.inherits(AACDecode, redioactive.Valve);
+  RED.nodes.registerType("valveTwo",AACDecode);
 }

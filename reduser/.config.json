@@ -440,6 +440,51 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/spout/webRTC-out.js"
     },
+    "funnelOne": {
+     "name": "funnelOne",
+     "types": [
+      "funnelOne"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/testing/funnelOne.js"
+    },
+    "funnelTwo": {
+     "name": "funnelTwo",
+     "types": [
+      "funnelTwo"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/testing/funnelTwo.js"
+    },
+    "spout": {
+     "name": "spout",
+     "types": [
+      "spout"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/testing/spout.js"
+    },
+    "valveOne": {
+     "name": "valveOne",
+     "types": [
+      "valveOne"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/testing/valveOne.js"
+    },
+    "valveTwo": {
+     "name": "valveTwo",
+     "types": [
+      "valveTwo"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/testing/valveTwo.js"
+    },
     "aac-dec": {
      "name": "aac-dec",
      "types": [
