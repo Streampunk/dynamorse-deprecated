@@ -6,7 +6,7 @@
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by appli cable law or agreed to in writing, software
+  Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -18,6 +18,18 @@ var express = require("express");
 var RED = require("node-red");
 var fs = require('fs');
 var dgram = require('dgram');
+var ledger = require('nmos-ledger');
+
+var hostname = require('os').hostname();
+var shortHostname = hostname.match(/([^\.]*)\.?.*/)[1];
+var pid = process.pid;
+
+var node = new ledger.Node(null, null, `Dynamorse ${shortHostname} ${pid}`,
+  `http://dynamorse-${shortHostname}-${pid}.local:3001`,
+  `${hostname}`);
+var store = new ledger.NodeRAMStore(node);
+var nodeAPI = new ledger.NodeAPI(3001, store);
+nodeAPI.init().start();
 
 // Create an Express app
 var app = express();
@@ -43,7 +55,11 @@ var settings = {
     httpNodeRoot: "/api",
     userDir:"reduser",
     nodesDir: process.cwd() + "/reduser/nodes/",
-    functionGlobalContext: { },    // enables global context
+    functionGlobalContext: {
+      node : node,
+      nodeAPI : nodeAPI,
+      ledger : ledger
+    },    // enables global context
     paletteCategories: ['subflows', 'funnel', 'valve', 'spout', 'testing', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
     logging: { console : { level : "trace", audit : true } }
 };

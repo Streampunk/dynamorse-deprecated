@@ -21,17 +21,24 @@ module.exports = function (RED) {
     RED.nodes.createNode(this,config);
     redioactive.Funnel.call(this, config);
     this.log(JSON.stringify(config, null, 2));
-    this.count = 0;
+    this.count = +config.start;
+    this.log(JSON.stringify(this.context().global.get('node')));
     this.generator(function (push, next) {
-      if (this.count < 100) {
+      if (this.count <= +config.end) {
         push(null, this.count++);
-        setTimeout(next, 10);
+        setTimeout(next, +config.delay);
       } else {
-        push(null, redioactive.end);
+        if (config.repeat) {
+          this.count = config.start;
+          push(null, this.count++);
+          setTimeout(next, +config.delay);
+        } else {
+          push(null, redioactive.end);
+        }
       }
     }.bind(this));
     this.on('close', this.close);
   }
   util.inherits(GlobIn, redioactive.Funnel);
-  RED.nodes.registerType("funnelOne",GlobIn);
+  RED.nodes.registerType("funnel one",GlobIn);
 };

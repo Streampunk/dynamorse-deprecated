@@ -278,6 +278,15 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/node_modules/node-red/nodes/core/storage/50-file.js"
     },
+    "device": {
+     "name": "device",
+     "types": [
+      "device"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/device.js"
+    },
     "glob-in": {
      "name": "glob-in",
      "types": [
@@ -443,7 +452,7 @@
     "funnelOne": {
      "name": "funnelOne",
      "types": [
-      "funnelOne"
+      "funnel one"
      ],
      "enabled": true,
      "module": "node-red",

@@ -15,73 +15,52 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('funnelOne',{
+  RED.nodes.registerType('funnel one',{
     category: 'testing',
     color: '#C1C1A6',
     defaults: {
       name : { value : "" },
-      folder : { value : "." },
-      glob : { value : "%n.raw" },
-      loop : { value : false },
-      in : { value : 0 , validate : RED.validators.number() },
-      out : {
-        value : Number.MAX_SAFE_INTEGER /*,
-        validate : function (v) {
-          return Red.validators.number()(v) && v > this.in; } */
-      },
-      maxBuffer : { value : 100, validate : RED.validators.number() }
+      delay : { value : "0", validate : RED.validators.number() },
+      start : { value : "0", validate : RED.validators.number() },
+      end : { value : "1000000", validate : RED.validators.number() },
+      repeat : { value : false },
+      buffersize : { value : "100", validate : RED.validators.number() }
     },
     inputs:0,
     outputs:1,
     icon: "funnel.png",
     label: function() {
-      return this.name ||  "funnelOne";
+      return this.name || "funnel one";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="funnelOne">
-  <div class="form-row">
-    <label for="node-input-folder"><i class="fa fa-folder"></i> Folder</label>
-    <input type="text" id="node-input-folder" placeholder=".">
+<script type="text/x-red" data-template-name="funnel one">
+  <div class="form-row"><i class="fa fa-sign-in"></i> Count start and end:</div>
+  <div class="form-row"><label></label>
+    start <input type="text" id="node-input-start" placeholder="0" style="width:100px;"/>
+    &nbsp;&nbsp;end <input type="text" id="node-input-end" placeholder="1000000" style="width:100px;"/>
   </div>
   <div class="form-row">
-    <label for="node-input-glob"><i class="fa fa-cogs"></i> Glob</label>
-    <input type="text" id="node-input-glob" placeholder="%.raw">
+     <label for="node-input-repeat"><i class="fa fa-repeat"></i> repeat?</label>
+     <input type="checkbox" id="node-input-repeat" unchecked></input>
   </div>
   <div class="form-row">
-    <label for="node-input-loop"><i class="fa fa-repeat"></i> Loop?</label>
-    <input type="checkbox" id="node-input-loop" unchecked>
+    <label for="node-input-delay"><i class="fa fa-clock-o"></i> delay</label>
+    <input type="text" id="node-input-delay" placeholder="0">
   </div>
-  <div class="form-row">
-    <label for="node-input-wibble"><i class="fa fa-paw"></i> Wibble?</label>
-    <select name="node-input-wibble" id="node-input-wibble">
-      <option value="value1">Value 1</option>
-      <option value="value2" selected>Value 2</option>
-      <option value="value3">Value 3</option>
-    </select>
-  </div>
-  <div class="form-row">
-    <div>
-      <label for="node-input-in"><i class="fa fa-sign-in"></i> In</label>
-      <input type="text" id="node-input-in" placeholder="0">
-    </div>
-    <div>
-      <label for="node-input-out"><i class="fa fa-sign-out"></i> Out</label>
-      <input type="text" id="node-input-out" placeholder="Number.MAX_SAFE_INTEGER">
-    </div>
-  </div>
+  <br/>
   <!-- Common to all funnel nodes -->
   <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
   <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> Maximum Buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="100">
+    <label for="node-input-buffersize"><i class="fa fa-suitcase"></i> maximum buffer</label>
+    <input type="text" id="node-input-buffersize" placeholder="100">
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="funnelOne">
+<script type="text/x-red" data-help-name="funnel one">
   <p>Test funnel node with one output that generates a bounded sequence of integers.</p>
 </script>
