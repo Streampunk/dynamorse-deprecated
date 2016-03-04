@@ -93,9 +93,9 @@ function Funnel (config) {
     };
   };
   var push = function (err, val) {
-    setImmediate(function () { if (err) {
-      node.log(`Push received with value ${val}, queue length ${queue.length}, pending ${JSON.stringify(pending)}`);
-      setStatus('red', 'dot', 'error');
+    node.log(`Push received with value ${val}, queue length ${queue.length}, pending ${JSON.stringify(pending)}`);
+    if (err) {
+      node.setStatus('red', 'dot', 'error');
       node.send({
         payload : null,
         error : err,
@@ -136,7 +136,7 @@ function Funnel (config) {
       } else {
         node.setStatus('green', 'dot', 'generating');
       }
-    } });
+    } // });
   };
   var workStart = null;
   var next = function () {
@@ -156,6 +156,29 @@ function Funnel (config) {
     work = cb;
     node.setStatus('green', 'dot', 'generating');
     next();
+  }
+  var highlandStream = null;
+  this.highland = function (stream) {
+    highlandStream = stream;
+    stream
+      .errors(function (err, hpush) {
+        push(err);
+      })
+      .each(function (x) {
+        if (workStart) { workTimes.push(process.hrtime(workStart)); }
+        push(null, x);
+        workStart = process.hrtime();
+        if (queue.length > 0.8 * maxBuffer) {
+          paused = true;
+          highlandStream.pause();
+          node.log('Pausing.');
+        }
+      })
+      .done(function () {
+        push(null, theEnd);
+      });
+    next = function () { highlandStream.resume(); }
+    node.setStatus('green', 'dot', 'generating');
   }
   this.close = function (done) { // done is undefined :-(
     node.setStatus('yellow', 'ring', 'closing');
@@ -324,6 +347,11 @@ function Valve (config) {
 function Spout (config) {
   var eachFn = null;
   var doneFn = function () { };
+  var errorFn = function (err, n) { // Defauly error handler shuts the pipeline
+    node.error(`Unhandled error ${err.toString()}.`);
+    doneFn = function () { }
+    eachFn = null;
+  }
   var node = this;
   this.nodeStatus = "";
   this.setStatus = setStatus.bind(this);
@@ -333,6 +361,9 @@ function Spout (config) {
     eachFn = f;
     node.setStatus('green', 'dot', 'consuming');
   };
+  this.errors = function (ef) {
+    errorFn = ef;
+  }
   this.done = function (f) {
     doneFn = f;
   };
@@ -345,10 +376,8 @@ function Spout (config) {
   };
   this.on('input', function (msg) {
     if (msg.error) {
-      node.error(`Unhandled error ${msg.error.toString()}.`);
-      doneFn = function () { }
-      eachFn = null;
       node.setStatus('red', 'dot', 'error');
+      errorFn(msg.error, next(msg));
     } else if (isEnd(msg.payload)) {
       node.setStatus('grey', 'ring', 'done');
       var execDone = doneFn;

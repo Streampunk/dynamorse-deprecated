@@ -6,7 +6,7 @@
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by appli cable law or agreed to in writing, software
+  Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -21,12 +21,16 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     redioactive.Spout.call(this, config);
     this.each(function (x, next) {
-      this.log(`Received ${x}.`);
+      this.log(`Received ${JSON.stringify(x, null, 2)}.`);
       next();
     }.bind(this));
     this.done(function () {
       this.log('Thank goodness that is over!');
     }.bind(this));
+    this.errors(function (err, next) {
+      this.log(`Received error ${err.toString()}.`);
+      next();
+    });
   }
   util.inherits(GlobOut, redioactive.Spout);
   RED.nodes.registerType("glob-out",GlobOut);

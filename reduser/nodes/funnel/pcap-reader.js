@@ -6,7 +6,7 @@
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by appli cable law or agreed to in writing, software
+  Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -16,63 +16,39 @@
 var util = require('util');
 var fs = require('fs');
 var redioactive = require('../../../util/Redioactive.js');
+var H = require('highland');
+var pcapInlet = require('../../../funnel/pcapInlet.js');
+var udpToGrain = require('../../../valve/udpToGrain.js');
+var SDP = require('../../../model/SDP.js');
+
+var videoSDP = `v=0
+o=- 1443716955 1443716955 IN IP4 172.29.82.50
+s=IP Studio Stream
+t=0 0
+m=video 5000 RTP/AVP 96
+c=IN IP4 232.121.83.127/32
+a=source-filter:incl IN IP4 232.121.83.127 172.29.82.50
+a=rtpmap:96 raw/90000
+a=fmtp:96 sampling=YCbCr-4:2:2; width=1920; height=1080; depth=10; colorimetry=BT709-2; interlace=1
+a=mediaclk:direct=1119082333 rate=90000
+a=extmap:1 urn:x-ipstudio:rtp-hdrext:origin-timestamp
+a=extmap:2 urn:ietf:params:rtp-hdrext:smpte-tc 3600@90000/25
+a=extmap:3 urn:x-ipstudio:rtp-hdrext:flow-id
+a=extmap:4 urn:x-ipstudio:rtp-hdrext:source-id
+a=extmap:5 urn:x-ipstudio:rtp-hdrext:grain-flags
+a=extmap:7 urn:x-ipstudio:rtp-hdrext:sync-timestamp
+a=extmap:9 urn:x-ipstudio:rtp-hdrext:grain-duration
+a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`;
+
+var sdp = new SDP(videoSDP);
 
 module.exports = function (RED) {
   function PCAPReader (config) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
-    var stream = fs.createReadStream('/Users/vizigoth/Documents/streampunk/nmi/phase1/examples/rtp-video-rfc4175-1080i50-colour.pcap');
-    var nextLen = 0;
-    var chunks = 0;
-    var packets = 0;
-    var leftOver = null;
-    var breakInHeader = false;
-    this.generator(function (push, next) {
-      stream.once('readable', function () {
-        var b = stream.read();
-        if (b === null) {
-          return push (null, redioactive.End);
-        }
-        chunks++;
-        var packetEnd = 0;
-        if (chunks === 1) {
-          packetEnd = 24;
-        } else {
-          if (!breakInHeader) {
-            push(null, Buffer.concat([leftOver, b], nextLen).slice(42).length);
-            packets++;
-            packetEnd = nextLen - leftOver.length;
-          }
-        }
-
-        while (packetEnd < b.length) {
-          var packetHeader = (breakInHeader) ?
-            Buffer.concat([leftOver, b.slice(0, 16 - leftOver.length)], 16) :
-            b.slice(packetEnd, packetEnd + 16);
-          // console.log(packetHeader);
-          nextLen = packetHeader.readUInt32LE(8);
-          packetEnd += (breakInHeader) ? 16 - leftOver.length : 16;
-          if (packetEnd + nextLen <= b.length) {
-            push(null, b.slice(packetEnd + 42, packetEnd + nextLen).length);
-            packets++;
-            packetEnd += nextLen;
-            breakInHeader = false;
-            if (b.length - packetEnd < 16) {
-              leftOver = b.slice(packetEnd);
-              breakInHeader = true;
-              packetEnd = b.length;
-            }
-          } else {
-            leftOver = b.slice(packetEnd);
-            packetEnd = b.length;
-            breahInHeader = false;
-          }
-        }
-
-        next();
-      });
-    });
-
+    this.highland(
+      pcapInlet('/Users/vizigoth/Documents/streampunk/nmi/phase1/examples/rtp-video-rfc4175-1080i50-sync.pcap')
+        .pipe(udpToGrain(sdp)));
     this.on('close', this.close);
   }
   util.inherits(PCAPReader, redioactive.Funnel);
