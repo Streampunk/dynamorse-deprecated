@@ -27,9 +27,15 @@ var pid = process.pid;
 var node = new ledger.Node(null, null, `Dynamorse ${shortHostname} ${pid}`,
   `http://dynamorse-${shortHostname}-${pid}.local:3001`,
   `${hostname}`);
+var device = new ledger.Device(null, null, `${shortHostname}-${pid}-device`,
+  null, node.id, null, null);
 var store = new ledger.NodeRAMStore(node);
 var nodeAPI = new ledger.NodeAPI(3001, store);
 nodeAPI.init().start();
+
+nodeAPI.getStore().putDevice(device, function (err, dev, deltaStore) {
+  nodeAPI.setStore(deltaStore);
+});
 
 // Create an Express app
 var app = express();
@@ -89,4 +95,46 @@ setInterval(function () {
     `remember,host=${hostname},pid=${pid},type=heapTotal value=${usage.heapTotal}\n` +
     `remember,host=${hostname},pid=${pid},type=heapUsed value=${usage.heapUsed}`);
   soc.send(message, 0, message.length, 8765);
+}, 2000);
+
+var redNodeID = RED.util.generateId();
+
+setTimeout(function () {
+  if (!RED.nodes.getFlows().some(function (x) {
+    return x.label === 'Dynamorse'
+  })) {
+    RED.nodes.addFlow({
+      label : 'Dynamorse',
+      configs: [ {
+        id: RED.util.generateId(),
+        type: 'device',
+        nmos_id: device.id,
+        version: device.version,
+        nmos_label: device.label,
+        nmos_type: device.type,
+        node_id: device.node_id,
+        node_ref: redNodeID
+      }, {
+        id: redNodeID,
+        type: 'self',
+        nmos_id: node.id,
+        version: node.version,
+        nmos_label: node.label,
+        href: node.href,
+        hostname: node.hostname
+      } ],
+      nodes: [ {
+        id : RED.util.generateId(),
+        type: 'comment',
+        name: 'Streampunk Media',
+        info: 'Design professional media workflows with _Dynamorse_.',
+        x: 122,
+        y: 45,
+        wires: []
+      }]
+    });
+  }
+  RED.nodes.getFlows().forEach(function (x) {
+    console.log(x);
+  });
 }, 2000);

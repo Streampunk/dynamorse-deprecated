@@ -14,15 +14,10 @@
 */
 
 module.exports = function(RED) {
-  function Device (config) {
+  function Gauges (config) {
     RED.nodes.createNode(this, config);
-    var node = this;
-    var updatedDevice = null;
-    if (config.nmos_id) {
-      node.context().global.nodeAPI.getStore().getDevice(config.nmos_id) {}
-    } else {
-
-    }
+    this.host = config.host;
+    this.port = config.port;
   }
-  RED.nodes.registerType("device", Device);
+  RED.nodes.registerType("gauges", Gauges);
 }

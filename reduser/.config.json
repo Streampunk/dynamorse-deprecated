@@ -287,6 +287,24 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/device.js"
     },
+    "gauges": {
+     "name": "gauges",
+     "types": [
+      "gauges"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/gauges.js"
+    },
+    "self": {
+     "name": "self",
+     "types": [
+      "self"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/self.js"
+    },
     "glob-in": {
      "name": "glob-in",
      "types": [
