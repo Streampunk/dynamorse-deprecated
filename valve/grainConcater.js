@@ -17,8 +17,8 @@ var Grain = require('../model/Grain.js');
 var codecadon = require('../../codecadon');
 var grainProcessor = require('./grainProcessor.js');
 
-module.exports = function(srcWidth, srcHeight, srcFmtCode, dstWidth, dstHeight, dstFmtCode) {
-  var concater = new codecadon.Concater(dstFmtCode, dstWidth, dstHeight);
+module.exports = function(numBytes) {
+  var concater = new codecadon.Concater(numBytes);
 
   concater.doProcess = function(srcBuf, dstBuf, cb) {
     return concater.concat (srcBuf, dstBuf, function(err, result) {

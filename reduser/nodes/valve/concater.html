@@ -19,6 +19,7 @@
       category: 'valve',
       color: '#B0744B',
       defaults: {
+        numBytes : { value : "5184000", validate : RED.validators.number() },
         name: { value : ""},
         maxBuffer : { value : 100, validate : RED.validators.number() }
       },
@@ -32,6 +33,11 @@
 </script>
 
 <script type="text/x-red" data-template-name="concater">
+  <div class="form-row"><i class="fa fa-check"></i> Required Buffer Size in bytes:</div>
+  <div class="form-row"><label></label>
+    <input type="number" id="node-input-numBytes" placeholder="5184000">
+  </div>
+
   <!-- Common to all funnel nodes -->
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
