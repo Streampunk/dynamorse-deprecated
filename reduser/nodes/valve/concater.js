@@ -13,17 +13,57 @@
   limitations under the License.
 */
 
-// Ready for some scriptorian magic :-)
-
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
+var codecadon = require('../../../../codecadon');
+var Grain = require('../../../model/Grain.js');
 
 module.exports = function (RED) {
   function Concater (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
-    this.consume(function (err, x, push, next) {
 
+    var concater = new codecadon.Concater(config.numBytes);
+    concater.on('exit', function() {
+      console.log('Concater exiting');
+      concater.finish();
+    });
+    concater.on('error', function(err) {
+      console.log('Concater error: ' + err);
+    });
+    console.log('concater start');
+    var dstBufLen = concater.start();
+
+    this.consume(function (err, x, push, next) {
+      if (err) {
+        push(err);
+        next();
+      } else if (x === null) {
+        console.log('concater quit');
+        concater.quit(function() {
+          push(null, redioactive.End);
+        });
+      } else {
+        if (Grain.isGrain(x)) {
+          var dstBuf = new Buffer(dstBufLen);
+          var numQueued = concater.concat(x.buffers, dstBuf, function(err, result) {
+            if (err) {
+              push(err);
+            } else if (result) {
+              push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
+                                   x.timecode, x.flow_id, x.source_id, x.duration));
+            }
+            next();
+          });
+          // allow a number of packets to queue ahead
+          if (numQueued < config.maxBuffer) { 
+            next(); 
+            }
+        } else {
+          push(null, x);
+          next();
+        }
+      }
     });
     this.on('close', this.close);
   }

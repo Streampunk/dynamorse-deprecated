@@ -79,8 +79,7 @@ pcapInlet('/Users/simon/OneDrive/Streampunk/nmi-examples/rtp-video-rfc4175-1080i
 //pcapInlet('/Users/simon/OneDrive/Streampunk/nmi-examples/rtp-video-rfc4175-1080i50-colour.pcap')
 //pcapInlet('/Volumes/Ormiscraid/media/streampunk/examples/rtp-video-rfc4175-1080i50-sync.pcap')
   .pipe(udpToGrain(sdp))
-  .pipe(grainConcater(srcWidth, srcHeight, srcFmtCode, 
-                      srcWidth, srcHeight, srcFmtCode))
+  .pipe(grainConcater(srcWidth * srcHeight * 5 / 2))
   .pipe(grainScaleConverter(srcWidth, srcHeight, srcFmtCode,
                             encWidth, encHeight, encInFmtCode))
   .pipe(grainEncoder(encWidth, encHeight, encInFmtCode,
