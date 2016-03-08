@@ -22,6 +22,7 @@ module.exports = function (RED) {
     redioactive.Spout.call(this, config);
     this.each(function (x, next) {
       this.log(`Received ${JSON.stringify(x, null, 2)}.`);
+      RED.comms.publish('debug', { msg: JSON.stringify(x, null, 2) });
       next();
     }.bind(this));
     this.done(function () {
