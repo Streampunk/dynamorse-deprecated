@@ -566,14 +566,14 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/encoder.js"
     },
-    "grain-upd": {
-     "name": "grain-upd",
+    "grain-xray": {
+     "name": "grain-xray",
      "types": [
-      "grain-upd"
+      "grain-xray"
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/grain-upd.js"
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/grain-xray.js"
     },
     "imagemagick": {
      "name": "imagemagick",
