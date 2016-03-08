@@ -18,11 +18,11 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     var node = this;
     var updatedDevice = null;
-    if (config.nmos_id) {
-      node.context().global.nodeAPI.getStore().getDevice(config.nmos_id) {}
-    } else {
-
-    }
+  //   if (config.nmos_id) {
+  //     node.context().global.nodeAPI.getStore().getDevice(config.nmos_id) {}
+  //   } else {
+  //
+  //   }
   }
   RED.nodes.registerType("device", Device);
 }
