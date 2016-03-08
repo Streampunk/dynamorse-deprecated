@@ -27,6 +27,7 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
 
+    console.log(config.format, config.width, config.height);
     var converter = new codecadon.ScaleConverter(config.format, config.width, config.height);
     converter.on('exit', function() {
       console.log('Converter exiting');
@@ -41,9 +42,9 @@ module.exports = function (RED) {
       if (err) {
         push(err);
         next();
-      } else if (x === null) {
+      } else if (redioactive.isEnd(x)) {
         converter.quit(function() {
-          push(null, redioactive.End);
+          push(null, x);
         });
       } else {
         if (Grain.isGrain(x)) {

@@ -31,17 +31,15 @@ module.exports = function (RED) {
     concater.on('error', function(err) {
       console.log('Concater error: ' + err);
     });
-    console.log('concater start');
     var dstBufLen = concater.start();
 
     this.consume(function (err, x, push, next) {
       if (err) {
         push(err);
         next();
-      } else if (x === null) {
-        console.log('concater quit');
+      } else if (redioactive.isEnd(x)) {
         concater.quit(function() {
-          push(null, redioactive.End);
+          push(null, x);
         });
       } else {
         if (Grain.isGrain(x)) {
