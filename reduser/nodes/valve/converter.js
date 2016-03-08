@@ -18,17 +18,12 @@ var util = require('util');
 var codecadon = require('../../../../codecadon');
 var Grain = require('../../../model/Grain.js');
 
-var srcWidth = 1920;
-var srcHeight = 1080;
-var srcFmtCode = '4175'
-
 module.exports = function (RED) {
   function Converter (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
 
-    console.log(config.format, config.width, config.height);
-    var converter = new codecadon.ScaleConverter(config.format, config.width, config.height);
+    var converter = new codecadon.ScaleConverter(config.dstFormat, +config.dstWidth, +config.dstHeight);
     converter.on('exit', function() {
       console.log('Converter exiting');
       converter.finish();
@@ -49,7 +44,7 @@ module.exports = function (RED) {
       } else {
         if (Grain.isGrain(x)) {
           var dstBuf = new Buffer(dstBufLen);
-          var numQueued = converter.scaleConvert(x.buffers, srcWidth, srcHeight, srcFmtCode, dstBuf, function(err, result) {
+          var numQueued = converter.scaleConvert(x.buffers, +config.srcWidth, +config.srcHeight, config.srcFormat, dstBuf, function(err, result) {
             if (err) {
               push(err);
             } else if (result) {
@@ -59,7 +54,7 @@ module.exports = function (RED) {
             next();
           });
           // allow a number of packets to queue ahead
-          if (numQueued < config.maxBuffer) { 
+          if (numQueued < +config.maxBuffer) { 
             next(); 
             }
         } else {

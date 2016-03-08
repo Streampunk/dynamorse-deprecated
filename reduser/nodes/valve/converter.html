@@ -19,9 +19,12 @@
       category: 'valve',
       color: '#AF4830',
       defaults: {
-        width: { value : 1280, validate : RED.validators.number() },
-        height: { value : 720, validate : RED.validators.number() },
-        format: { value : "420P" },
+        srcWidth: { value : 1920, validate : RED.validators.number() },
+        srcHeight: { value : 1080, validate : RED.validators.number() },
+        srcFormat: { value : "4175" },
+        dstWidth: { value : 1280, validate : RED.validators.number() },
+        dstHeight: { value : 720, validate : RED.validators.number() },
+        dstFormat: { value : "420P" },
         name: { value : "" },
         maxBuffer : { value : 100, validate : RED.validators.number() }
       },
@@ -36,16 +39,32 @@
 
 <script type="text/x-red" data-template-name="converter">
   <div class="form-row">
-    <label for="node-input-width"><i class="fa fa-arrows-h"></i> Width</label>
-    <input type="number" id="node-input-width" placeholder="1280">
+    <label for="node-input-srcWidth"><i class="fa fa-arrows-h"></i> Src Width</label>
+    <input type="number" id="node-input-srcWidth" placeholder="1920">
   </div>
   <div class="form-row">
-    <label for="node-input-height"><i class="fa fa-arrows-v"></i> Height</label>
-    <input type="number" id="node-input-height" placeholder="720">
+    <label for="node-input-srcHeight"><i class="fa fa-arrows-v"></i> Src Height</label>
+    <input type="number" id="node-input-srcHeight" placeholder="1080">
   </div>
   <div class="form-row">
-    <label for="node-input-format"><i class="fa fa-paw"></i> Format</label>
-    <select name="node-input-format" id="node-input-format">
+    <label for="node-input-srcFormat"><i class="fa fa-paw"></i> Src Format</label>
+    <select name="node-input-srcFormat" id="node-input-srcFormat">
+      <option value="4175" selected>4175</option>
+      <option value="V210">V210</option>
+    </select>
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-dstWidth"><i class="fa fa-arrows-h"></i> Dest Width</label>
+    <input type="number" id="node-input-dstWidth" placeholder="1280">
+  </div>
+  <div class="form-row">
+    <label for="node-input-dstHeight"><i class="fa fa-arrows-v"></i> Dest Height</label>
+    <input type="number" id="node-input-dstHeight" placeholder="720">
+  </div>
+  <div class="form-row">
+    <label for="node-input-dstFormat"><i class="fa fa-paw"></i> Dest Format</label>
+    <select name="node-input-dstFormat" id="node-input-dstFormat">
       <option value="420P" selected>420P</option>
     </select>
   </div>

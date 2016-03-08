@@ -19,9 +19,10 @@
       category: 'valve',
       color: '#A09D45',
       defaults: {
-        width: { value : 1280, validate : RED.validators.number() },
-        height: { value : 720, validate : RED.validators.number() },
-        format: { value : "h264" },
+        srcWidth: { value : 1280, validate : RED.validators.number() },
+        srcHeight: { value : 720, validate : RED.validators.number() },
+        srcFormat: { value : "420P" },
+        dstFormat: { value : "h264" },
         name: { value : ""},
         maxBuffer : { value : 100, validate : RED.validators.number() }
       },
@@ -36,16 +37,22 @@
 
 <script type="text/x-red" data-template-name="encoder">
   <div class="form-row">
-    <label for="node-input-width"><i class="fa fa-arrows-h"></i> Width</label>
-    <input type="number" id="node-input-width" placeholder="1280">
+    <label for="node-input-srcWidth"><i class="fa fa-arrows-h"></i> Src Width</label>
+    <input type="number" id="node-input-srcWidth" placeholder="1280">
   </div>
   <div class="form-row">
-    <label for="node-input-height"><i class="fa fa-arrows-v"></i> Height</label>
-    <input type="number" id="node-input-height" placeholder="720">
+    <label for="node-input-srcHeight"><i class="fa fa-arrows-v"></i> Src Height</label>
+    <input type="number" id="node-input-srcHeight" placeholder="720">
   </div>
   <div class="form-row">
-    <label for="node-input-format"><i class="fa fa-paw"></i> Format</label>
-    <select name="node-input-format" id="node-input-format">
+    <label for="node-input-srcFormat"><i class="fa fa-paw"></i> Src Format</label>
+    <select name="node-input-srcFormat" id="node-input-srcFormat">
+      <option value="420P" selected>420P</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-dstFormat"><i class="fa fa-paw"></i> Dest Format</label>
+    <select name="node-input-dstFormat" id="node-input-dstFormat">
       <option value="h264" selected>h264</option>
     </select>
   </div>
