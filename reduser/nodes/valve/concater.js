@@ -23,7 +23,7 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
 
-    var concater = new codecadon.Concater(config.numBytes);
+    var concater = new codecadon.Concater(+config.numBytes);
     concater.on('exit', function() {
       console.log('Concater exiting');
       concater.finish();
@@ -31,17 +31,15 @@ module.exports = function (RED) {
     concater.on('error', function(err) {
       console.log('Concater error: ' + err);
     });
-    console.log('concater start');
     var dstBufLen = concater.start();
 
     this.consume(function (err, x, push, next) {
       if (err) {
         push(err);
         next();
-      } else if (x === null) {
-        console.log('concater quit');
+      } else if (redioactive.isEnd(x)) {
         concater.quit(function() {
-          push(null, redioactive.End);
+          push(null, x);
         });
       } else {
         if (Grain.isGrain(x)) {
@@ -56,7 +54,7 @@ module.exports = function (RED) {
             next();
           });
           // allow a number of packets to queue ahead
-          if (numQueued < config.maxBuffer) { 
+          if (numQueued < +config.maxBuffer) { 
             next(); 
             }
         } else {

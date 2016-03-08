@@ -18,16 +18,12 @@ var util = require('util');
 var codecadon = require('../../../../codecadon');
 var Grain = require('../../../model/Grain.js');
 
-var srcWidth = 1280;
-var srcHeight = 720;
-var srcFmtCode = '420P'
-
 module.exports = function (RED) {
   function Encoder (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
 
-    var encoder = new codecadon.Encoder(config.format, config.width, config.height);
+    var encoder = new codecadon.Encoder(config.dstFormat, +config.srcWidth, +config.srcHeight);
     encoder.on('exit', function() {
       console.log('Encoder exiting');
       encoder.finish();
@@ -41,14 +37,14 @@ module.exports = function (RED) {
       if (err) {
         push(err);
         next();
-      } else if (x === null) {
+      } else if (redioactive.isEnd(x)) {
         encoder.quit(function() {
-          push(null, redioactive.End);
+          push(null, x);
         });
       } else {
         if (Grain.isGrain(x)) {
           var dstBuf = new Buffer(dstBufLen);
-          var numQueued = encoder.encode(x.buffers, srcWidth, srcHeight, srcFmtCode, dstBuf, function(err, result) {
+          var numQueued = encoder.encode(x.buffers, +config.srcWidth, +config.srcHeight, config.srcFormat, dstBuf, function(err, result) {
             if (err) {
               push(err);
             } else if (result) {
@@ -58,7 +54,7 @@ module.exports = function (RED) {
             next();
           });
           // allow a number of packets to queue ahead
-          if (numQueued < config.maxBuffer) { 
+          if (numQueued < +config.maxBuffer) { 
             next(); 
           }
         } else {
