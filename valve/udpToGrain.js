@@ -128,5 +128,7 @@ module.exports = function(sdp) {
       next();
     }
   }
-  return H.pipeline(H.consume(udpConsumer));
+  return H.pipeline(
+    H.consume(udpConsumer),
+    H.errors(function (err, push) { console.error('udpToGrain: ' + err) }));
 }
