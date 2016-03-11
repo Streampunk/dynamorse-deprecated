@@ -14,7 +14,7 @@
 */
 
 module.exports = function (RED) {
-  function RawIn (config) {
+  function AspenTSIn (config) {
     RED.nodes.createNode(this,config);
     var node = this;
     var count = 0;
@@ -29,5 +29,5 @@ module.exports = function (RED) {
       next();
     });
   }
-  RED.nodes.registerType("raw-in",RawIn);
+  RED.nodes.registerType("aspen-ts-in", AspenTSIn);
 }

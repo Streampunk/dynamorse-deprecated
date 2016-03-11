@@ -305,6 +305,24 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/self.js"
     },
+    "raw-file-in": {
+     "name": "raw-file-in",
+     "types": [
+      "raw-file-in"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/10-raw-file-in.js"
+    },
+    "cloud-store-in": {
+     "name": "cloud-store-in",
+     "types": [
+      "cloud-store-in"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/12-cloud-store-in.js"
+    },
     "glob-in": {
      "name": "glob-in",
      "types": [
@@ -312,34 +330,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/glob-in.js"
-    },
-    "grain-maker": {
-     "name": "grain-maker",
-     "types": [
-      "grain-maker"
-     ],
-     "enabled": true,
-     "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/grain-maker.js"
-    },
-    "jtnm-receiver": {
-     "name": "jtnm-receiver",
-     "types": [
-      "jtnm-receiver"
-     ],
-     "enabled": true,
-     "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/jtnm-receiver.js"
-    },
-    "mov-in": {
-     "name": "mov-in",
-     "types": [
-      "mov-in"
-     ],
-     "enabled": true,
-     "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/mov-in.js"
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/14-glob-in.js"
     },
     "mxf-in": {
      "name": "mxf-in",
@@ -348,34 +339,16 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/mxf-in.js"
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/20-mxf-in.js"
     },
-    "pcap-reader": {
-     "name": "pcap-reader",
+    "mov-in": {
+     "name": "mov-in",
      "types": [
-      "pcap-reader"
+      "mov-in"
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/pcap-reader.js"
-    },
-    "raw-in": {
-     "name": "raw-in",
-     "types": [
-      "raw-in"
-     ],
-     "enabled": true,
-     "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/raw-in.js"
-    },
-    "sdi-in": {
-     "name": "sdi-in",
-     "types": [
-      "sdi-in"
-     ],
-     "enabled": true,
-     "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/sdi-in.js"
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/22-mov-in.js"
     },
     "wav-in": {
      "name": "wav-in",
@@ -384,7 +357,34 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/wav-in.js"
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/22-wav-in.js"
+    },
+    "nmos-rtp-in": {
+     "name": "nmos-rtp-in",
+     "types": [
+      "nmos-rtp-in"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/30-nmos-rtp-in.js"
+    },
+    "aspen-ts-in": {
+     "name": "aspen-ts-in",
+     "types": [
+      "aspen-ts-in"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/32-aspen-ts-in.js"
+    },
+    "spm-http-in": {
+     "name": "spm-http-in",
+     "types": [
+      "spm-http-in"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/40-spm-http-in.js"
     },
     "webRTC-in": {
      "name": "webRTC-in",
@@ -393,7 +393,34 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/webRTC-in.js"
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/42-webRTC-in.js"
+    },
+    "sdi-in": {
+     "name": "sdi-in",
+     "types": [
+      "sdi-in"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/50-sdi-in.js"
+    },
+    "pcap-reader": {
+     "name": "pcap-reader",
+     "types": [
+      "pcap-reader"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/90-pcap-reader.js"
+    },
+    "buffer-in": {
+     "name": "buffer-in",
+     "types": [
+      "buffer-in"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/funnel/92-buffer-in.js"
     },
     "glob-out": {
      "name": "glob-out",
@@ -529,15 +556,6 @@
      "enabled": true,
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/aac-enc.js"
-    },
-    "concater": {
-     "name": "concater",
-     "types": [
-      "concater"
-     ],
-     "enabled": true,
-     "module": "node-red",
-     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/concater.js"
     },
     "converter": {
      "name": "converter",

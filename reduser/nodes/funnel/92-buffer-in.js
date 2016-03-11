@@ -14,7 +14,7 @@
 */
 
 module.exports = function (RED) {
-  function GriainMaker (config) {
+  function BufferIn (config) {
     RED.nodes.createNode(this,config);
     var node = this;
     var count = 0;
@@ -29,5 +29,5 @@ module.exports = function (RED) {
       next();
     });
   }
-  RED.nodes.registerType("grain-maker",GriainMaker);
+  RED.nodes.registerType("buffer-in", BufferIn);
 }

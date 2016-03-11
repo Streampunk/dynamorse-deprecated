@@ -15,28 +15,35 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('wav-in',{
+  RED.nodes.registerType('cloud-store-in',{
     category: 'funnel',
-    color: '#D8BFD8',
+    color: '#FDE8C3',
     defaults: {
-      name: {value:""}
+      name: { value : ""},
+      maxBuffer : { value : 100, validate : RED.validators.number() }
     },
     inputs:0,
     outputs:1,
     icon: "funnel.png",
     label: function() {
-      return this.name ||  "wav-in";
+      return this.name ||  "cloud-store-in";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="wav-in">
+<script type="text/x-red" data-template-name="cloud-store-in">
+  <!-- Common to all funnel nodes -->
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> Maximum Buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="100">
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="wav-in">
-  <p>Description of wav-in.</p>
+<script type="text/x-red" data-help-name="cloud-store-in">
+  <p>Read an object that is a sequence of concatenated raw data for grains, where each of
+  the grains has the same number of bytes.</p>
 </script>

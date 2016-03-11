@@ -15,7 +15,7 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('raw-in',{
+  RED.nodes.registerType('raw-file-in',{
     category: 'funnel',
     color: '#FDE8C3',
     defaults: {
@@ -26,12 +26,12 @@
     outputs:1,
     icon: "funnel.png",
     label: function() {
-      return this.name ||  "raw-in";
+      return this.name ||  "raw-file-in";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="raw-in">
+<script type="text/x-red" data-template-name="raw-file-in">
   <!-- Common to all funnel nodes -->
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
@@ -43,7 +43,7 @@
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="raw-in">
+<script type="text/x-red" data-help-name="raw-file-in">
   <p>Read a file that is a sequence of concatenated raw data for grains, where each of
   the grains has the same number of bytes.</p>
 </script>

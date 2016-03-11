@@ -15,28 +15,28 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('sdi-in',{
+  RED.nodes.registerType('aspen-ts-in',{
     category: 'funnel',
-    color: '#D8BFD8',
+    color: '#E59D63',
     defaults: {
       name: {value:""}
     },
     inputs:0,
-    outputs:3,
+    outputs:1,
     icon: "funnel.png",
     label: function() {
-      return this.name ||  "sdi-in";
+      return this.name ||  "aspen-ts-in";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="sdi-in">
+<script type="text/x-red" data-template-name="aspen-ts-in">
   <div class="form-row">
     <label for="node-input-name"><i class="icon-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="sdi-in">
-  <p>Description of sdi-in.</p>
+<script type="text/x-red" data-help-name="aspen-ts-in">
+  <p>Description of jtnm-receiver.</p>
 </script>

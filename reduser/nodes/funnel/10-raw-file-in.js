@@ -14,7 +14,7 @@
 */
 
 module.exports = function (RED) {
-  function JTNMRec (config) {
+  function RawFileIn (config) {
     RED.nodes.createNode(this,config);
     var node = this;
     var count = 0;
@@ -29,5 +29,5 @@ module.exports = function (RED) {
       next();
     });
   }
-  RED.nodes.registerType("jtnm-receiver",JTNMRec);
+  RED.nodes.registerType("raw-file-in",RawFileIn);
 }

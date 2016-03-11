@@ -15,9 +15,9 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('grain-maker',{
+  RED.nodes.registerType('wav-in',{
     category: 'funnel',
-    color: '#D8BFD8',
+    color: '#D79748',
     defaults: {
       name: {value:""}
     },
@@ -25,18 +25,18 @@
     outputs:1,
     icon: "funnel.png",
     label: function() {
-      return this.name ||  "grain-maker";
+      return this.name ||  "wav-in";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="grain-maker">
+<script type="text/x-red" data-template-name="wav-in">
   <div class="form-row">
     <label for="node-input-name"><i class="icon-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="grain-maker">
-  <p>Description of grain-maker.</p>
+<script type="text/x-red" data-help-name="wav-in">
+  <p>Description of wav-in.</p>
 </script>
