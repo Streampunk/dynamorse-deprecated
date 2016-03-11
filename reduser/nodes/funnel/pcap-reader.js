@@ -19,6 +19,7 @@ var redioactive = require('../../../util/Redioactive.js');
 var H = require('highland');
 var pcapInlet = require('../../../funnel/pcapInlet.js');
 var udpToGrain = require('../../../valve/udpToGrain.js');
+var grainConcater = require('../../../valve/grainConcater.js');
 var SDP = require('../../../model/SDP.js');
 
 var videoSDP = `v=0
@@ -41,6 +42,7 @@ a=extmap:9 urn:x-ipstudio:rtp-hdrext:grain-duration
 a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`;
 
 var sdp = new SDP(videoSDP);
+var srcBytesPerPixelPair = 5; // !!! rfc4175 pgroup !!!
 
 module.exports = function (RED) {
   function PCAPReader (config) {
@@ -48,7 +50,8 @@ module.exports = function (RED) {
     redioactive.Funnel.call(this, config);
     this.highland(
       pcapInlet('/Users/vizigoth/Documents/streampunk/nmi/phase1/examples/rtp-video-rfc4175-1080i50-sync.pcap')
-        .pipe(udpToGrain(sdp)));
+        .pipe(udpToGrain(sdp))
+        .pipe(grainConcater(sdp.getWidth(0) * sdp.getHeight(0) * srcBytesPerPixelPair / 2)));
     this.on('close', this.close);
   }
   util.inherits(PCAPReader, redioactive.Funnel);
