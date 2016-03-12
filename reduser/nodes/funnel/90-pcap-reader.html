@@ -14,13 +14,52 @@
   limitations under the License.
 -->
 
+<!-- Assumption wrt NMOS:
+
+  - All funnels create a new NMIS Flow per output that exists from deployment
+    until close.
+  - All funnel-created Flows create a NMOS Source that is common to all child
+    flows created by subsequent node red nodes.
+  - All sources are linked to a device that is represented by a configuration
+    node.
+
+  Property mappings:
+
+  - name -> Flow.label and Source.label
+  - Flow.id and Source.id - taken from grain if regernate = false, else
+    created fresh.
+  - format -> Flow.format and Source.format
+  - description -> Flow.description and Source.description
+  - device -> Source.device_id
+  - regenerate === true -> Flow.parents and Source.parents set to values from PCAP
+  - Flow.tags set from media-specific properties
+-->
+
 <script type="text/javascript">
   RED.nodes.registerType('pcap-reader',{
     category: 'funnel',
     color: '#F4CD94',
     defaults: {
-      name: { value : ""},
-      maxBuffer : { value : 100, validate : RED.validators.number() }
+      name : { value : "" },
+      file : { value : "", required : true },
+      loop : { value : false },
+      regenerate : { value : false },
+      format : { value : "urn:x-nmos:format:video" },
+      description : { value : "" },
+      device : { value : "", type : "device" },
+      sdpURL : { value : "" },
+      encodingName : { value : "raw" },
+      clockRate : { value : 90000, validate : RED.validators.number() },
+      sampling : { value : "YCbCr-4:2:2" },
+      width : { value : 1920, validate : RED.validators.number() },
+      height : { value : 1080, validate : RED.validators.number() },
+      depth : { value : 8, validate : RED.validators.number() },
+      colorimetry : { value : "BT709-2" },
+      interlace : { value : false },
+      packing : { value : "pgroup" },
+      channels : { value : 1, validate : RED.validators.number() },
+      bitrate : { value : 0, validate : RED.validators.number() },
+      maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:0,
     outputs:1,
@@ -33,16 +72,133 @@
 
 <script type="text/x-red" data-template-name="pcap-reader">
   <!-- Common to all funnel nodes -->
-  <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
+  <div class="form-row"> <!-- Used as the name for the flow and source. -->
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+    <input type="text" id="node-input-name" placeholder="source and flow label">
   </div>
   <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> Maximum Buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="100">
+    <label for="node-input-file"><i class="fa fa-file"></i> pcap file</label>
+    <input type="text" id="node-input-file" placeholder="PCAP file path">
+  </div>
+  <div class="form-row">
+    <label for="node-input-loop"><i class="fa fa-repeat"></i> loop?</label>
+    <input type="checkbox" id="node-input-loop" style="width: 100px">
+    <label for="node-input-regenerate"><i class="fa fa-clock-o"></i> regenerate?</label>
+    <input type="checkbox" id="node-input-regenerate" style="width: 100px">
+  </div>
+  <div class="form-row">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
+    <input type="number" id="node-input-maxBuffer" min="1" placeholder="10" style="width: 100px">
+  </div>
+  <!-- Properties related to creating flows and sources. -->
+  <p>Enter details used to configure a NMOS flow and source:</p>
+  <div class="form-row">
+    <label for="node-input-format"><i class="fa fa-video-camera"></i> format</label>
+    <select id="node-input-format">
+      <option value="urn:x-nmos:format:video" selected>video</option>
+      <option value="urn:x-nmos:format:audio">audio</option>
+      <option value="urn:x-nmos:format:event">event</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+    <input type="text" id="node-input-description" placeholder="source and flow description">
+  </div>
+  <div class="form-row">
+    <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
+    <input type="text" id="node-input-device">
+  </div>
+  <!-- Media-specific properties, either derived from an SDP file or given parameters -->
+  <p>Either enter a link to a SDP file describing the stream or provide parameters.</p>
+  <div class="form-row">
+    <label for="node-input-sdpURL"><i class="fa fa-external-link-square"></i> SDP URL</label>
+    <input type="text" id="node-input-sdpURL" placeholder="file:video.sdp">
+  </div>
+  <div class="form-row">
+    <label for="node-input-encodingName" style="width: 120px"><i class="fa fa-map-signs">
+      </i> encoding name</label>
+    <select id="node-input-encodingName">
+      <option value="raw" selected>video/raw</option>
+      <option value="h264">video/H264</option>
+      <option value="L16">audio/L16</option>
+      <option value="L24">audio/L24</option>
+      <option value="smpte291">video/smpte291</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label><i class="fa fa-arrows"></i> dimensions</label>
+    <label for="node-input-width" style="text-align: right">width</label>
+    <input type="number" min="0" id="node-input-width" placeholder="1920"
+      style="width: 80px" list="widths">
+    <label for="node-input-height" style="text-align: right">height</label>
+    <input type="number" min="0" id="node-input-height" placeholder="1080"
+      style="width: 80px" list="heights">
+    <datalist id="widths">
+      <option value="720"/>
+      <option value="800"/>
+      <option value="1024"/>
+      <option value="1280"/>
+      <option value="1440"/>
+      <option value="1600"/>
+      <option value="1920"/>
+      <option value="2560"/>
+      <option value="3840"/>
+    </datalist>
+    <datalist id="heights">
+      <option value="576"/>
+      <option value="600"/>
+      <option value="768"/>
+      <option value="720"/>
+      <option value="900"/>
+      <option value="1080"/>
+      <option value="1440"/>
+      <option value="2160"/>
+    </datalist>
+  </div>
+  <div class="form-row">
+    <label for="node-input-clockRate"><i class="fa fa-heartbeat"></i> clock rate</label>
+    <input type="number" id="node-input-clockRate" min="0" list="rates"
+      placeholder="90000" style="width: 80px">
+    <datalist id="rates">
+      <option value="90000">
+      <option value="48000">
+    </datalist>
+    <label for="node-input-sampling" style="text-align: right"><i class="fa fa-eye"></i> sampling</label>
+    <select id="node-input-sampling" style="width: 120px">
+      <option value="RGB">RGB</option>
+      <option value="RGBA">RGBA</option>
+      <option value="BGR">BGR</option>
+      <option value="BGRA">BGRA</option>
+      <option value="YCbCr-4:4:4">YCbCr-4:4:4</option>
+      <option value="YCbCr-4:2:2" selected>YCbCr-4:2:2</option>
+      <option value="YCbCr-4:2:0">YCbCr-4:2:0</option>
+      <option value="YCbCr-4:1:1">YCbCr-4:1:1</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-depth"><i class="fa fa-picture-o"></i> depth</label>
+    <input type="number" min="8" placeholder="8" id="node-input-depth" style="width: 80px">
+    <label for="node-input-colorimetry" style="text-align: right">
+      <i class="fa fa-pencil-square-o"></i> colorimetry</label>
+    <select id="node-input-colorimetry" style="width: 120px">
+      <option value="BT601-5">BT601-5</option>
+      <option value="BT709-2" selected>BT709-2</option>
+      <option value="SMPTE240M">SMPTE240M</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-interlace"><i class="fa fa-bars"></i> interlace?</label>
+    <input type="checkbox" id="node-input-interlace" style="width: 95px">
+    <label for="node-input-packing" style="text-align: right">
+      <i class="fa fa-briefcase"></i> packing</label>
+    <select id="node-input-packing" style="width: 140px">
+      <option value="V210">V210</option>
+      <option value="pgroup" selected>RFC4175 pgroup</option>
+    </select>
   </div>
 </script>
 
 <script type="text/x-red" data-help-name="pcap-reader">
-  <p>Read UDP packet payloads from a Wireshark package captuire (PCAP) file.</p>
+  <h2>PCAP File Reader</h1>
+  <p>Read UDP packet payloads from a Wireshark packet capture (PCAP) file.</p>
 </script>
