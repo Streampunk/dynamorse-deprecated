@@ -13,17 +13,55 @@
   limitations under the License.
 */
 
-// Ready for some scriptorian magic :-)
-
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
+var codecadon = require('../../../../codecadon');
+var Grain = require('../../../model/Grain.js');
 
 module.exports = function (RED) {
   function Decoder (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
-    this.consume(function (err, x, push, next) {
 
+    var decoder = new codecadon.Decoder(config.dstFormat, +config.srcWidth, +config.srcHeight);
+    decoder.on('exit', function() {
+      console.log('Decoder exiting');
+      decoder.finish();
+    });
+    decoder.on('error', function(err) {
+      console.log('Decoder error: ' + err);
+    });
+    var dstBufLen = decoder.start();
+
+    this.consume(function (err, x, push, next) {
+      if (err) {
+        push(err);
+        next();
+      } else if (redioactive.isEnd(x)) {
+        decoder.quit(function() {
+          push(null, x);
+        });
+      } else {
+        if (Grain.isGrain(x)) {
+          var dstBuf = new Buffer(dstBufLen);
+          var numQueued = decoder.decode(x.buffers, +config.srcWidth, +config.srcHeight, config.srcFormat, dstBuf, function(err, result) {
+            if (err) {
+              push(err);
+            } else if (result) {
+              push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
+                                   x.timecode, x.flow_id, x.source_id, x.duration));
+            }
+            next();
+          });
+          // allow a number of packets to queue ahead
+          if (numQueued < +config.maxBuffer) { 
+            next(); 
+          }
+        } else {
+          push(null, x);
+          next();
+        }
+      }
     });
     this.on('close', this.close);
   }

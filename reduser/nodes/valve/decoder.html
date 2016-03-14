@@ -19,6 +19,10 @@
       category: 'valve',
       color: '#A09D45',
       defaults: {
+        srcWidth: { value : 1280, validate : RED.validators.number() },
+        srcHeight: { value : 720, validate : RED.validators.number() },
+        srcFormat: { value : "h264" },
+        dstFormat: { value : "420P" },
         name: { value : ""},
         maxBuffer : { value : 100, validate : RED.validators.number() }
       },
@@ -32,6 +36,27 @@
 </script>
 
 <script type="text/x-red" data-template-name="decoder">
+  <div class="form-row">
+    <label for="node-input-srcWidth"><i class="fa fa-arrows-h"></i> Src Width</label>
+    <input type="number" id="node-input-srcWidth" placeholder="1280">
+  </div>
+  <div class="form-row">
+    <label for="node-input-srcHeight"><i class="fa fa-arrows-v"></i> Src Height</label>
+    <input type="number" id="node-input-srcHeight" placeholder="720">
+  </div>
+  <div class="form-row">
+    <label for="node-input-srcFormat"><i class="fa fa-paw"></i> Src Format</label>
+    <select name="node-input-srcFormat" id="node-input-srcFormat">
+      <option value="h264" selected>420P</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-dstFormat"><i class="fa fa-paw"></i> Dest Format</label>
+    <select name="node-input-dstFormat" id="node-input-dstFormat">
+      <option value="420P" selected>h264</option>
+    </select>
+  </div>
+
   <!-- Common to all funnel nodes -->
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
