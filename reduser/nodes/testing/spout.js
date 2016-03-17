@@ -21,8 +21,9 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     redioactive.Spout.call(this, config);
     this.each(function (x, next) {
-      this.log(`Received ${x}.`);
-      setTimeout(next, 100);
+      this.log(`Received ${util.inspect(x)}.`);
+      if (config.timeout === 0) setImmediate(next);
+      else setTimeout(next, config.timeout);
     }.bind(this));
     this.done(function () {
       this.log('Thank goodness that is over!');

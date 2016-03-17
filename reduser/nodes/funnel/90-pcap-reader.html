@@ -57,7 +57,7 @@
       colorimetry : { value : "BT709-2" },
       interlace : { value : false },
       packing : { value : "pgroup" },
-      channels : { value : 1, validate : RED.validators.number() },
+      channels : { value : 0, validate : RED.validators.number() },
       bitrate : { value : 0, validate : RED.validators.number() },
       maxBuffer : { value : 10, validate : RED.validators.number() }
     },
@@ -163,7 +163,7 @@
       <option value="90000">
       <option value="48000">
     </datalist>
-    <label for="node-input-sampling" style="text-align: right"><i class="fa fa-eye"></i> sampling</label>
+    <label for="node-input-sampling" style="text-align: left">&nbsp;<i class="fa fa-eye"></i> sampling</label>
     <select id="node-input-sampling" style="width: 120px">
       <option value="RGB">RGB</option>
       <option value="RGBA">RGBA</option>
@@ -178,8 +178,8 @@
   <div class="form-row">
     <label for="node-input-depth"><i class="fa fa-picture-o"></i> depth</label>
     <input type="number" min="8" placeholder="8" id="node-input-depth" style="width: 80px">
-    <label for="node-input-colorimetry" style="text-align: right">
-      <i class="fa fa-pencil-square-o"></i> colorimetry</label>
+    <label for="node-input-colorimetry" style="text-align: left">
+      &nbsp;<i class="fa fa-pencil-square-o"></i> colorimetry</label>
     <select id="node-input-colorimetry" style="width: 120px">
       <option value="BT601-5">BT601-5</option>
       <option value="BT709-2" selected>BT709-2</option>
@@ -189,12 +189,20 @@
   <div class="form-row">
     <label for="node-input-interlace"><i class="fa fa-bars"></i> interlace?</label>
     <input type="checkbox" id="node-input-interlace" style="width: 95px">
-    <label for="node-input-packing" style="text-align: right">
-      <i class="fa fa-briefcase"></i> packing</label>
+    <label for="node-input-packing" style="text-align: left">
+      &nbsp;<i class="fa fa-briefcase"></i> packing</label>
     <select id="node-input-packing" style="width: 140px">
       <option value="V210">V210</option>
       <option value="pgroup" selected>RFC4175 pgroup</option>
+      <option value="audio">RFC3190 audio</option>
     </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-channels"><i class="fa fa-music"></i> channels</label>
+    <input type="number" min="0" placeholder="0" id="node-input-channels" style="width: 80px">
+    <label for="node-input-bitrate" style="text-align: left">
+      &nbsp;<i class="fa fa-long-arrow-right"></i> bitrate</label>
+    <input type="number" min="0" placeholder="0" id="node-input-bitrate" style="width: 80px">
   </div>
 </script>
 

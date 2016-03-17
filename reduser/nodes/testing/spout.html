@@ -19,30 +19,30 @@
     category: 'testing',
     color: '#C1C1A6',
     defaults: {
-      name: {value : "" },
-      device : { value : "", type : "device" }
+      name : { value : "" },
+      timeout : { value : 0, validate : RED.validators.number() }
     },
     inputs:1,
     outputs:0,
     align: 'right',
     icon: "spout.png",
     label: function() {
-      return this.name ||  "spout";
+      return this.name || "spout";
     }
   });
 </script>
 
 <script type="text/x-red" data-template-name="spout">
   <div class="form-row">
-    <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
-    <input type="text" id="node-input-device">
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+    <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
+    <label for="node-input-timeout"><i class="fa fa-clock-o"></i> timeout</label>
+    <input type="number" min="0" id="node-input-timeout" placeholder="0">
   </div>
 </script>
 
 <script type="text/x-red" data-help-name="spout">
-  <p>Test spout node that prints what it receives.</p>
+  <p>Test spout node that prints to the console what it receives.</p>
 </script>

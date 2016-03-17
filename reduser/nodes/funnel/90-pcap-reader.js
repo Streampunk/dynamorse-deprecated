@@ -21,6 +21,7 @@ var pcapInlet = require('../../../funnel/pcapInlet.js');
 var udpToGrain = require('../../../valve/udpToGrain.js');
 var grainConcater = require('../../../valve/grainConcater.js');
 var SDP = require('../../../model/SDP.js');
+var util = require('util');
 
 var videoSDP = `v=0
 o=- 1443716955 1443716955 IN IP4 172.29.82.50
@@ -48,10 +49,13 @@ module.exports = function (RED) {
   function PCAPReader (config) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
-    this.highland(
-      pcapInlet('/Users/vizigoth/Documents/streampunk/nmi/phase1/examples/rtp-video-rfc4175-1080i50-sync.pcap')
-        .pipe(udpToGrain(sdp))
-        .pipe(grainConcater(sdp.getWidth(0) * sdp.getHeight(0) * srcBytesPerPixelPair / 2)));
+    // Read SDP file / URL or check config
+    // Create flow
+    this.log(util.inspect(config));
+    // this.highland(
+    //   pcapInlet('/Users/vizigoth/Documents/streampunk/nmi/phase1/examples/rtp-video-rfc4175-1080i50-sync.pcap')
+    //   .pipe(udpToGrain(sdp))
+    //   .pipe(grainConcater(sdp.getWidth(0) * sdp.getHeight(0) * srcBytesPerPixelPair / 2)));
     this.on('close', this.close);
   }
   util.inherits(PCAPReader, redioactive.Funnel);
