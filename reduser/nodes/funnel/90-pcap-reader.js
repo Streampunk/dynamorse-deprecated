@@ -49,9 +49,16 @@ module.exports = function (RED) {
   function PCAPReader (config) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
+    this.log(util.inspect(config));
+    fs.access(config.file, fs.R_OK, function (e) {
+      if (e) {
+        console.log('Bad!!!!!!!!!');
+        return this.preFlightError(e);
+      }
+    }.bind(this));
     // Read SDP file / URL or check config
     // Create flow
-    this.log(util.inspect(config));
+
     // this.highland(
     //   pcapInlet('/Users/vizigoth/Documents/streampunk/nmi/phase1/examples/rtp-video-rfc4175-1080i50-sync.pcap')
     //   .pipe(udpToGrain(sdp))

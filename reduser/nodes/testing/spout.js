@@ -25,6 +25,11 @@ module.exports = function (RED) {
       if (config.timeout === 0) setImmediate(next);
       else setTimeout(next, config.timeout);
     }.bind(this));
+    this.errors(function (e, next) {
+      this.warn(`Received unhandled error: ${e.message}.`);
+      if (config.timeout === 0) setImmediate(next);
+      else setTimeout(next, config.timeout);
+    }.bind(this));
     this.done(function () {
       this.log('Thank goodness that is over!');
     }.bind(this));
