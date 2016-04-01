@@ -33,6 +33,7 @@ var isEnd = function (x) {
 var theEnd = new End;
 
 var setStatus = function (fill, shape, text) {
+  console.log('***', arguments);
   if (this.nodeStatus !== text && this.nodeStatus !== 'done') {
     this.status({ fill : fill, shape : shape, text: text});
     this.nodeStatus = text;
@@ -179,6 +180,14 @@ function Funnel (config) {
       });
     next = function () { highlandStream.resume(); }
     node.setStatus('green', 'dot', 'generating');
+  }
+  this.preFlightError = function (e) {
+    node.error(`Preflight error: ${e.message}.`);
+    push(e);
+    node.setStatus('red', 'ring', 'preflight fail');
+    next = function () {
+      node.setStatus('red', 'ring', 'preflight fail');
+    }
   }
   this.close = function (done) { // done is undefined :-(
     node.setStatus('yellow', 'ring', 'closing');
