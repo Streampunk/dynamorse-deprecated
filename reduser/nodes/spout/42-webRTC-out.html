@@ -15,35 +15,30 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('nmos-rtp-in',{
-    category: 'funnel',
-    color: '#E59D63',
+  RED.nodes.registerType('webRTC-out',{
+    category: 'spout',
+    color: '#FFFBD5',
     defaults: {
-      name: { value : "" },
-      maxBuffer : { value : 10, validate : RED.validators.number() }
+      name: { value : "" }
     },
-    inputs:0,
-    outputs:1,
-    icon: "funnel.png",
+    inputs:1,
+    outputs:0,
+    align: 'right',
+    icon: "spout.png",
     label: function() {
-      return this.name || "nmos-rtp-in";
+      return this.name ||  "webRTC-out";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="nmos-rtp-in">
-  <!-- Common to all funnel nodes -->
+<script type="text/x-red" data-template-name="webRTC-out">
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
     <input type="text" id="node-input-name" placeholder="name">
   </div>
-  <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="10">
-  </div>
 </script>
 
-<script type="text/x-red" data-help-name="nmos-rtp-in">
-  <h1>NMOS RTP stream input</h1>
-  <p>Recieve an NMOS RTP stream, discovered by querying an NMOS query API.</p>
+<script type="text/x-red" data-help-name="webRTC-out">
+  <h1>WebRTC stream input</h1>
+  <p>Send a WebRTC stream.</p>
 </script>

@@ -20,7 +20,7 @@
     color: '#FDE8C3',
     defaults: {
       name: { value : ""},
-      maxBuffer : { value : 100, validate : RED.validators.number() }
+      maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:0,
     outputs:1,
@@ -34,12 +34,12 @@
 <script type="text/x-red" data-template-name="cloud-store-in">
   <!-- Common to all funnel nodes -->
   <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
   <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> Maximum Buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="100">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="10">
   </div>
 </script>
 

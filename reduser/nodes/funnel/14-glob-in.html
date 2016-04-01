@@ -29,7 +29,7 @@
         validate : function (v) {
           return Red.validators.number()(v) && v > this.in; } */
       },
-      maxBuffer : { value : 100, validate : RED.validators.number() }
+      maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:0,
     outputs:1,
@@ -73,11 +73,11 @@
   </div>
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
+    <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> Maximum Buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="100">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="10">
   </div>
 
 </script>

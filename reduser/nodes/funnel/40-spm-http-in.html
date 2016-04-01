@@ -19,24 +19,33 @@
     category: 'funnel',
     color: '#FFFBD5',
     defaults: {
-      name: {value:""}
+      name : { value : "" },
+      maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:0,
     outputs:1,
     icon: "funnel.png",
     label: function() {
-      return this.name ||  "spm-http-in";
+      return this.name || "spm-http-in";
     }
   });
 </script>
 
 <script type="text/x-red" data-template-name="spm-http-in">
-  <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
-  </div>
+<!-- Common to all funnel nodes -->
+<div class="form-row">
+  <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+  <input type="text" id="node-input-name" placeholder="name">
+</div>
+<div class="form-row">
+  <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
+  <input type="number" id="node-input-maxBuffer" placeholder="10">
+</div>
 </script>
 
 <script type="text/x-red" data-help-name="spm-http-in">
-  <p>Description of webRTC-in.</p>
+  <h1>Streampunk Media HTTP input</h1>
+  <p>Receive a Streampunk Media HTTP stream, providing a simple media transport
+  using a simple HTTP encapslation, push or pull, with an option to secure with
+  HTTPS.</p>
 </script>

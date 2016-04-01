@@ -17,11 +17,11 @@ var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
 
 module.exports = function (RED) {
-  function SpmHTTPIn (config) {
+  function ASPENTSOut (config) {
     RED.nodes.createNode(this, config);
-    redioactive.Funnel.call(this, config);
+    redioactive.Spout.call(this, config);
     // Go figure!
   }
-  util.inherits(SpmHTTPIn, redioactive.Funnel);
-  RED.nodes.registerType("spm-http-in", SpmHTTPIn);
+  util.inherits(ASPENTSOut, redioactive.Spout);
+  RED.nodes.registerType("aspen-ts-out", ASPENTSOut);
 }

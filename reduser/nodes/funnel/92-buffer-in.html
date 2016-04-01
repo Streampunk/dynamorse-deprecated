@@ -15,7 +15,7 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('buffer-in',{
+  RED.nodes.registerType('buffer-in', {
     category: 'funnel',
     color: '#F4CD94',
     defaults: {
@@ -25,18 +25,25 @@
     outputs:1,
     icon: "funnel.png",
     label: function() {
-      return this.name ||  "buffer-in";
+      return this.name || "buffer-in";
     }
   });
 </script>
 
 <script type="text/x-red" data-template-name="buffer-in">
-  <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
-  </div>
+<!-- Common to all funnel nodes -->
+<div class="form-row">
+  <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+  <input type="text" id="node-input-name" placeholder="name">
+</div>
+<div class="form-row">
+  <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
+  <input type="number" id="node-input-maxBuffer" placeholder="10">
+</div>
 </script>
 
 <script type="text/x-red" data-help-name="buffer-in">
-  <p>Description of grain-maker.</p>
+  <h1>Stream of node-red buffers input</h1>
+  <p>Receive a stream of buffers from a node-red source, adding grain metadata
+  as required.</p>
 </script>

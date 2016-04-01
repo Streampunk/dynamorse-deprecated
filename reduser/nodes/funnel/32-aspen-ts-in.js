@@ -13,21 +13,15 @@
   limitations under the License.
 */
 
+var redioactive = require('../../../util/Redioactive.js');
+var util = require('util');
+
 module.exports = function (RED) {
   function AspenTSIn (config) {
     RED.nodes.createNode(this,config);
-    var node = this;
-    var count = 0;
-    var next = function () {
-      var msg = {
-        payload : count++,
-        next : next
-      };
-      node.send(msg);
-    };
-    setImmediate(function() {
-      next();
-    });
+    redioactive.Funnel.call(this, config);
+    // Go figure!
   }
+  util.inherits(AspenTSIn, redioactive.Funnel);
   RED.nodes.registerType("aspen-ts-in", AspenTSIn);
 }

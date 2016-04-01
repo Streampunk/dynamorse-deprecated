@@ -7,7 +7,7 @@
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by appli cable law or agreed to in writing, software
+  Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -15,29 +15,30 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('webRTC-out',{
+  RED.nodes.registerType('nmos-rtp-out',{
     category: 'spout',
-    color: '#E6E0F8',
+    color: '#E59D63',
     defaults: {
-      name: {value:""}
+      name: { value : "" }
     },
     inputs:1,
     outputs:0,
     align: 'right',
     icon: "spout.png",
     label: function() {
-      return this.name ||  "webRTC-out";
+      return this.name || "nmos-rtp-out";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="webRTC-out">
+<script type="text/x-red" data-template-name="nmos-rtp-out">
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+    <input type="text" id="node-input-name" placeholder="name">
   </div>
 </script>
 
-<script type="text/x-red" data-help-name="webRTC-out">
-  <p>Description of webRTC-out.</p>
+<script type="text/x-red" data-help-name="nmos-rtp-out">
+  <h1>NMOS RTP stream input</h1>
+  <p>Send an NMOS RTP stream, advertised via an NMOS registration API.</p>
 </script>
