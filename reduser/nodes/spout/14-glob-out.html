@@ -1,0 +1,46 @@
+<!--
+  Copyright 2016 Christine S. MacNeill
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by appli cable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/javascript">
+  RED.nodes.registerType('glob-out', {
+    category: 'spout',
+    color: '#FDE8C3',
+    defaults: {
+      name: { value : "" }
+    },
+    inputs:1,
+    outputs:0,
+    align: 'right',
+    icon: "spout.png",
+    label: function() {
+      return this.name || "glob-out";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="glob-out">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="glob-out">
+  <h1>Files-by-glob output</h1>
+  <p>Writes raw essence from a sequence of files in a folder, where the sequence
+  in which the grains are written is given by a <em>glob</em> (file name with
+  wildcard) pattern.</p>
+</script>
