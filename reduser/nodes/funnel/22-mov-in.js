@@ -6,7 +6,7 @@
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by appli cable law or agreed to in writing, software
+  Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -15,19 +15,7 @@
 
 module.exports = function (RED) {
   function MOVIn (config) {
-    RED.nodes.createNode(this,config);
-    var node = this;
-    var count = 0;
-    var next = function () {
-      var msg = {
-        payload : count++,
-        next : next
-      };
-      node.send(msg);
-    };
-    setImmediate(function() {
-      next();
-    });
+    RED.nodes.createNode(this, config);
   }
   RED.nodes.registerType("mov-in",MOVIn);
 }

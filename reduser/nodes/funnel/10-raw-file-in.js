@@ -6,28 +6,21 @@
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by appli cable law or agreed to in writing, software
+  Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
   limitations under the License.
 */
 
+var redioactive = require('../../../util/Redioactive.js');
+
 module.exports = function (RED) {
   function RawFileIn (config) {
     RED.nodes.createNode(this,config);
-    var node = this;
-    var count = 0;
-    var next = function () {
-      var msg = {
-        payload : count++,
-        next : next
-      };
-      node.send(msg);
-    };
-    setImmediate(function() {
-      next();
-    });
+    redioactive.Funnel.call(this, config);
+    // Go figure
   }
-  RED.nodes.registerType("raw-file-in",RawFileIn);
+  util.inherits(RawFileIn, redioactive.Funnel);
+  RED.nodes.registerType("raw-file-in", RawFileIn);
 }

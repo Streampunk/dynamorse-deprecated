@@ -14,10 +14,10 @@
 */
 
 var util = require('util');
-var redioactive = require('../../../util/Redioactive.js')
+var redioactive = require('../../../util/Redioactive.js');
 
 module.exports = function (RED) {
-  function GlobOut (config) {
+  function TestSpout (config) {
     RED.nodes.createNode(this, config);
     redioactive.Spout.call(this, config);
     this.each(function (x, next) {
@@ -29,6 +29,6 @@ module.exports = function (RED) {
       this.log('Thank goodness that is over!');
     }.bind(this));
   }
-  util.inherits(GlobOut, redioactive.Spout);
-  RED.nodes.registerType("spout",GlobOut);
+  util.inherits(TestSpout, redioactive.Spout);
+  RED.nodes.registerType("spout", TestSpout);
 }

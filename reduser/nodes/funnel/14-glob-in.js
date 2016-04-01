@@ -20,11 +20,8 @@ module.exports = function (RED) {
   function GlobIn (config) {
     RED.nodes.createNode(this,config);
     redioactive.Funnel.call(this, config);
-    this.generator(function (push, next) {
-
-    }.bind(this));
-    this.on('close', this.close);
+    // Go figure
   }
   util.inherits(GlobIn, redioactive.Funnel);
-  RED.nodes.registerType("glob-in",GlobIn);
+  RED.nodes.registerType("glob-in", GlobIn);
 };
