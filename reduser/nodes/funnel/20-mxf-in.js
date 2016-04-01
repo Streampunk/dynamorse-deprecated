@@ -14,12 +14,13 @@
 */
 
 var redioactive = require('../../../util/Redioactive.js');
+var util = require('util');
 
 module.exports = function (RED) {
   function MXFIn (config) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
-
+    // Go figure
   }
   util.inherits(MXFIn, redioactive.Funnel);
   RED.nodes.registerType("mxf-in", MXFIn);

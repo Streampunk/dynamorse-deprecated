@@ -58,7 +58,7 @@ function Funnel (config) {
   var workTimes = [];
   var paused = false;
   var soc = dgram.createSocket('udp4');
-  console.log('***', util.inspect(this.setStatus, {showHidden: true}));
+  console.log('***', util.inspect(this.setStatus, { showHidden: true }));
   node.setStatus('grey', 'ring', 'initialising');
   var maxBuffer = 10;
   if (config.maxBuffer && typeof config.maxBuffer === 'string')

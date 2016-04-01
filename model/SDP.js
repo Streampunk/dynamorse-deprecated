@@ -314,6 +314,43 @@ SDP.prototype.getHeight = function (i) {
   return undefined;
 }
 
+SDP.prototype.getSampling = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.fmtp)) {
+    var hm = this.m[i].a.fmtp[0].match(/.*sampling=([\w-:]+).*/);
+    if (hm) return hm[1];
+  }
+  return undefined;
+}
+
+SDP.prototype.getColorimetry = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.fmtp)) {
+    var hm = this.m[i].a.fmtp[0].match(/.*colorimetry=([\w-]+).*/);
+    if (hm) return hm[1];
+  }
+  return undefined;
+}
+
+SDP.prototype.getDepth = function(i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.fmtp)) {
+    var hm = this.m[i].a.fmtp[0].match(/.*depth=([0-9]+).*/);
+    if (hm) return +hm[1];
+  }
+  return undefined;
+}
+
+SDP.prototype.getInterlace = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.fmtp)) {
+    var hm = this.m[i].a.fmtp[0].match(/.*interlace=([01]).*/);
+    if (hm) return +hm[1];
+  }
+  return undefined;
+}
+
+
 SDP.isSDP = function (x) {
   return x !== null &&
     typeof x === 'object' &&

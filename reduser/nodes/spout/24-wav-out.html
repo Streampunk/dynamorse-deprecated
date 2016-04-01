@@ -17,27 +17,29 @@
 <script type="text/javascript">
   RED.nodes.registerType('wav-out',{
     category: 'spout',
-    color: '#E6E0F8',
+    color: '#D79748',
     defaults: {
-      name: {value:""}
+      name: { value : "" }
     },
     inputs:1,
     outputs:0,
     align: 'right',
     icon: "spout.png",
     label: function() {
-      return this.name ||  "wav-out";
+      return this.name || "wav-out";
     }
   });
 </script>
 
 <script type="text/x-red" data-template-name="wav-out">
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+    <input type="text" id="node-input-name" placeholder="name">
   </div>
 </script>
 
 <script type="text/x-red" data-help-name="wav-out">
-  <p>Description of wav-out.</p>
+  <h1>WAVE audio file output</h1>
+  <p>Write audio grains to a WAVE audio (<code>.wav</code>) file, streaming input
+  from one or more NMOS-style flows.</p>
 </script>

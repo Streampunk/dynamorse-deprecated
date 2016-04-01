@@ -16,7 +16,7 @@
 var fs = require('fs');
 var H = require('highland');
 
-function pcapInlet(file) {
+function pcapInlet(file, loop) {
   var stream = fs.createReadStream(file);
   var nextLen = 0;
   var chunks = 0;
@@ -72,6 +72,7 @@ function pcapInlet(file) {
       next();
     }
   }
+  
   return H(stream).consume(pcapConsumer);
 }
 

@@ -26,18 +26,20 @@
     align: 'right',
     icon: "spout.png",
     label: function() {
-      return this.name ||  "mov-out";
+      return this.name || "mov-out";
     }
   });
 </script>
 
 <script type="text/x-red" data-template-name="mov-out">
   <div class="form-row">
-    <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
 </script>
 
 <script type="text/x-red" data-help-name="mov-out">
-  <p>Description of mov-out.</p>
+  <h1>MOV file output</h1>
+  <p>Write grains to a MXF file, taking one or more NMOS flows to make
+  an interleaved file.</p>
 </script>

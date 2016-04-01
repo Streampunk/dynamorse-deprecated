@@ -13,9 +13,15 @@
   limitations under the License.
 */
 
+var redioactive = require('../../../util/Redioactive.js');
+var util = require('util');
+
 module.exports = function (RED) {
   function MOVIn (config) {
     RED.nodes.createNode(this, config);
+    redioactive.Funnel.call(this, config);
+    // Go figure
   }
-  RED.nodes.registerType("mov-in",MOVIn);
+  util.inherits(MOVIn, redioactive.Funnel);
+  RED.nodes.registerType("mov-in", MOVIn);
 }

@@ -14,15 +14,11 @@
 */
 
 module.exports = function (RED) {
-    function MOVOut (config) {
-      RED.nodes.createNode(this, config);
-      var node = this;
-      var waiting = true;
-      var lastMsg = null;
-      node.on('input', function (msg) {
-        // Transform message - perform action
-        msg.next();
-      });
-    }
-    RED.nodes.registerType("mov-out",MOVOut);
+  function MOVOut (config) {
+    RED.nodes.createNode(this, config);
+    redioactive.Spout.call(this, config);
+    // Go figure!
   }
+  util.inherits(MOVOut, redioactive.Spout);
+  RED.nodes.registerType("mov-out", MOVOut);
+}
