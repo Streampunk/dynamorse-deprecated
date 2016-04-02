@@ -17,11 +17,11 @@ var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
 
 module.exports = function (RED) {
-  function Graphics (config) {
+  function Merge (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
     // Go figure
   }
-  util.inherits(Graphics, redioactive.Valve);
-  RED.nodes.registerType("graphics", Graphics);
+  util.inherits(Merge, redioactive.Valve);
+  RED.nodes.registerType("merge", Merge);
 }

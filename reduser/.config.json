@@ -305,6 +305,123 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/self.js"
     },
+    "drop": {
+     "name": "drop",
+     "types": [
+      "drop"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/10-drop.js"
+    },
+    "take": {
+     "name": "take",
+     "types": [
+      "take"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/12-take.js"
+    },
+    "doto": {
+     "name": "doto",
+     "types": [
+      "doto"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/20-doto.js"
+    },
+    "map": {
+     "name": "map",
+     "types": [
+      "map"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/22-map.js"
+    },
+    "filter": {
+     "name": "filter",
+     "types": [
+      "filter"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/24-filter.js"
+    },
+    "head": {
+     "name": "head",
+     "types": [
+      "head"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/30-head.js"
+    },
+    "last": {
+     "name": "last",
+     "types": [
+      "last"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/32-last.js"
+    },
+    "throttle": {
+     "name": "throttle",
+     "types": [
+      "throttle"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/40-throttle.js"
+    },
+    "rate-limit": {
+     "name": "rate-limit",
+     "types": [
+      "rate-limit"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/42-rate-limit.js"
+    },
+    "retime": {
+     "name": "retime",
+     "types": [
+      "retime"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/44-retime.js"
+    },
+    "concat": {
+     "name": "concat",
+     "types": [
+      "concat"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/50-concat.js"
+    },
+    "merge": {
+     "name": "merge",
+     "types": [
+      "merge"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/52-merge.js"
+    },
+    "otherwise": {
+     "name": "otherwise",
+     "types": [
+      "otherwise"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/fitting/54-otherwise.js"
+    },
     "raw-file-in": {
      "name": "raw-file-in",
      "types": [

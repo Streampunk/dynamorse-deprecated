@@ -66,7 +66,7 @@ var settings = {
       nodeAPI : nodeAPI,
       ledger : ledger
     },    // enables global context
-    paletteCategories: ['subflows', 'funnel', 'valve', 'spout', 'testing', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
+    paletteCategories: ['subflows', 'funnel', 'valve', 'fitting', 'spout', 'testing', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
     logging: { console : { level : "trace", audit : true } }
 };
 

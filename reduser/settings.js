@@ -157,7 +157,7 @@ module.exports = {
     // palette. If a node's category is not in the list, the category will get
     // added to the end of the palette.
     // If not set, the following default order is used:
-    paletteCategories: ['subflows', 'funnel', 'valve', 'spout', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
+    paletteCategories: ['subflows', 'funnel', 'valve', 'fitting', 'spout', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
 
     // Configure the logging output
     logging: {

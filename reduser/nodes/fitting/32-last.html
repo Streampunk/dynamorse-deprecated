@@ -15,23 +15,23 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('graphics',{
-    category: 'valve',
-    color: '#87A980',
+  RED.nodes.registerType('last', {
+    category: 'fitting',
+    color: '#83AE9A',
     defaults: {
       name: { value : "" },
       maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:1,
     outputs:1,
-    icon: "valve.png",
+    icon: "tee.png",
     label: function() {
-      return this.name || "graphics";
+      return this.name || "last";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="graphics">
+<script type="text/x-red" data-template-name="last">
 <!-- Common to all funnel nodes -->
 <div class="form-row">
   <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
@@ -43,7 +43,8 @@
 </div>
 </script>
 
-<script type="text/x-red" data-help-name="graphics">
-  <h1>Graphics effects</h1>
-  <p>Add graphics and effects to a flow, creating an updated output flow.</p>
+<script type="text/x-red" data-help-name="last">
+  <h1>Last of flow</h1>
+  <p>Take the last grain of the the flow. Options are provided to repeat the grain
+  a given number of times or in a continuous loop.</p>
 </script>

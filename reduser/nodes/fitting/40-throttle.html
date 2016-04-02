@@ -15,23 +15,23 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('graphics',{
-    category: 'valve',
-    color: '#87A980',
+  RED.nodes.registerType('throttle', {
+    category: 'fitting',
+    color: '#EECC5A',
     defaults: {
       name: { value : "" },
       maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:1,
     outputs:1,
-    icon: "valve.png",
+    icon: "tee.png",
     label: function() {
-      return this.name || "graphics";
+      return this.name || "throttle";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="graphics">
+<script type="text/x-red" data-template-name="throttle">
 <!-- Common to all funnel nodes -->
 <div class="form-row">
   <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
@@ -43,7 +43,8 @@
 </div>
 </script>
 
-<script type="text/x-red" data-help-name="graphics">
-  <h1>Graphics effects</h1>
-  <p>Add graphics and effects to a flow, creating an updated output flow.</p>
+<script type="text/x-red" data-help-name="throttle">
+  <h1>Throttle grains</h1>
+  <p>Ensure that no more than so many grains per specified time interval
+  flow down the pipes, dropping any that exceed the given rate.</p>
 </script>
