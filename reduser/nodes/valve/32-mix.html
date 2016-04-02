@@ -15,35 +15,35 @@
 -->
 
 <script type="text/javascript">
-  RED.nodes.registerType('cloud-store-in',{
-    category: 'funnel',
-    color: '#FDE8C3',
+  RED.nodes.registerType('mix', {
+    category: 'valve',
+    color: '#62806A',
     defaults: {
       name: { value : "" },
       maxBuffer : { value : 10, validate : RED.validators.number() }
     },
-    inputs:0,
+    inputs:1,
     outputs:1,
-    icon: "funnel.png",
+    icon: "valve.png",
     label: function() {
-      return this.name || "cloud-store-in";
+      return this.name || "mix";
     }
   });
 </script>
 
-<script type="text/x-red" data-template-name="cloud-store-in">
-  <!-- Common to all funnel nodes -->
-  <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
-    <input type="text" id="node-input-name" placeholder="name">
-  </div>
-  <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="10">
-  </div>
+<script type="text/x-red" data-template-name="mix">
+<!-- Common to all funnel nodes -->
+<div class="form-row">
+  <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+  <input type="text" id="node-input-name" placeholder="name">
+</div>
+<div class="form-row">
+  <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
+  <input type="number" id="node-input-maxBuffer" placeholder="10">
+</div>
 </script>
 
-<script type="text/x-red" data-help-name="cloud-store-in">
-  <h1>Cloud store input</h1>
-  <p>Read an object or objects that are sequence of concatenated raw data for grains.</p>
+<script type="text/x-red" data-help-name="mix">
+  <h1>Mix inputs</h1>
+  <p>Mix the inputs of two flows.</p>
 </script>

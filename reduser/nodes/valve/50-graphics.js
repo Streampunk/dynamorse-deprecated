@@ -13,34 +13,15 @@
   limitations under the License.
 */
 
+var redioactive = require('../../../util/Redioactive.js');
+var util = require('util');
+
 module.exports = function (RED) {
-  function AACEncode (config) {
+  function Graphics (config) {
     RED.nodes.createNode(this, config);
-    var node = this;
-    var waiting = true;
-    var pendingMsg = null;
-    var next = function () {
-      if (pendingMsg) {
-        pendingMsg.next = next;
-        node.send(pendingMsg);
-        pendingMsg = null;
-        waiting = false;
-      } else {
-        waiting = true;
-      }
-    };
-    node.on('input', function (msg) {
-      // Transform message here
-      if (waiting) {
-        msg.next = next;
-        node.send(msg);
-        msg.next();
-        pendngMsg = null;
-        waiting = false;
-      } else {
-        pendingMsg = msg;
-      }
-    });
+    redioactive.Valve.call(this, config);
+    // Go figure
   }
-  RED.nodes.registerType("aac-enc",AACEncode);
+  util.inherits(Graphics, redioactive.Valve);
+  RED.nodes.registerType("graphics", Graphics);
 }
