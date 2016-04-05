@@ -296,6 +296,15 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/gauges.js"
     },
+    "rtp-ext": {
+     "name": "rtp-ext",
+     "types": [
+      "rtp-ext"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/rtp-ext.js"
+    },
     "self": {
      "name": "self",
      "types": [

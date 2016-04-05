@@ -17,7 +17,6 @@ var fs = require('fs');
 var H = require('highland');
 
 function pcapInlet(file, loop) {
-  var stream = fs.createReadStream(file);
   var nextLen = 0;
   var chunks = 0;
   var packets = 0;
@@ -35,8 +34,13 @@ function pcapInlet(file, loop) {
     else {
       chunks++;
       var packetEnd = 0;
-      if (chunks === 1) {
+      // The following condition creates either a year 2055 or 2083 problem!
+      // Detects pcap magic number of 0xd4c3b2a1
+      if ((chunks === 1) ||
+           ((leftOver.length === 0) && ((b.readUInt32LE(0) === 0xa1b2c3d4) ||
+           (b.readUInt32BE(0) === 0xa1b2c3d4)))) {
         packetEnd = 24;
+        breakInHeader = false;
       } else {
         if (!breakInHeader) {
           push(null, Buffer.concat([leftOver, b], nextLen).slice(42));
@@ -72,8 +76,14 @@ function pcapInlet(file, loop) {
       next();
     }
   }
-  
-  return H(stream).consume(pcapConsumer);
+
+  return H(function(push, next) {
+      push(null, H(fs.createReadStream(file)));
+      next();
+    })
+    .take(loop ? Number.MAX_SAFE_INTEGER : 1)
+    .sequence()
+    .consume(pcapConsumer);
 }
 
 module.exports = pcapInlet;

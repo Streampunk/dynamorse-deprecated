@@ -18,8 +18,8 @@ var fs = require('fs');
 var redioactive = require('../../../util/Redioactive.js');
 var H = require('highland');
 var pcapInlet = require('../../../funnel/pcapInlet.js');
-// var udpToGrain = require('../../../valve/udpToGrain.js');
-// var grainConcater = require('../../../valve/grainConcater.js');
+var udpToGrain = require('../../../valve/udpToGrain.js');
+var grainConcater = require('../../../valve/grainConcater.js');
 var SDP = require('../../../model/SDP.js');
 var util = require('util');
 var url = require('url');
@@ -42,9 +42,9 @@ module.exports = function (RED) {
         return this.preFlightError(err);
       }
       this.highland(
-        pcapInlet(config.file));
-        //.pipe(udpToGrain(this.tags))
-        //.pipe(grainConcater(+this.tags.width[0] * +this.tags.height[0] * srcBytesPerPixelPair / 2)));
+        pcapInlet(config.file, config.loop)
+        .pipe(udpToGrain(this.tags))
+        .pipe(grainConcater(+this.tags.width[0] * +this.tags.height[0] * srcBytesPerPixelPair / 2)));
     }.bind(this));
     this.on('close', this.close);
   }

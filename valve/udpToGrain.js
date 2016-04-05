@@ -130,5 +130,5 @@ module.exports = function(sdp) {
   }
   return H.pipeline(
     H.consume(udpConsumer),
-    H.errors(function (err, push) { console.error('udpToGrain: ' + err) }));
+    H.errors(function (err, push) { console.error('udpToGrain: ' + err); }));
 }

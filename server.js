@@ -27,7 +27,7 @@ var pid = process.pid;
 var node = new ledger.Node(null, null, `Dynamorse ${shortHostname} ${pid}`,
   `http://dynamorse-${shortHostname}-${pid}.local:3001`,
   `${hostname}`);
-var device = new ledger.Device(null, null, `${shortHostname}-${pid}-device`,
+var device = new ledger.Device(null, null, `device-${shortHostname}-${pid}`,
   null, node.id, null, null);
 var store = new ledger.NodeRAMStore(node);
 var nodeAPI = new ledger.NodeAPI(3001, store);
@@ -98,6 +98,7 @@ setInterval(function () {
 }, 2000);
 
 var redNodeID = RED.util.generateId();
+var extDefID = RED.util.generateId();
 
 setTimeout(function () {
   if (!RED.nodes.getFlows().some(function (x) {
@@ -121,13 +122,27 @@ setTimeout(function () {
         version: node.version,
         nmos_label: node.label,
         href: node.href,
-        hostname: node.hostname
+        hostname: node.hostname,
+        rtp_ext: extDefID
+      }, {
+        id : extDefID,
+        type : 'rtp-ext',
+        name : 'rtp-extensions-default',
+        origin_timestamp_id : 1,
+        smpte_tc_id : 2,
+        smpte_tc_param : '3600@90000/25',
+        flow_id_id : 3,
+        source_id_id : 4,
+        grain_flags_id : 5,
+        sync_timestamp_id : 7,
+        grain_duration_id : 9,
+        ts_refclk : 'IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc'
       } ],
       nodes: [ {
         id : RED.util.generateId(),
         type: 'comment',
         name: 'Streampunk Media',
-        info: 'Design professional media workflows with _Dynamorse_.',
+        info: 'Design and deploy professional media workflows with _Dynamorse_.',
         x: 122,
         y: 45,
         wires: []
