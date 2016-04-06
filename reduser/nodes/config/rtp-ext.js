@@ -21,6 +21,12 @@ module.exports = function(RED) {
     var node = this;
     var store = this.context().global.nodeAPI.getStore();
     node.log(util.inspect(config));
+
+    this.getConfig = function () {
+      return config;
+    }
   }
   RED.nodes.registerType("rtp-ext", RtpExt);
+
+
 }

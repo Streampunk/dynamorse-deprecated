@@ -37,6 +37,9 @@ nodeAPI.getStore().putDevice(device, function (err, dev, deltaStore) {
   nodeAPI.setStore(deltaStore);
 });
 
+// Identity of the config node with header extensions
+var extDefID = '82d4e109.7d2b2';
+
 // Create an Express app
 var app = express();
 
@@ -64,7 +67,8 @@ var settings = {
     functionGlobalContext: {
       node : node,
       nodeAPI : nodeAPI,
-      ledger : ledger
+      ledger : ledger,
+      rtp_ext_id : extDefID
     },    // enables global context
     paletteCategories: ['subflows', 'funnel', 'valve', 'fitting', 'spout', 'testing', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
     logging: { console : { level : "trace", audit : true } }
@@ -98,7 +102,6 @@ setInterval(function () {
 }, 2000);
 
 var redNodeID = RED.util.generateId();
-var extDefID = RED.util.generateId();
 
 setTimeout(function () {
   if (!RED.nodes.getFlows().some(function (x) {
@@ -122,8 +125,7 @@ setTimeout(function () {
         version: node.version,
         nmos_label: node.label,
         href: node.href,
-        hostname: node.hostname,
-        rtp_ext: extDefID
+        hostname: node.hostname
       }, {
         id : extDefID,
         type : 'rtp-ext',
@@ -136,7 +138,7 @@ setTimeout(function () {
         grain_flags_id : 5,
         sync_timestamp_id : 7,
         grain_duration_id : 9,
-        ts_refclk : 'IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc'
+        ts_refclk : 'ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc'
       } ],
       nodes: [ {
         id : RED.util.generateId(),

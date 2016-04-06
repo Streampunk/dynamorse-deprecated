@@ -37,13 +37,15 @@ module.exports = function (RED) {
       }
     }.bind(this));
     this.tags = {};
+    this.exts = RED.nodes.getNode(
+      this.context().global.get('rtp_ext_id')).getConfig();
     this.sdpURLReader(config, function (err, data) {
       if (err) {
         return this.preFlightError(err);
       }
       this.highland(
         pcapInlet(config.file, config.loop)
-        .pipe(udpToGrain(this.tags))
+        .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video'))) // Once the first grain is out, create source and flow
         .pipe(grainConcater(+this.tags.width[0] * +this.tags.height[0] * srcBytesPerPixelPair / 2)));
     }.bind(this));
     this.on('close', this.close);
@@ -65,11 +67,12 @@ module.exports = function (RED) {
       this.setTag('depth', sdp, sdp.getDepth, config);
       this.setTag('colorimetry', sdp, sdp.getColorimetry, config);
       this.setTag('interlace', sdp, sdp.getInterlace, config);
-      this.tags.packging = 'pgroup';
+      this.tags.packging = [ 'pgroup' ];
     } else if (this.tags.format[0].endsWith('audio')) {
       this.setTag('channels', sdp, sdp.getEncodingParameters, config);
     }
     console.log(this.tags);
+    this.sdpToExt(sdp);
     return this.tags;
   }
 
@@ -119,6 +122,21 @@ module.exports = function (RED) {
     } else {
       cb(new Error('Cannot read an SDP file with protocols other than http or file.'));
     }
+  }
+
+  PCAPReader.prototype.sdpToExt = function (sdp) {
+    if (!SDP.isSDP(sdp)) return;
+    var revExtMap = sdp.getExtMapReverse(0);
+    this.exts.origin_timestamp_id = revExtMap['urn:x-ipstudio:rtp-hdrext:origin-timestamp'];
+    this.exts.smpte_tc_id = revExtMap['urn:ietf:params:rtp-hdrext:smpte-tc'];
+    this.exts.flow_id_id = revExtMap['urn:x-ipstudio:rtp-hdrext:flow-id'];
+    this.exts.source_id_id = revExtMap['urn:x-ipstudio:rtp-hdrext:source-id'];
+    this.exts.grain_flags_id = revExtMap['urn:x-ipstudio:rtp-hdrext:grain-flags'];
+    this.exts.sync_timestamp_id = revExtMap['urn:x-ipstudio:rtp-hdrext:sync-timestamp'];
+    this.exts.grain_duration_id = revExtMap['urn:x-ipstudio:rtp-hdrext:grain-duration'];
+    this.exts.ts_refclk = sdp.getTimestampReferenceClock(0);
+    this.exts.smpte_tc_param = sdp.getSMPTETimecodeParameters(0);
+    return this.exts;
   }
 
   PCAPReader.prototype.testAccess = function (config) {

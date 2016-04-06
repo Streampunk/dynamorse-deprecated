@@ -29,7 +29,7 @@
       grain_flags_id : { value : 5, validate : RED.validators.number() },
       sync_timestamp_id : { value : 7, validate : RED.validators.number() },
       grain_duration_id : { value : 9, validate : RED.validators.number() },
-      ts_refclk : { value : 'IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc' }
+      ts_refclk : { value : 'ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc' }
            // Constant ID for a dynamorse generated clock
     },
     label: function() {
@@ -78,7 +78,7 @@
   </div>
   <div class="form-row">
       <label for="node-config-ts_refclk"><i class="fa fa-tag"></i> ts refclk</label>
-      <input type="text" id="node-config-ts_refclk" placeholder="IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc"></input>
+      <input type="text" id="node-config-ts_refclk" placeholder="ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc"></input>
   </div>
   <!-- TODO: Add the ability to define additional extension flags. -->
 </script>

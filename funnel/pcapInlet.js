@@ -29,7 +29,7 @@ function pcapInlet(file, loop) {
     }
     else if (b === H.nil) {
       push(null, b);
-      stream.close();
+      //  stream.close();
     }
     else {
       chunks++;

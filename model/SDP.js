@@ -6,7 +6,7 @@
 
     http://www.apache.org/licenses/LICENSE-2.0
 
-  Unless required by appli cable law or agreed to in writing, software
+  Unless required by applicable law or agreed to in writing, software
   distributed under the License is distributed on an "AS IS" BASIS,
   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
   See the License for the specific language governing permissions and
@@ -262,6 +262,27 @@ SDP.prototype.getClockOffset = function (i) {
   if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.mediaclk)) {
     var om = this.m[i].a.mediaclk[0].match(/direct=([0-9]*).*/)
     if (om !== null) return +om[1];
+  }
+  return undefined;
+}
+
+SDP.prototype.getTimestampReferenceClock = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a['ts-refclk'])) {
+    return this.m[i].a['ts-refclk'][0];
+  }
+  return undefined;
+}
+
+SDP.prototype.getSMPTETimecodeParameters = function (i) {
+  if (i >= this.m.length) return undefined;
+  if (this.m[i].a !== undefined && Array.isArray(this.m[i].a.extmap)) {
+    var tcLine = this.m[i].a.extmap.map(function (x) {
+      return x.match(/[0-9][0-9]?\s+urn:ietf:params:rtp-hdrext:smpte-tc\s(\S+).*/);
+    }).find(function (x) { return x !== null; });
+    if (tcLine) {
+      return tcLine[1];
+    }
   }
   return undefined;
 }
