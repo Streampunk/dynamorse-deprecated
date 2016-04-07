@@ -19,20 +19,20 @@ module.exports = function(RED) {
   function Self (config) {
     RED.nodes.createNode(this, config);
     var node = this;
-    var store = this.context().global.nodeAPI.getStore();
+    var store = RED.settings.functionGlobalContext.nodeAPI.getStore();
     store.getSelf(function (err, self) {
       this.nmos_id = self.id;
       this.version = self.version;
       this.nmos_label = (config.nmos_label) ? config.nmos_label : self.label;
       this.href = (config.href) ? config.href : self.href;
       this.hostname = (config.hostname) ? config.hostname : self.hostname;
-      var updatedSelf = new (node.context().global).ledger.Node(
+      var updatedSelf = new (RED.settings.functionGlobalContext).ledger.Node(
         self.id, null, this.nmos_label,
         this.href, this.hostname, self.caps, self.services);
       store.putSelf(updatedSelf, function (err, stored, deltaStore) {
         if (err) return node.warn("Failed to store replacement self.");
         node.version = stored.version;
-        node.context().global.nodeAPI.setStore(deltaStore);
+        RED.settings.functionGlobalContext.nodeAPI.setStore(deltaStore);
       });
     });
   }

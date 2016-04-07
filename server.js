@@ -19,6 +19,7 @@ var RED = require("node-red");
 var fs = require('fs');
 var dgram = require('dgram');
 var ledger = require('nmos-ledger');
+var util = require('util');
 
 var hostname = require('os').hostname();
 var shortHostname = hostname.match(/([^\.]*)\.?.*/)[1];
@@ -27,18 +28,22 @@ var pid = process.pid;
 var node = new ledger.Node(null, null, `Dynamorse ${shortHostname} ${pid}`,
   `http://dynamorse-${shortHostname}-${pid}.local:3001`,
   `${hostname}`);
+// Externally advertised ... sources etc are registered with discovered registration
+// services
 var device = new ledger.Device(null, null, `device-${shortHostname}-${pid}`,
-  null, node.id, null, null);
+  ledger.deviceTypes.generic, node.id, null, null);
+// Internal only ... sources etc are not pushed to external registration services
+var pipelines = new ledger.Device(null, null, `pipelines-${shortHostname}-${pid}`,
+  ledger.deviceTypes.pipeline, node.id, null, null);
 var store = new ledger.NodeRAMStore(node);
 var nodeAPI = new ledger.NodeAPI(3001, store);
 nodeAPI.init().start();
 
-nodeAPI.getStore().putDevice(device, function (err, dev, deltaStore) {
-  nodeAPI.setStore(deltaStore);
-});
-
-// Identity of the config node with header extensions
-var extDefID = '82d4e109.7d2b2';
+// Fixed identifiers for global config nodes
+var deviceNodeID = 'f089bf72.0f764';
+var pipelinesNodeID = 'da7405b8.258bf8';
+var selfNodeID = 'd8044477.27fbb8';
+var extDefNodeID = '30fb5980.cf04a6';
 
 // Create an Express app
 var app = express();
@@ -68,7 +73,7 @@ var settings = {
       node : node,
       nodeAPI : nodeAPI,
       ledger : ledger,
-      rtp_ext_id : extDefID
+      rtp_ext_id : extDefNodeID
     },    // enables global context
     paletteCategories: ['subflows', 'funnel', 'valve', 'fitting', 'spout', 'testing', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
     logging: { console : { level : "trace", audit : true } }
@@ -85,8 +90,87 @@ app.use(settings.httpNodeRoot, RED.httpNode);
 
 server.listen(8000);
 
-// Start the runtime
-RED.start();
+// Start the runtime - function can be used to do work after types are loaded
+RED.start().then(function () {
+  //console.log("STARTED!");
+});
+
+// Run flow configurations once flows are loaded
+var EE = require('events').EventEmitter;
+var logger = new EE();
+RED.log.addHandler(logger);
+logger.on('log', function (x) { if (x.msg === 'Started flows') {
+  logger.removeAllListeners();
+  nodeAPI.getStore().putDevice(device, function (err, dev, deltaStore) {
+    deltaStore.putDevice(pipelines, function (err, pipes, readyStore) {
+      nodeAPI.setStore(readyStore);
+      RED.log.info('Devices and self registred with ledger.');
+    });
+  });
+  RED.nodes.updateFlow('global', {
+    configs: [ {
+      id: deviceNodeID,
+      type: 'device',
+      nmos_id: device.id,
+      version: device.version,
+      nmos_label: device.label,
+      nmos_type: device.type,
+      node_id: device.node_id,
+      node_ref: selfNodeID
+    }, {
+      id: pipelinesNodeID,
+      type: 'device',
+      nmos_id: pipelines.id,
+      version: pipelines.version,
+      nmos_label: pipelines.label,
+      nmos_type: pipelines.type,
+      node_id: pipelines.node_id,
+      node_ref: selfNodeID
+    }, {
+      id: selfNodeID,
+      type: 'self',
+      nmos_id: node.id,
+      version: node.version,
+      nmos_label: node.label,
+      href: node.href,
+      hostname: node.hostname,
+      nodeAPI: nodeAPI
+    }, {
+      id : extDefNodeID,
+      type : 'rtp-ext',
+      name : 'rtp-extensions-default',
+      origin_timestamp_id : 1,
+      smpte_tc_id : 2,
+      smpte_tc_param : '3600@90000/25',
+      flow_id_id: 3,
+      source_id_id : 4,
+      grain_flags_id : 5,
+      sync_timestamp_id : 7,
+      grain_duration_id : 9,
+      ts_refclk : 'ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc'
+    } ],
+    nodes: [] }
+  ).then(function () {
+    RED.log.info('Global flow updated with dynamorse configurations.');
+    if (!RED.nodes.getFlows().some(function (x) {
+      return x.label === 'Dynamorse'
+    })) {
+      RED.nodes.addFlow({
+        label : 'Dynamorse',
+        configs: [ ],
+        nodes: [ {
+          id : RED.util.generateId(),
+          type: 'comment',
+          name: 'Streampunk Media',
+          info: 'Design and deploy professional media workflows with _Dynamorse_.',
+          x: 122,
+          y: 45,
+          wires: []
+        } ]
+      });
+    }
+  }).then(function () { RED.log.info('Dynamorse tab checked and created if required.')})
+}} );
 
 // Send process memory statistics to influxDB every couple of seconds
 var hostname = require('os').hostname();
@@ -99,59 +183,4 @@ setInterval(function () {
     `remember,host=${hostname},pid=${pid},type=heapTotal value=${usage.heapTotal}\n` +
     `remember,host=${hostname},pid=${pid},type=heapUsed value=${usage.heapUsed}`);
   soc.send(message, 0, message.length, 8765);
-}, 2000);
-
-var redNodeID = RED.util.generateId();
-
-setTimeout(function () {
-  if (!RED.nodes.getFlows().some(function (x) {
-    return x.label === 'Dynamorse'
-  })) {
-    RED.nodes.addFlow({
-      label : 'Dynamorse',
-      configs: [ {
-        id: RED.util.generateId(),
-        type: 'device',
-        nmos_id: device.id,
-        version: device.version,
-        nmos_label: device.label,
-        nmos_type: device.type,
-        node_id: device.node_id,
-        node_ref: redNodeID
-      }, {
-        id: redNodeID,
-        type: 'self',
-        nmos_id: node.id,
-        version: node.version,
-        nmos_label: node.label,
-        href: node.href,
-        hostname: node.hostname
-      }, {
-        id : extDefID,
-        type : 'rtp-ext',
-        name : 'rtp-extensions-default',
-        origin_timestamp_id : 1,
-        smpte_tc_id : 2,
-        smpte_tc_param : '3600@90000/25',
-        flow_id_id : 3,
-        source_id_id : 4,
-        grain_flags_id : 5,
-        sync_timestamp_id : 7,
-        grain_duration_id : 9,
-        ts_refclk : 'ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc'
-      } ],
-      nodes: [ {
-        id : RED.util.generateId(),
-        type: 'comment',
-        name: 'Streampunk Media',
-        info: 'Design and deploy professional media workflows with _Dynamorse_.',
-        x: 122,
-        y: 45,
-        wires: []
-      }]
-    });
-  }
-  RED.nodes.getFlows().forEach(function (x) {
-    console.log(x);
-  });
 }, 2000);
