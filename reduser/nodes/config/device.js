@@ -18,6 +18,7 @@ module.exports = function(RED) {
     RED.nodes.createNode(this, config);
     var node = this;
     var updatedDevice = null;
+    this.nmos_id = config.nmos_id;
   //   if (config.nmos_id) {
   //     node.context().global.nodeAPI.getStore().getDevice(config.nmos_id) {}
   //   } else {

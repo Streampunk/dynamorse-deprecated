@@ -17,20 +17,33 @@ var util = require('util');
 var redioactive = require('../../../util/Redioactive.js');
 
 module.exports = function (RED) {
-  function AACDecode (config) {
+  function ValveOne (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
+    this.nmos_flow = null;
     this.consume(function (err, x, push, next) {
       if (err) {
         push(err);
+        next();
       } else if (x === redioactive.end) {
         push(null, redioactive.end);
       } else {
-        push(/* x === 50 ? new Error('cock') : */ null, "it's a " + x);
+        if (!this.nmos_flow) {
+          this.getNMOSFlow(x, function (err, f) {
+            if (err) return push("Failed to resolve NMOS flow.");
+            this.nmos_flow = f;
+            this.log(util.inspect(this.nmos_flow));
+            push(null, "it's a " + x);
+            next();
+          }.bind(this));
+        } else {
+          push(/* x === 50 ? new Error('cock') : */ null, "it's a " + x);
+          next();
+        }
       }
-      next();
-    });
+
+    }.bind(this));
   }
-  util.inherits(AACDecode, redioactive.Valve);
-  RED.nodes.registerType("valveOne",AACDecode);
+  util.inherits(ValveOne, redioactive.Valve);
+  RED.nodes.registerType("valveOne", ValveOne);
 }

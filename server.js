@@ -73,7 +73,9 @@ var settings = {
       node : node,
       nodeAPI : nodeAPI,
       ledger : ledger,
-      rtp_ext_id : extDefNodeID
+      rtp_ext_id : extDefNodeID,
+      pipelinesID : pipelines.id,
+      updated : false
     },    // enables global context
     paletteCategories: ['subflows', 'funnel', 'valve', 'fitting', 'spout', 'testing', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
     logging: { console : { level : "trace", audit : true } }
@@ -92,7 +94,7 @@ server.listen(8000);
 
 // Start the runtime - function can be used to do work after types are loaded
 RED.start().then(function () {
-  //console.log("STARTED!");
+  RED.log.info("STARTED!");
 });
 
 // Run flow configurations once flows are loaded
@@ -107,6 +109,7 @@ logger.on('log', function (x) { if (x.msg === 'Started flows') {
       RED.log.info('Devices and self registred with ledger.');
     });
   });
+  RED.settings.functionGlobalContext.updated = true;
   RED.nodes.updateFlow('global', {
     configs: [ {
       id: deviceNodeID,

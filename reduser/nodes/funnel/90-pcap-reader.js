@@ -21,6 +21,7 @@ var pcapInlet = require('../../../funnel/pcapInlet.js');
 var udpToGrain = require('../../../valve/udpToGrain.js');
 var grainConcater = require('../../../valve/grainConcater.js');
 var SDP = require('../../../model/SDP.js');
+var Grain = require('../../../model/Grain.js');
 var util = require('util');
 var url = require('url');
 var http = require('http');
@@ -31,24 +32,52 @@ module.exports = function (RED) {
   function PCAPReader (config) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
+    // Do not run unless global config has been established
+    if (!this.context().global.get('updated')) {
+      this.log('False start.');
+      return;
+    }
     fs.access(config.file, fs.R_OK, function (e) {
       if (e) {
         return this.preFlightError(e);
       }
     }.bind(this));
+    var node = this;
     this.tags = {};
     this.exts = RED.nodes.getNode(
       this.context().global.get('rtp_ext_id')).getConfig();
+    var nodeAPI = this.context().global.get('nodeAPI');
+    var ledger = this.context().global.get('ledger');
     this.sdpURLReader(config, function (err, data) {
       if (err) {
         return this.preFlightError(err);
       }
+      var localName = config.name || `${config.type}-${config.id}`;
+      var localDescription = config.description || `${config.type}-${config.id}`;
+      var pipelinesID = config.device ?
+        RED.nodes.getNode(config.device).nmos_id :
+        this.context().global.get(pipelinesID);
+      var source = new ledger.Source(null, null, localName, localDescription,
+        ledger.formats.video, null, null, pipelinesID, null);
+      var flow = new ledger.Flow(null, null, localName, localDescription,
+        ledger.formats.video, this.tags, source.id, null);
+      nodeAPI.getStore().putSource(source, function(err, src, deltaStore) {
+        if (err) return node.log(`Unable to register source: ${err}`);
+        deltaStore.putFlow(flow, function(err, flw, readyStore) {
+          if (err) return node.log(`Unable to register flow: ${err}`);
+          nodeAPI.setStore(readyStore);
+        });
+      });
       this.highland(
         pcapInlet(config.file, config.loop)
-        .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video'))) // Once the first grain is out, create source and flow
+        .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
+        .map(function (g) {
+          return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
+            flow.id, source.id, g.duration);
+        }) // Once the first grain is out, create source and flow
         .pipe(grainConcater(+this.tags.width[0] * +this.tags.height[0] * srcBytesPerPixelPair / 2)));
     }.bind(this));
-    this.on('close', this.close);
+    this.on('close', this.close); // Delete flows when we're done?
   }
   util.inherits(PCAPReader, redioactive.Funnel);
   RED.nodes.registerType("pcap-reader", PCAPReader);
@@ -71,7 +100,7 @@ module.exports = function (RED) {
     } else if (this.tags.format[0].endsWith('audio')) {
       this.setTag('channels', sdp, sdp.getEncodingParameters, config);
     }
-    console.log(this.tags);
+    // console.log(this.tags);
     this.sdpToExt(sdp);
     return this.tags;
   }

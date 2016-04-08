@@ -33,7 +33,7 @@ var isEnd = function (x) {
 var theEnd = new End;
 
 var setStatus = function (fill, shape, text) {
-  console.log('***', arguments);
+  // console.log('***', arguments);
   if (this.nodeStatus !== text && this.nodeStatus !== 'done') {
     this.status({ fill : fill, shape : shape, text: text});
     this.nodeStatus = text;
@@ -44,7 +44,7 @@ var soc = dgram.createSocket('udp4');
 var nodeCount = 0;
 
 function safeStatString (s) {
-  console.log('+++', s);
+  // console.log('+++', s);
   return s.replace(/\W/g, '_');
 }
 
@@ -58,7 +58,7 @@ function Funnel (config) {
   var workTimes = [];
   var paused = false;
   var soc = dgram.createSocket('udp4');
-  console.log('***', util.inspect(this.setStatus, { showHidden: true }));
+  // console.log('***', util.inspect(this.setStatus, { showHidden: true }));
   node.setStatus('grey', 'ring', 'initialising');
   var maxBuffer = 10;
   if (config.maxBuffer && typeof config.maxBuffer === 'string')
@@ -334,6 +334,11 @@ function Valve (config) {
     next = function () {
       node.setStatus('grey', 'ring', 'closed');
     }
+  }
+  this.getNMOSFlow = function (grain, cb) {
+    var store = node.context().global.get('nodeAPI').getStore();
+    var flow_id = require('uuid').unparse(grain.flow_id);
+    store.getFlow(flow_id, cb);
   }
   var configName = safeStatString(node.type + (nodeCount++));
   var nodeType = safeStatString(node.type);
