@@ -20,13 +20,42 @@
     color: '#62806A', 
     defaults: {
       name: { value : "" },
-      maxBuffer : { value : 10, validate : RED.validators.number() }
+      maxBuffer : { value : 10, validate : RED.validators.number() },
+      active: { value : true }
     },
     inputs:1,
     outputs:1,
     icon: "valve.png",
     label: function() {
       return this.name || "switch";
+    },
+    align: "left",
+    button: {
+      toggle: "active",
+      onclick: function() {
+        var label = this.name||"switch";
+        var node = this;
+        $.ajax({
+          url: "switch/"+this.id+"/"+(this.active?"enable":"disable"),
+          type: "POST",
+          success: function(resp, textStatus, xhr) {
+            if (xhr.status == 200) {
+              RED.notify(node._("switch.notification.activated",{label:label}),"success");
+            } else if (xhr.status == 201) {
+              RED.notify(node._("switch.notification.deactivated",{label:label}),"success");
+            }
+          },
+          error: function(jqXHR,textStatus,errorThrown) {
+            if (jqXHR.status == 404) {
+              RED.notify(node._("common.notification.error", {message: node._("common.notification.errors.not-deployed")}),"error");
+            } else if (jqXHR.status == 0) {
+              RED.notify(node._("common.notification.error", {message: node._("common.notification.errors.no-response")}),"error");
+            } else {
+              RED.notify(node._("common.notification.error",{message:node._("common.notification.errors.unexpected",{status:err.status,message:err.response})}),"error");
+            }
+          }
+        });
+      }
     }
   });
 </script>
