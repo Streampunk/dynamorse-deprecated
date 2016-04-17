@@ -21,6 +21,7 @@ var util = require('util');
 
 var hostname = require('os').hostname();
 var pid = process.pid;
+var influx = '192.168.99.100';
 
 function End() { }
 
@@ -73,7 +74,7 @@ function Funnel (config) {
       pending = [];
       var payload = queue.shift();
       var message = new Buffer(`punkd value=${payload}`)
-      soc.send(message, 0, message.length, 8765);
+      soc.send(message, 0, message.length, 8765, influx);
       if (isEnd(payload)) {
         work = function () { }
         next = function () {
@@ -115,7 +116,7 @@ function Funnel (config) {
         node.log(`Sending ${payload} with pending ${JSON.stringify(pending)}.`);
         pending = [];
         var message = new Buffer(`punkd value=${payload}`)
-        soc.send(message, 0, message.length, 8765);
+        soc.send(message, 0, message.length, 8765, influx);
         if (isEnd(payload)) {
           work = function () { }
           next = function () {
@@ -189,16 +190,10 @@ function Funnel (config) {
       node.setStatus('red', 'ring', 'preflight fail');
     }
   }
-  this.close = function (done) { // done is undefined :-(
-    node.setStatus('yellow', 'ring', 'closing');
-    next = function () {
-      node.setStatus('grey', 'ring', 'closed');
-    }
-  }
   var configName = safeStatString(node.type + (nodeCount++));
   var nodeType = safeStatString(node.type);
   // Send stats every second
-  setInterval(function () {
+  var metrics = setInterval(function () {
     var measuredTimes = workTimes;
     workTimes = [];
     var sum = measuredTimes.reduce(function (prev, curr) {
@@ -209,8 +204,15 @@ function Funnel (config) {
       `nodeWorkAvg,host=${hostname},pid=${pid},redioType=funnel,nodeType=${nodeType},nodeName=${configName},nodeID=${node.id} value=${average}\n` +
       `bufferLength,host=${hostname},pid=${pid},redioType=funnel,nodeType=${nodeType},nodeName=${configName},nodeID=${node.id} value=${queue.length}`);
     // console.log('Sending stats', message.toString());
-    soc.send(message, 0, message.length, 8765);
+    soc.send(message, 0, message.length, 8765, influx);
   }, 1000);
+  this.close = function (done) { // done is undefined :-(
+    node.setStatus('yellow', 'ring', 'closing');
+    next = function () {
+      node.setStatus('grey', 'ring', 'closed');
+    }
+    setTimeout(function () { clearInterval(metrics) }, 2000);
+  }
 }
 
 function Valve (config) {
@@ -329,12 +331,6 @@ function Valve (config) {
     work = cb;
     node.setStatus('green', 'dot', 'running');
   }
-  this.close = function (done) { // done is undefined :-(
-    node.setStatus('yellow', 'ring', 'closing');
-    next = function () {
-      node.setStatus('grey', 'ring', 'closed');
-    }
-  }
   this.getNMOSFlow = function (grain, cb) {
     var store = node.context().global.get('nodeAPI').getStore();
     var flow_id = require('uuid').unparse(grain.flow_id);
@@ -343,7 +339,7 @@ function Valve (config) {
   var configName = safeStatString(node.type + (nodeCount++));
   var nodeType = safeStatString(node.type);
   // Send stats every second
-  setInterval(function () {
+  var metrics = setInterval(function () {
     var measuredTimes = workTimes;
     workTimes = [];
     var sum = measuredTimes.reduce(function (prev, curr) {
@@ -353,9 +349,16 @@ function Valve (config) {
       `grainFlow,host=${hostname},pid=${pid},redioType=valve,nodeType=${nodeType},nodeName=${configName},nodeID=${node.id} value=${measuredTimes.length}\n` +
       `nodeWorkAvg,host=${hostname},pid=${pid},redioType=valve,nodeType=${nodeType},nodeName=${configName},nodeID=${node.id} value=${average}\n` +
       `bufferLength,host=${hostname},pid=${pid},redioType=valve,nodeType=${nodeType},nodeName=${configName},nodeID=${node.id} value=${queue.length}\n`);
-    // console.log('Sending stats', message.toString());
-    soc.send(message, 0, message.length, 8765);
+      // console.log('Sending stats', message.toString());
+    soc.send(message, 0, message.length, 8765, influx);
   }, 1000);
+  this.close = function (done) { // done is undefined :-(
+    node.setStatus('yellow', 'ring', 'closing');
+    next = function () {
+      node.setStatus('grey', 'ring', 'closed');
+    }
+    setTimeout(function () { clearInterval(metrics) }, 2000);
+  }
 }
 
 function Spout (config) {
@@ -408,7 +411,7 @@ function Spout (config) {
   var configName = safeStatString(node.type + (nodeCount++));
   var nodeType = safeStatString(node.type);
   // Send stats every second
-  setInterval(function () {
+  var metrics = setInterval(function () {
     var measuredTimes = workTimes;
     workTimes = [];
     var sum = measuredTimes.reduce(function (prev, curr) {
@@ -417,9 +420,12 @@ function Spout (config) {
     var message = new Buffer(
       `grainFlow,host=${hostname},pid=${pid},redioType=spout,nodeType=${nodeType},nodeName=${configName},nodeID=${node.id} value=${measuredTimes.length}\n` +
       `nodeWorkAvg,host=${hostname},pid=${pid},redioType=spout,nodeType=${nodeType},nodeName=${configName},nodeID=${node.id} value=${average}`);
-    // console.log('Sending stats', message.toString());
-    soc.send(message, 0, message.length, 8765);
+      // console.log('Sending stats', message.toString());
+    soc.send(message, 0, message.length, 8765, influx);
   }, 1000);
+  this.close = function (done) {
+    setTimeout(function () { clearInterval(metrics) }, 2000);
+  };
 }
 
 module.exports = {

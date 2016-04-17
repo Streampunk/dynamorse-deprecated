@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Streampunk/dynamorse#readme",
   "dependencies": {
+    "body-parser": "^1.15.0",
     "express": "^4.13.4",
     "fastqueue": "^0.1.0",
     "highland": "^2.5.1",

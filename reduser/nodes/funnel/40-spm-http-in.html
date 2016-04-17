@@ -20,7 +20,15 @@
     color: '#FFFBD5',
     defaults: {
       name : { value : "" },
-      maxBuffer : { value : 10, validate : RED.validators.number() }
+      maxBuffer : { value : 10, validate : RED.validators.number() },
+      description : { value : "" },
+      device : { value : "", type : "device" },
+      protocol : { value : 'HTTP' },
+      mode : { value : 'push' },
+      pullURL : { value : '' },
+      path : { value : '' },
+      port : { value : 8712, validate : RED.validators.number() },
+      regenerate : { value : false }
     },
     inputs:0,
     outputs:1,
@@ -40,6 +48,40 @@
 <div class="form-row">
   <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
   <input type="number" id="node-input-maxBuffer" placeholder="10">
+</div>
+<div class="form-row">
+  <label for="node-input-regenerate"><i class="fa fa-clock-o"></i> regenerate?</label>
+  <input type="checkbox" id="node-input-regenerate" style="width: 100px">
+</div>
+<div class="form-row">
+  <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
+  <input type="text" id="node-input-device">
+</div>
+<div class="form-row">
+  <label for="node-input-protocol"><i class="fa fa-video-camera"></i> protocol</label>
+  <select id="node-input-protocol">
+    <option value="HTTP" selected>HTTP</option>
+    <option value="HTTPS">HTTPS</option>
+  </select>
+</div>
+<div class="form-row">
+  <label for="node-input-mode"><i class="fa fa-video-camera"></i> mode</label>
+  <select id="node-input-mode">
+    <option value="push" selected>push</option>
+    <option value="pull">pull</option>
+  </select>
+</div>
+<div class="form-row">
+  <label for="node-input-pullURL"><i class="fa fa-external-link-square"></i> pull URL</label>
+  <input type="text" id="node-input-pullURL" placeholder="http://localhost">
+</div>
+<div class="form-row">
+  <label for="node-input-path"><i class="fa fa-external-link-square"></i> path</label>
+  <input type="text" id="node-input-path" placeholder="/flow/flowID/grains">
+</div>
+<div class="form-row">
+  <label for="node-input-port"><i class="fa fa-suitcase"></i> port</label>
+  <input type="number" id="node-input-port" min="1024" placeholder="8712" style="width: 100px">
 </div>
 </script>
 
