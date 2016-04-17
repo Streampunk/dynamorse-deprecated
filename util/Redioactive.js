@@ -426,6 +426,13 @@ function Spout (config) {
   this.close = function (done) {
     setTimeout(function () { clearInterval(metrics) }, 2000);
   };
+  this.preFlightError = function (e) {
+    node.error(`Preflight error: ${e.message}.`);
+    node.setStatus('red', 'ring', 'preflight fail');
+    next = function () {
+      node.setStatus('red', 'ring', 'preflight fail');
+    }
+  }
 }
 
 module.exports = {

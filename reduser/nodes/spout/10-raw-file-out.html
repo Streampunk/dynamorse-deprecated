@@ -19,7 +19,10 @@
     category: 'spout',
     color: '#FDE8C3',
     defaults: {
-      name: { value : "" }
+      name : { value : '' },
+      file : { value : '' },
+      headers : { value : '' },
+      timeout : {  value : 0, validate : RED.validators.number() }
     },
     inputs:1,
     outputs:0,
@@ -33,8 +36,20 @@
 
 <script type="text/x-red" data-template-name="raw-file-out">
   <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+    <label for="node-input-name"><i class="fa fa-tag" aria-hidden="true"></i> name</label>
     <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-file"><i class="fa fa-file" aria-hidden="true"></i> file</label>
+    <input type="text" id="node-input-file" placeholder="essence.raw">
+  </div>
+  <div class="form-row">
+    <label for="node-input-headers"><i class="fa fa-file-text" aria-hidden="true"></i> headers</label>
+    <input type="text" id="node-input-headers" placeholder="">
+  </div>
+  <div class="form-row">
+    <label for="node-input-timeout"><i class="fa fa-clock-o"></i> timeout</label>
+    <input type="number" min="0" id="node-input-timeout" placeholder="0">
   </div>
 </script>
 
