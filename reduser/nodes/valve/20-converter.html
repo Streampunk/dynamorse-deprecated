@@ -19,14 +19,13 @@
       category: 'valve',
       color: '#AF4830',
       defaults: {
-        srcWidth: { value : 1920, validate : RED.validators.number() },
-        srcHeight: { value : 1080, validate : RED.validators.number() },
-        srcFormat: { value : "4175" },
+        name: { value : "" },
+        maxBuffer : { value : 10, validate : RED.validators.number() },
+        description : { value : "" },
+        device : { value : "", type : "device", required : true },
         dstWidth: { value : 1280, validate : RED.validators.number() },
         dstHeight: { value : 720, validate : RED.validators.number() },
-        dstFormat: { value : "420P" },
-        name: { value : "" },
-        maxBuffer : { value : 100, validate : RED.validators.number() }
+        dstFormat: { value : "420P" }
       },
       inputs:1,
       outputs:1,
@@ -38,20 +37,23 @@
 </script>
 
 <script type="text/x-red" data-template-name="converter">
+  <!-- Common to all funnel nodes -->
   <div class="form-row">
-    <label for="node-input-srcWidth"><i class="fa fa-arrows-h"></i> Src Width</label>
-    <input type="number" id="node-input-srcWidth" placeholder="1920">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
   </div>
   <div class="form-row">
-    <label for="node-input-srcHeight"><i class="fa fa-arrows-v"></i> Src Height</label>
-    <input type="number" id="node-input-srcHeight" placeholder="1080">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> Maximum Buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="100">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+    <input type="text" id="node-input-description" placeholder="source and flow description">
   </div>
   <div class="form-row">
-    <label for="node-input-srcFormat"><i class="fa fa-paw"></i> Src Format</label>
-    <select name="node-input-srcFormat" id="node-input-srcFormat">
-      <option value="4175" selected>4175</option>
-      <option value="V210">V210</option>
-    </select>
+    <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
+    <input type="text" id="node-input-device">
   </div>
 
   <div class="form-row">
@@ -67,16 +69,6 @@
     <select name="node-input-dstFormat" id="node-input-dstFormat">
       <option value="420P" selected>420P</option>
     </select>
-  </div>
-
-  <!-- Common to all funnel nodes -->
-  <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
-  </div>
-  <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> Maximum Buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="100">
   </div>
 </script>
 

@@ -67,7 +67,7 @@ var sdp = new SDP(videoSDP);
 
 var srcWidth = sdp.getWidth(0);
 var srcHeight = sdp.getHeight(0);
-var srcFmtCode = '4175'
+var srcFmtCode = 'pgroup'
 
 var encWidth = 1280;
 var encHeight = 720;
