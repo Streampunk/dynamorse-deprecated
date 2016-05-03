@@ -1,0 +1,5 @@
+PCAP file: /Users/sparkpunk/Documents/Streampunk/nmi-examples/rtp-video-rfc4175-1080i50-sync.pcap
+
+Description: Streampunk Media NAB 2016
+
+SDP file: file:/Users/sparkpunk/Documents/Streampunk/nmi-examples/sdp_rfc4175_10bit_1080i50.sdp
