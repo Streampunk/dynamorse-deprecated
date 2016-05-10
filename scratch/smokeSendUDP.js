@@ -15,9 +15,9 @@
 */
 
 var H = require('highland');
-var udpInlet = require('../valve/udpInlet.js');
-var pcapInlet = require('../valve/pcapInlet.js');
-var udpSpigot = require('../spigot/udpSpigot.js');
+// var udpInlet = require('../valve/udpInlet.js');
+var pcapInlet = require('../funnel/pcapInlet.js');
+var udpSpigot = require('../spout/udpSpigot.js');
 var SDP = require('../model/SDP.js');
 var dgram = require('dgram');
 
@@ -41,7 +41,7 @@ a=extmap:9 urn:x-ipstudio:rtp-hdrext:grain-duration
 a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`
 
 var mcastAddress = '224.1.1.1';
-var netif = '169.254.242.232';
+var netif = '192.168.0.12';
 var port = 8000;
 
 var pcapFile = '/Volumes/Ormiscraid/media/streampunk/examples/rtp-video-rfc4175-1080i50-sync.pcap';
