@@ -26,8 +26,6 @@ var util = require('util');
 var url = require('url');
 var http = require('http');
 
-var srcBytesPerPixelPair = 5; // !!! rfc4175 pgroup !!!
-
 module.exports = function (RED) {
   function PCAPReader (config) {
     RED.nodes.createNode(this, config);
@@ -75,7 +73,7 @@ module.exports = function (RED) {
           return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
             flow.id, source.id, g.duration);
         }) // Once the first grain is out, create source and flow
-        .pipe(grainConcater(+this.tags.width[0] * +this.tags.height[0] * srcBytesPerPixelPair / 2)));
+        .pipe(grainConcater(this.tags)));
     }.bind(this));
     this.on('close', this.close); // Delete flows when we're done?
   }
@@ -96,7 +94,7 @@ module.exports = function (RED) {
       this.setTag('depth', sdp, sdp.getDepth, config);
       this.setTag('colorimetry', sdp, sdp.getColorimetry, config);
       this.setTag('interlace', sdp, sdp.getInterlace, config);
-      this.tags.packging = [ 'pgroup' ];
+      this.tags.packing = [ 'pgroup' ];
     } else if (this.tags.format[0].endsWith('audio')) {
       this.setTag('channels', sdp, sdp.getEncodingParameters, config);
     }

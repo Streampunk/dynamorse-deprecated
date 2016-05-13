@@ -22,16 +22,28 @@ module.exports = function (RED) {
   function Decoder (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
+    this.srcFlow = null;
+    var dstFlow = null;
+    var dstBufLen = 0;
 
-    var decoder = new codecadon.Decoder(config.dstFormat, +config.srcWidth, +config.srcHeight);
-    decoder.on('exit', function() {
+    var decoder = new codecadon.Decoder(function() {
       console.log('Decoder exiting');
-      decoder.finish();
     });
     decoder.on('error', function(err) {
       console.log('Decoder error: ' + err);
     });
-    var dstBufLen = decoder.start();
+
+    var node = this;
+    var nodeAPI = this.context().global.get('nodeAPI');
+    var ledger = this.context().global.get('ledger');
+    var localName = config.name || `${config.type}-${config.id}`;
+    var localDescription = config.description || `${config.type}-${config.id}`;
+    var pipelinesID = config.device ?
+      RED.nodes.getNode(config.device).nmos_id :
+      this.context().global.get(pipelinesID);
+
+    var source = new ledger.Source(null, null, localName, localDescription,
+      ledger.formats.video, null, null, pipelinesID, null);
 
     this.consume(function (err, x, push, next) {
       if (err) {
@@ -42,14 +54,39 @@ module.exports = function (RED) {
           push(null, x);
         });
       } else {
-        if (Grain.isGrain(x)) {
+        if (!this.srcFlow) {
+          this.getNMOSFlow(x, function (err, f) {
+            if (err) return push("Failed to resolve NMOS flow.");
+            this.srcFlow = f;
+
+            var dstTags = JSON.parse(JSON.stringify(this.srcFlow.tags));
+            dstTags["packing"] = [ `${config.dstFormat}` ];
+            dstFlow = new ledger.Flow(null, null, localName, localDescription,
+              ledger.formats.video, dstTags, source.id, null);
+
+            nodeAPI.getStore().putSource(source, function(err, src, deltaStore) {
+              if (err) return push(`Unable to register source: ${err}`);
+              deltaStore.putFlow(dstFlow, function(err, flw, readyStore) {
+                if (err) return push(`Unable to register flow: ${err}`);
+                nodeAPI.setStore(readyStore);
+              });
+            });
+
+            dstBufLen = decoder.setInfo(this.srcFlow.tags, dstTags);
+            setTimeout(function () { 
+              push(null, new Grain(x.buffers, x.ptpSync, x.ptpOrigin, 
+                                   x.timecode, dstFlow.id, source.id, x.duration));
+              next();
+            }, 50);
+          }.bind(this));
+        } else if (Grain.isGrain(x)) {
           var dstBuf = new Buffer(dstBufLen);
-          var numQueued = decoder.decode(x.buffers, +config.srcWidth, +config.srcHeight, config.srcFormat, dstBuf, function(err, result) {
+          var numQueued = decoder.decode(x.buffers, dstBuf, function(err, result) {
             if (err) {
               push(err);
             } else if (result) {
               push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
-                                   x.timecode, x.flow_id, x.source_id, x.duration));
+                                   x.timecode, dstFlow.id, source.id, x.duration));
             }
             next();
           });
@@ -62,7 +99,7 @@ module.exports = function (RED) {
           next();
         }
       }
-    });
+    }.bind(this));
     this.on('close', this.close);
   }
   util.inherits(Decoder, redioactive.Valve);
