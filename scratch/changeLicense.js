@@ -1,4 +1,4 @@
-/* Copyright 2015 Christine S. MacNeill
+/* Copyright 2016 Streampunk Media Ltd.
 
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
@@ -13,17 +13,14 @@
   limitations under the License.
 */
 
-var Queue = require('fastqueue');
+var fs = require('fs');
 
-var q = new Queue;
+var fileName = process.argv[2];
 
-var start = Date.now();
+var oldLicData = fs.readFileSync(fileName, 'utf8');
 
-for ( var x = 0 ; x < 1000 ; x++ ) {
-  for ( var y = 0 ; y < 1000 ; y++) q.push(y);
-  for ( var y = 0 ; y < 1000 ; y++) q.shift();
-  q.length;
-}
+var updated = oldLicData.replace(/Copyright 201[56] Christine S\. MacNeill/g,
+  'Copyright 2016 Streampunk Media Ltd.');
+var updated = updated.replace(/appli\scable/g, 'applicable');
 
-var end = Date.now();
-console.log(end - start);
+fs.writeFileSync(fileName, updated, 'utf8');
