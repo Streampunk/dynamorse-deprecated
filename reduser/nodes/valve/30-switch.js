@@ -16,6 +16,7 @@
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
 var Grain = require('../../../model/Grain.js');
+var uuid = require('uuid');
 
 module.exports = function (RED) {
   function Switch (config) {
@@ -23,7 +24,8 @@ module.exports = function (RED) {
     redioactive.Valve.call(this, config);
     this.active = (config.active === null || typeof config.active === "undefined") || config.active;
     var node = this;
-    this.nmos_flow = null;
+    this.topFlow = null;
+    this.btmFlow = null;
 
     this.consume(function (err, x, push, next) {
       if (err) {
@@ -32,18 +34,28 @@ module.exports = function (RED) {
       } else if (redioactive.isEnd(x)) {
         push(null, x);
       } else {
-        this.getNMOSFlow(x, function (err, f) {
-          if (err) {
-            this.warn("Failed to resolve NMOS flow: " + err);
-            return push("Failed to resolve NMOS flow.");
-          }
-          this.nmos_flow = f;
-          this.warn(util.inspect(this.nmos_flow));
-        }.bind(this));
+        if ((!this.topFlow) || (!this.btmFlow)) { 
+          this.getNMOSFlow(x, function (err, f) {
+            if (err) return push("Failed to resolve NMOS flow.");
 
-        if (Grain.isGrain(x)) {
-          push(null, x);
-          next();
+            if (!this.topFlow)
+              this.topFlow = f;
+            else if (!this.btmFlow && (f !== this.topFlow))
+              this.btmFlow = f;
+            push(null, x);
+            next();
+          }.bind(this));
+        } else {
+          if (Grain.isGrain(x)) {
+            var fid = uuid.unparse(x.flow_id);
+            if ((this.active && (fid === this.topFlow.id)) || (!this.active && (fid === this.btmFlow.id))) {
+              push(null, x);
+            }
+            next();
+          } else {
+            push(null, x);
+            next();
+          }
         }
       }
     }.bind(this));
