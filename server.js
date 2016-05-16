@@ -103,12 +103,10 @@ var logger = new EE();
 RED.log.addHandler(logger);
 logger.on('log', function (x) { if (x.msg === 'Started flows') {
   logger.removeAllListeners();
-  nodeAPI.getStore().putDevice(device, function (err, dev, deltaStore) {
-    deltaStore.putDevice(pipelines, function (err, pipes, readyStore) {
-      nodeAPI.setStore(readyStore);
-      RED.log.info('Devices and self registred with ledger.');
-    });
-  });
+  nodeAPI.putResource(device).catch(RED.log.error);
+  nodeAPI.putResource(device).then(function () {
+    RED.log.info('Devices and self registred with ledger.');
+  }, RED.log.error);
   RED.settings.functionGlobalContext.updated = true;
   RED.nodes.updateFlow('global', {
     configs: [ {
