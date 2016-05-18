@@ -101,56 +101,56 @@ RED.start().then(function () {
 var EE = require('events').EventEmitter;
 var logger = new EE();
 RED.log.addHandler(logger);
-logger.on('log', function (x) { if (x.msg === 'Started flows') {
+logger.on('log', function (x) { if (x.msg === 'Starting flows') {
   logger.removeAllListeners();
   nodeAPI.putResource(device).catch(RED.log.error);
-  nodeAPI.putResource(device).then(function () {
+  nodeAPI.putResource(pipelines).then(function () {
     RED.log.info('Devices and self registred with ledger.');
-  }, RED.log.error);
-  RED.settings.functionGlobalContext.updated = true;
-  RED.nodes.updateFlow('global', {
-    configs: [ {
-      id: deviceNodeID,
-      type: 'device',
-      nmos_id: device.id,
-      version: device.version,
-      nmos_label: device.label,
-      nmos_type: device.type,
-      node_id: device.node_id,
-      node_ref: selfNodeID
-    }, {
-      id: pipelinesNodeID,
-      type: 'device',
-      nmos_id: pipelines.id,
-      version: pipelines.version,
-      nmos_label: pipelines.label,
-      nmos_type: pipelines.type,
-      node_id: pipelines.node_id,
-      node_ref: selfNodeID
-    }, {
-      id: selfNodeID,
-      type: 'self',
-      nmos_id: node.id,
-      version: node.version,
-      nmos_label: node.label,
-      href: node.href,
-      hostname: node.hostname,
-      nodeAPI: nodeAPI
-    }, {
-      id : extDefNodeID,
-      type : 'rtp-ext',
-      name : 'rtp-extensions-default',
-      origin_timestamp_id : 1,
-      smpte_tc_id : 2,
-      smpte_tc_param : '3600@90000/25',
-      flow_id_id: 3,
-      source_id_id : 4,
-      grain_flags_id : 5,
-      sync_timestamp_id : 7,
-      grain_duration_id : 9,
-      ts_refclk : 'ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc'
-    } ],
-    nodes: [] }
+    RED.settings.functionGlobalContext.updated = true;
+    RED.nodes.updateFlow('global', {
+      configs: [ {
+        id: deviceNodeID,
+        type: 'device',
+        nmos_id: device.id,
+        version: device.version,
+        nmos_label: device.label,
+        nmos_type: device.type,
+        node_id: device.node_id,
+        node_ref: selfNodeID
+      }, {
+        id: pipelinesNodeID,
+        type: 'device',
+        nmos_id: pipelines.id,
+        version: pipelines.version,
+        nmos_label: pipelines.label,
+        nmos_type: pipelines.type,
+        node_id: pipelines.node_id,
+        node_ref: selfNodeID
+      }, {
+        id: selfNodeID,
+        type: 'self',
+        nmos_id: node.id,
+        version: node.version,
+        nmos_label: node.label,
+        href: node.href,
+        hostname: node.hostname,
+        nodeAPI: nodeAPI
+      }, {
+        id : extDefNodeID,
+        type : 'rtp-ext',
+        name : 'rtp-extensions-default',
+        origin_timestamp_id : 1,
+        smpte_tc_id : 2,
+        smpte_tc_param : '3600@90000/25',
+        flow_id_id: 3,
+        source_id_id : 4,
+        grain_flags_id : 5,
+        sync_timestamp_id : 7,
+        grain_duration_id : 9,
+        ts_refclk : 'ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc'
+      } ],
+      nodes: [] }
+    )}
   ).then(function () {
     RED.log.info('Global flow updated with dynamorse configurations.');
     if (!RED.nodes.getFlows().some(function (x) {
@@ -170,7 +170,10 @@ logger.on('log', function (x) { if (x.msg === 'Started flows') {
         } ]
       });
     }
-  }).then(function () { RED.log.info('Dynamorse tab checked and created if required.')})
+  }).then(
+    function () { RED.log.info('Dynamorse tab checked and created if required.')},
+    RED.log.error
+  );
 }} );
 
 // Send process memory statistics to influxDB every couple of seconds

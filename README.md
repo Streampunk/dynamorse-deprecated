@@ -63,7 +63,9 @@ Each dynamorse instance can send statistics to _influxdb_, a time series databas
 
 Dynamorse uses standard IT tools so that it fits alongside other metrics systems and applications in an enterprise IT environment. Combined with system monitoring tools that also work with the same toolsets, such as _collectd_, it is possible to monitor and respond to issues such as real-time streams about to dropping below real-time performance. Also, developers and testers can analyze performance by watching for memory leaks, buffer overflows, the impact of garbage collection etc..
 
-# Installation
+# Getting started
+
+## Installation
 
 Install Node.js for your plarform. This software has been developed against the long term stable (LTS) release. To install dynamorse as a global application on your system:
 
@@ -77,7 +79,7 @@ At this time, dynamorse is not intended for use as dependency in other projects.
 
     npm install dynamorse
 
-# Running
+## Running
 
 To run dynamorse when it is installed as a global application (`-g` flag):
 
@@ -93,6 +95,16 @@ The choice of available nodes is provided down the left-hand-side. Each node is 
 
 Once you are happy with a design, hit the deploy button. This will send the flow to the dynamorse server and the server will attempt to run it. Check the debug tab on the right-hand-side for live debug messages and errors.
 
+### Thread pool size
+
+The default thread pool size for libuv, an underlying component of node, is only sufficient for 2 or 3 dynamorse nodes. To increase the size of the pool, set the `UV_THREADPOOL_SIZE` environment variable to a number higher than the default of `4`. On Mac/Linux:
+
+    export UV_THREADPOOL_SIZE=32
+
+On Windows:
+
+    set UV_THREADPOOL_SIZE=32
+
 ## Examples to try
 
 To follow.
@@ -101,11 +113,11 @@ To follow.
 
 To follow.
 
-# Next steps
+# Support, status and further development
 
-Streampunk Media have released dynamorse as open-source so that interested users can try out the project's unique approach, track its progress and provide feedback. This is prototype software that is not yet for production use in its current form. To date, the authors have focused on de-risking the platform as they build from the ground up, proving concepts such as reactive streams and asynchronous access to media-processing C++ libraries. As a result, many of the dynamorse nodes are not fully functional or even implemented at all, but the author's have every intention of completing this work. The status of the implementation and the current next-step plan can be viewed via github issues and milestones.
+Streampunk Media have released dynamorse as open source so that interested users can try out the project's unique approach, track its progress and provide feedback. This is prototype software that is not yet for production use in its current form. To date, the authors have focused on de-risking the platform as they build from the ground up, proving ideas such as reactive streams with IoT and asynchronous access to media-processing C++ libraries. As a result, many of the dynamorse nodes are not fully functional and - in some cases - not even implemented at all. It is the authors' intention to complete this work. The status of the implementation and the current next-step plan can be viewed via github issues and milestones.
 
-Contributions can be made via pull requests and will be considered by the author on their merits. Enhancement requests and bug reports should be raised as github issues. For support, to request development priority or for bespoke node development, please contact Streampunk Media.
+Contributions can be made via pull requests and will be considered by the authors on their merits. Enhancement requests and bug reports should be raised as github issues. For support, to request development priority or for bespoke node development, please contact Streampunk Media.
 
 Dynamorse will remain open-source. Where links are made to commercial 3rd party libraries, such as codec libraries, access to those features will only be available via a professional-grade support contract. The aim is to give user's a choice between patent-free codecs with open-source implementations (VP8, VP9, VC-2, etc) and codecs with associated patents where professional grade implementations are only available commercially (AVCi, HEVC). More details to follow.
 

@@ -22,6 +22,7 @@ module.exports = function(srcTags) {
   var concater = new codecadon.Concater(function() {
     console.log('Concater exiting');
   });
+  console.log(srcTags);
   var dstBufLen = concater.setInfo(srcTags);
 
   var grainMuncher = function (err, x, push, next) {
@@ -39,14 +40,14 @@ module.exports = function(srcTags) {
           if (err) {
             push(err);
           } else if (result) {
-            push(null, new Grain(result, x.ptpSync, x.ptpOrigin, 
+            push(null, new Grain(result, x.ptpSync, x.ptpOrigin,
                                  x.timecode, x.flow_id, x.source_id, x.duration));
           }
           next();
         });
         // allow a number of packets to queue ahead
-        if (numQueued < 2) { 
-          next(); 
+        if (numQueued < 2) {
+          next();
         }
       } else {
         push(null, x);

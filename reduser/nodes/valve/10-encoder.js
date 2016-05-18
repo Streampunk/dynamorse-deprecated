@@ -64,20 +64,17 @@ module.exports = function (RED) {
             dstFlow = new ledger.Flow(null, null, localName, localDescription,
               ledger.formats.video, dstTags, source.id, null);
 
-            nodeAPI.getStore().putSource(source, function(err, src, deltaStore) {
-              if (err) return push(`Unable to register source: ${err}`);
-              deltaStore.putFlow(dstFlow, function(err, flw, readyStore) {
-                if (err) return push(`Unable to register flow: ${err}`);
-                nodeAPI.setStore(readyStore);
-              });
+            nodeAPI.putResource(source).catch(function(err) {
+              push(`Unable to register source: ${err}`);
             });
-
-            dstBufLen = encoder.setInfo(this.srcFlow.tags, dstTags);
-            setTimeout(function () { 
-              push(null, new Grain(x.buffers, x.ptpSync, x.ptpOrigin, 
+            nodeAPI.putResource(dstFlow).then(function () {
+              dstBufLen = encoder.setInfo(this.srcFlow.tags, dstTags);
+              push(null, new Grain(x.buffers, x.ptpSync, x.ptpOrigin,
                                    x.timecode, dstFlow.id, source.id, x.duration));
               next();
-            }, 50);
+            }.bind(this), function (err) {
+              push(`Unable to register flow: ${err}`);
+            });
           }.bind(this));
         } else if (Grain.isGrain(x)) {
           var dstBuf = new Buffer(dstBufLen);

@@ -332,9 +332,9 @@ function Valve (config) {
     node.setStatus('green', 'dot', 'running');
   }
   this.getNMOSFlow = function (grain, cb) {
-    var store = node.context().global.get('nodeAPI').getStore();
+    var nodeAPI = node.context().global.get('nodeAPI');
     var flow_id = require('uuid').unparse(grain.flow_id);
-    store.getFlow(flow_id, cb);
+    nodeAPI.getResource(flow_id, 'flow', cb);
   }
   var configName = safeStatString(node.type + (nodeCount++));
   var nodeType = safeStatString(node.type);

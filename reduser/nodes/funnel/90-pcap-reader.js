@@ -55,25 +55,26 @@ module.exports = function (RED) {
       var pipelinesID = config.device ?
         RED.nodes.getNode(config.device).nmos_id :
         this.context().global.get(pipelinesID);
+      console.log('***', RED.nodes.getNode(config.device), this.context().global.get('pipelinesID'));
       var source = new ledger.Source(null, null, localName, localDescription,
         ledger.formats.video, null, null, pipelinesID, null);
       var flow = new ledger.Flow(null, null, localName, localDescription,
         ledger.formats.video, this.tags, source.id, null);
-      nodeAPI.getStore().putSource(source, function(err, src, deltaStore) {
+      nodeAPI.putResource(source, function(err, result) {
         if (err) return node.log(`Unable to register source: ${err}`);
-        deltaStore.putFlow(flow, function(err, flw, readyStore) {
-          if (err) return node.log(`Unable to register flow: ${err}`);
-          nodeAPI.setStore(readyStore);
-        });
       });
-      this.highland(
-        pcapInlet(config.file, config.loop)
-        .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
-        .map(function (g) {
-          return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
-            flow.id, source.id, g.duration);
-        }) // Once the first grain is out, create source and flow
-        .pipe(grainConcater(this.tags)));
+      nodeAPI.putResource(flow).then(function () {
+        this.highland(
+          pcapInlet(config.file, config.loop)
+          .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
+          .map(function (g) {
+            return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
+              flow.id, source.id, g.duration);
+          }) // Once the first grain is out, create source and flow
+          .pipe(grainConcater(this.tags)));
+      }.bind(this), function(err, result) {
+        if (err) return node.log(`Unable to register flow: ${err}`);
+      });
     }.bind(this));
     this.on('close', this.close); // Delete flows when we're done?
   }
