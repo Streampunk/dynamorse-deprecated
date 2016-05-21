@@ -14,7 +14,7 @@
 */
 
 var macIn = require('../valve/macadamInlet.js');
-var macadam = require('../../macadam')
+var macadam = require('macadam')
 var fs = require('fs');
 var count = 0;
 var ws = fs.createWriteStream('/Volumes/Ormiscraid/media/streampunk/recordings/fire100f.v210.yuv');

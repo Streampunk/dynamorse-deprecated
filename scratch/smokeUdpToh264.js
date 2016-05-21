@@ -19,7 +19,7 @@ var grainConcater = require('../valve/grainConcater.js');
 var grainScaleConverter = require('../valve/grainScaleConverter.js');
 var grainEncoder = require('../valve/grainEncoder.js');
 var pcapInlet = require('../funnel/pcapInlet.js');
-var codecadon = require('../../codecadon');
+var codecadon = require('codecadon');
 
 var H = require('highland');
 var SDP = require('../model/SDP.js');
@@ -87,4 +87,3 @@ pcapInlet('/Users/simon/OneDrive/Streampunk/nmi-examples/rtp-video-rfc4175-1080i
   .errors(function (err, push) { console.error(err); })
   .each(function (x) { console.log(count++ + ' ' + JSON.stringify(x, null, 2) ); } )
   .done(function() { console.log('Done!');});
-  

@@ -14,7 +14,7 @@
 */
 
 var Grain = require('../model/Grain.js');
-var codecadon = require('../../codecadon');
+var codecadon = require('codecadon');
 var grainProcessor = require('./grainProcessor.js');
 
 module.exports = function(srcWidth, srcHeight, srcFmtCode, dstWidth, dstHeight, dstFmtCode) {
@@ -22,7 +22,7 @@ module.exports = function(srcWidth, srcHeight, srcFmtCode, dstWidth, dstHeight, 
 
   encoder.doProcess = function(srcBuf, dstBuf, cb) {
     return encoder.encode (srcBuf, srcWidth, srcHeight, srcFmtCode, dstBuf, function(err, result) {
-      cb(err, result);            
+      cb(err, result);
     });
   };
 

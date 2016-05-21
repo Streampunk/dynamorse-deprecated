@@ -6,7 +6,9 @@ IT swiss army knife for professional media infrastructure and production. This i
 * Applying Internet of Things concepts (IBM's [Node-RED](http://nodered.org)) to running media infrastructure on commodity IT systems, changing traditional infrastructure into a drag-and-drop interfaces and JSON REST APIs;
 * Using [reactive streams](http://www.reactive-streams.org/) concepts from big data to manage, monitor and balance resources, including CPU load. Reactive streams are similar in concept to [adaptive bitrate streams](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming) that are in common use in stream media delivery.
 
-With dynamorse, you can create streaming workflows on-the-fly by plumbing inputs (_funnels_) to outputs (_spouts_) via transformations (_valves_) under the control of (_fittings_). Everything is measured in real time by a set of _gauges_. Watch the video to find out more.
+With dynamorse, you can create streaming workflows on-the-fly by building pipelines that connect inputs (_funnels_) to outputs (_spouts_) via transformations (_valves_) under the control of _fittings_. Everything is measured in real time by a set of _gauges_. Everything that flows down a dynamorse pipe is an NMOS _grain_ and every pipe that you draw contains an NMOS _flow_.
+
+Watch the video to find out how to install dynamorse and get started with building virtual infrastructure.
 
 __MAKE A VIDEO!!!__
 
@@ -15,10 +17,10 @@ __MAKE A VIDEO!!!__
 Dynamorse treats all of the following kinds of media as streaming equals, turning them into _flows_ of _grains_:
 
 * RTP streams - TR-03, ASPEN MPEG-TS;
-* HTTP streams - Streampunk-defined and MPEG-DASH;
+* HTTP streams - [Arachnid](https://github.com/Streampunk/arachnid) (Streampunk Media defined) and MPEG-DASH;
 * Raw files - H.264 bytestream, uncompressed - DPX-style, WAV;
 * Container file formats - MXF, MOV;
-* SDI streams - BlackMagic DeckLINK API, SMPTE 2022-6.
+* SDI streams - Blackmagic Design capture and playback devices, SMPTE 2022-6.
 
 Inputs are called _funnels_, outputs are called _spouts_.
 
@@ -34,13 +36,14 @@ Create pipelines between the funnels and spouts and add _valves_ that transform 
 
 ### Fittings
 
-The final piece of the dynamorse jigsaw puzzle are the pipe _fittings_ - a set of utilities that allow flows to be combined. This is the beginning of a journey towards the development of a stream-based creation and delivery tool, enabling Immersive Social TV experiences that can personalized to who is watching. Features include:
+The final piece of the dynamorse jigsaw puzzle are the pipe _fittings_ - a set of utilities that allow flows to be combined. This is the beginning of a journey towards the development of a stream-based creation and delivery tool, enabling _Immersive Social TV_ experiences that can personalized to who is watching. Features include:
 
 * Constrain the number of grains that flow down a pipe;
 * Sequence a set of _flows_ one after the other;
 * Set an alternative source in the event the expected source is not available;
 * Rate limit or retime a flow;
-* Apply a function that transforms either the metadata or payload flowing down a pipe.
+* Apply a function that transforms either the metadata or payload flowing down a pipe;
+* Control back-pressure.
 
 ### NMOS-inside
 
@@ -66,7 +69,7 @@ Redioactive is designed to support pipelines that are more complex than linking 
 * For more fine-grained control of the back-pressure, check out the fittings nodes.
 * A combination of all of the above.
 
-The design of redioactive was inspired by [highland.js](http://highlandjs.org/). Direct integration of highland with Node-RED did not seem easy to achieve at the time of implementation.
+The design of redioactive was inspired by [highland.js](http://highlandjs.org/). Direct integration of highland with Node-RED did not seem easy to achieve at the time of implementation. Highland is still used behind the scenes for sub-grain processing.
 
 ### Watchful eye
 
@@ -126,9 +129,9 @@ To follow.
 
 ## Support, status and further development
 
-Streampunk Media have released dynamorse as open source so that interested users can try out the project's unique approach, track its progress and provide feedback. This is prototype software that is not yet for production use in its current form. To date, the authors have focused on de-risking the platform as they build from the ground up, proving ideas such as reactive streams with IoT and asynchronous access to media-processing C++ libraries. As a result, many of the dynamorse nodes are not fully functional and - in some cases - not even implemented at all. It is the authors' intention to complete this work. The status of the implementation and the current next-step plan can be viewed via github issues and milestones.
+Streampunk Media have released dynamorse as open source so that interested users can try out the project's unique approach, track its progress and provide feedback. This is prototype software that is not yet suitable for production use in its current form. To date, the authors have focused on de-risking the platform as they build from the ground up, proving ideas such as combining reactive streams with IoT and asynchronous access with media-processing C++ libraries. As a result, many of the dynamorse nodes are not fully functional and - in some cases - not even implemented at all. It is the authors' intention to complete this work. The status of the implementation and the current next-step plan can be viewed via [github issues](https://github.com/Streampunk/dynamorse/issues) and [milestones](https://github.com/Streampunk/dynamorse/milestones).
 
-Contributions can be made via pull requests and will be considered by the authors on their merits. Enhancement requests and bug reports should be raised as github issues. For support, to request development priority or for bespoke node development, please contact Streampunk Media](http://www.streampunk.media/). For updates follow [@StrmPunkd](https://twitter.com/StrmPunkd) on Twitter.
+Contributions can be made via pull requests and will be considered by the authors on their merits. Enhancement requests and bug reports should be raised as [github issues](https://github.com/Streampunk/dynamorse/issues). For support, to request development priority or for bespoke node development, please contact Streampunk Media](http://www.streampunk.media/) at [furnace@streampunk.media](mailto:furnace@streampunk.media). For updates, follow [@StrmPunkd](https://twitter.com/StrmPunkd) on Twitter.
 
 Dynamorse will remain open-source. Where links are made to commercial 3rd party libraries, such as codec libraries, access to those features will only be available via a professional-grade support contract. The aim is to give user's a choice between patent-free codecs with open-source implementations (VP8, VP9, VC-2, etc) and codecs with associated patents where professional grade implementations are only available commercially (AVCi, HEVC). More details of the support packages to follow.
 

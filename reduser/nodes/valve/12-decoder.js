@@ -15,7 +15,7 @@
 
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
-var codecadon = require('../../../../codecadon');
+var codecadon = require('codecadon');
 var Grain = require('../../../model/Grain.js');
 
 module.exports = function (RED) {

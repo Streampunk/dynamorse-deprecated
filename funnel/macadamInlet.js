@@ -13,8 +13,7 @@
   limitations under the License.
 */
 
-// TODO: Change to link binding
-var macadam = require('../../macadam');
+var macadam = require('macadam');
 var H = require('highland');
 
 module.exports = function (deviceIndex, displayMode, pixelFormat, stopper) {
