@@ -32,7 +32,7 @@ test('A packet with extensions', function (t) {
   var lineData = p.getLineData()[0];
   t.equal(lineData.length, 1350, 'has expected line data length.');
   t.equal(lineData.fieldID, false, 'is first field (fieldID = false).');
-  t.equal(lineData.lineNo, 21, 'if for line 21.');
+  t.equal(lineData.lineNo, 21, 'is for line 21.');
   t.equal(lineData.offset, 0, 'has zero offset.');
   t.equal(lineData.continuation, false, 'has no continuation.');
   t.deepEqual(lineData.data,
@@ -53,11 +53,11 @@ test('A packet with continuation', function (t) {
   t.equal(lineData.length, 600, 'has expected 1st line data length.');
   t.equal(lineData.fieldID, false, 'is 1st line first field (fieldID = false).');
   t.equal(lineData.lineNo, 21, 'is 1st line 21.');
-  t.equal(lineData.offset, 0, 'has 1st line zero offset.');
-  t.equal(lineData.continuation, true, 'has 1st line no continuation.');
+  t.equal(lineData.offset, 1680, 'has 1st line zero offset.');
+  t.equal(lineData.continuation, true, 'has 1st line continuation.');
   t.deepEqual(lineData.data,
-    packet3.slice(p.getPayloadStart() + 8,
-      p.getPayloadStart() + 8 + lineData.length),
+    packet3.slice(p.getPayloadStart() + 14,
+      p.getPayloadStart() + 14 + lineData.length),
     'has 1st line expected payload.');
   var prevLength = lineData.length;
   lineData = p.getLineData()[1];
@@ -67,8 +67,8 @@ test('A packet with continuation', function (t) {
   t.equal(lineData.offset, 0, 'has zero offset.');
   t.equal(lineData.continuation, false, 'has no continuation.');
   t.deepEqual(lineData.data,
-    packet0.slice(p.getPayloadStart() + 8,
-      p.getPayloadStart() + 8 + lineData.length),
+    packet3.slice(p.getPayloadStart() + 14 + p.getLineData()[0].length,
+      p.getPayloadStart() + 14 + p.getLineData()[0].length + lineData.length),
     'has expected payload.');
   t.end();
 });
