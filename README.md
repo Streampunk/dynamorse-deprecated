@@ -3,10 +3,10 @@
 IT swiss army knife for professional media infrastructure and production. This is a *prototype* [Node.js](http://nodejs.org/) application that demonstrates:
 
 * Putting the [Joint Taskforce for Networked Media](http://www.jt-nm.org)'s [Reference Architecture](http://www.jt-nm.org/RA-1.0/index.shtml) to work - streaming professional quality media with support for identity, timimg and [NMOS](http://www.nmos.tv) [registration and discovery](https://github.com/AMWA-TV/nmos-discovery-registration);
-* Applying Internet of Things concepts (IBM's [Node-RED](http://nodered.org)) to running media infrastructure on commodity IT systems, changing traditional infrastructure into a drag-and-drop interfaces and JSON REST APIs;
-* Using [reactive streams](http://www.reactive-streams.org/) concepts from big data to manage, monitor and balance resources, including CPU load. Reactive streams are similar in concept to [adaptive bitrate streams](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming) that are in common use in stream media delivery.
+* Applying Internet of Things concepts (IBM's [Node-RED](http://nodered.org)) to running media infrastructure on commodity IT systems, changing traditional infrastructure into drag-and-drop interfaces and JSON REST APIs;
+* Using [reactive streams](http://www.reactive-streams.org/) concepts from big data to manage, monitor and balance collaborative resources, including CPU load. Reactive streams are similar in concept to the [adaptive bitrate streams](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming) commonly used in streaming media delivery.
 
-With dynamorse, you can create streaming workflows on-the-fly by building pipelines that connect inputs (_funnels_) to outputs (_spouts_) via transformations (_valves_) under the control of _fittings_. Everything is measured in real time by a set of _gauges_. Everything that flows down a dynamorse pipe is an NMOS _grain_ and every pipe that you draw contains an NMOS _flow_.
+The name _dynamorse_ is a reference to dynamic morse code - still a stream of information but conveyed and controlled dynamically. With dynamorse, you can create streaming workflows on-the-fly by building pipelines that connect inputs (_funnels_) to outputs (_spouts_) via transformations (_valves_) under the control of _fittings_. Everything is measured in real time by a set of _gauges_. Everything that flows down a dynamorse pipe is an NMOS _grain_ and every pipe contains an NMOS _flow_.
 
 Watch the video to find out how to install dynamorse and get started with building virtual infrastructure.
 
@@ -16,11 +16,11 @@ __MAKE A VIDEO!!!__
 
 Dynamorse treats all of the following kinds of media as streaming equals, turning them into _flows_ of _grains_:
 
-* RTP streams - TR-03, ASPEN MPEG-TS;
+* RTP streams - [TR-03](http://www.videoservicesforum.org/download/technical_recommendations/VSF_TR-03_DRAFT_2015-10-19.pdf), [ASPEN](http://aspen-community.com/) MPEG-TS;
 * HTTP streams - [Arachnid](https://github.com/Streampunk/arachnid) (Streampunk Media defined) and MPEG-DASH;
 * Raw files - H.264 bytestream, uncompressed - DPX-style, WAV;
 * Container file formats - MXF, MOV;
-* SDI streams - Blackmagic Design capture and playback devices, SMPTE 2022-6.
+* SDI streams - [Blackmagic Design](https://www.blackmagicdesign.com/) capture and playback devices, SMPTE 2022-6 (to follow).
 
 Inputs are called _funnels_, outputs are called _spouts_.
 
@@ -30,7 +30,7 @@ Create pipelines between the funnels and spouts and add _valves_ that transform 
 
 * Encoding - convert uncompressed flows into compressed flows;
 * Decoding - convert compressed flows into uncompressed flows;
-* Converting - 10-bit to 8-bit, RFC4175 pixel groups to the common V210 bytestream format, picture rescaling.
+* Converting - 10-bit to 8-bit, [RFC4175](https://tools.ietf.org/html/rfc4175) pixel groups to the common [V210](https://developer.apple.com/library/mac/technotes/tn2162/_index.html#//apple_ref/doc/uid/DTS40013070-CH1-TNTAG8-V210__4_2_2_COMPRESSION_TYPE) bytestream format, picture rescaling.
 * Switch - switch between different inputs and grain boundaries.
 * Graphics - pass each grain through a graphics programming library to, for example, add text or a bug.
 
@@ -73,9 +73,9 @@ The design of redioactive was inspired by [highland.js](http://highlandjs.org/).
 
 ### Watchful eye
 
-Each dynamorse instance can send statistics to _influxdb_, a time series database that is optimized for storing and searching metrics information. The running instance sends metrics about the overall performance of the application, along with each Node-RED node sending details about how many grains it processed per second and how long it took to process each grain. This data can be mined and turned into reports or graphed in real time with tools such as Apache's Grafana.
+Each dynamorse instance can send statistics to [influxdb](https://influxdata.com/time-series-platform/influxdb/), a time-series database that is optimized for storing and searching metrics information. The running instance sends metrics about the overall performance of the application, along with each Node-RED node sending details about how many grains it processed per second and how long it took to process each grain. This data can be mined and turned into reports or graphed in real time with tools such as  [Grafana](http://grafana.org/).
 
-Dynamorse uses standard IT tools so that it fits alongside other metrics systems and applications in an enterprise IT environment. Combined with system monitoring tools that also work with the same toolsets, such as _collectd_, it is possible to monitor and respond to issues such as real-time streams about to dropping below real-time performance. Also, developers and testers can analyze performance by watching for memory leaks, buffer overflows, the impact of garbage collection etc..
+Dynamorse uses standard IT tools so that it fits alongside other metrics systems and applications in an enterprise IT environment. Combined with system monitoring tools that also work with the same toolsets, such as [collectd](https://collectd.org/), it is possible to monitor and respond to issues such as real-time streams about to dropping below real-time performance. Also, developers and testers can analyze performance by watching for memory leaks, buffer overflows, the impact of garbage collection etc..
 
 ## Getting started
 
@@ -111,7 +111,7 @@ Once you are happy with a design, hit the deploy button. This will send the flow
 
 #### Thread pool size
 
-The default thread pool size for libuv, an underlying component of node, is only sufficient for 2 or 3 dynamorse nodes. To increase the size of the pool, set the `UV_THREADPOOL_SIZE` environment variable to a number higher than the default of `4`. On Mac/Linux:
+The default thread pool size for libuv, an underlying component of node, is only sufficient for 2 or 3 dynamorse nodes. To increase the size of the pool, set the `UV_THREADPOOL_SIZE` environment variable to a number higher than the default of `4`. For example, before running dynamorse on Mac/Linux:
 
     export UV_THREADPOOL_SIZE=32
 
@@ -119,13 +119,51 @@ On Windows:
 
     set UV_THREADPOOL_SIZE=32
 
+#### Configuration nodes
+
+Configurations that are available for use across a number of different nodes are configured via Node-RED _configuration nodes_. These are not visible by default but can be viewed by selecting the drop down menu icon on the top right-hand-side of the Node-RED user interface (icon is three parallel horizontal lines) and selecting configuration nodes. A config tab will appear alongside the _info_ and _debug_ tabs in the right-hand panel. Configurations are available to:
+
+* Set the name and description of the NMOS node that is advertised as the self node.
+* Set the names and descriptions for the NMOS devices represented by this NMOS node, with the _generic_ device representing edge flows that are exposed or consumed externally and the _pipelines_ device representing internal flows. When detected, the _generic_ flows are registered with a local registration API.
+* Defaults for the RTP extension headers found in streams supporting the [NMOS in stream timing and identity](https://github.com/AMWA-TV/nmos-in-stream-id-timing) specification. These defaults are used where no SDP is available on input or when a new stream in created as an output.
+* Configure the address and port of the connection for sending metrics data to an influx database.
+
 ### Examples to try
 
-To follow.
+#### Grain analyzer
 
-### Configuration nodes
+Show details of a grain on input.
 
-To follow.
+1. Download an example PCAP file from the NMOS examples, eg. `[rtp-audio-l24-2chan.pcap](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/pcap/rtp-audio-l24-2chan.pcap)`.
+2. Download the corresponding example SDP file from the NMOS examples, eg. `[sdp_L24_2chan.sdp](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/sdp/sdp_L24_2chan.sdp)`.
+3. Create the graph shown in the image below, the a _pcap-reader_ funnel connected to a _grain_xray_ gauge (with the valves) that is in turn connected to the testing _spout_. ![grain analyzer wiring](images/grain-analyzer.png)
+4. Configure the the PCAP node as follows:
+  * `pcap file` should be the path to the file downloaded in step 1, e.g. `/Users/streampunk/Downloads/rtp-audio-l24-2chan.pcap`.
+  * `device` should be the device that starts `pipelines-...`.
+  * `SDP URL` should be a `file:` URL to the SDP file downloaded in step 2, e.g. `file:sdp_L24_2chan.sdp`. Other parameters will be set from the SDP file.
+5. Set to watch the debug tab in the right-hand panel a press the _Deploy_ button. Details of the grains contained in the PCAP file will be displayed in JSON format.
+
+The longer example files provided to members of the AMWA Networked Media Incubator may also be used as an input source.
+
+#### Create a WAV file
+
+1.
+2.
+3.
+
+#### Encode an H.264 file
+
+1.
+2.
+3.
+
+#### Send a WAV file as an NMOS flow
+
+1.
+2.
+3.
+
+Analyse or record the RTP stream produced using Wireshark or set up another dynamorse instance and use the output of this example as the input to another. A filtered PCAP recording containing only the RTP packets can be used as an input to the _pcap-reader_ Node-RED node.
 
 ## Support, status and further development
 

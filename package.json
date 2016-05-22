@@ -30,5 +30,6 @@
     "xml2js": "^0.4.16",
     "codecadon": "^0.0.1",
     "macadam": "^0.1.1"
-  }
+  },
+  "bin": "./server.js"
 }
