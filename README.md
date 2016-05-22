@@ -107,7 +107,7 @@ Connect to the user interface via a web browser. By default, the UI runs on port
 
 The choice of available nodes is provided down the left-hand-side. Each node is self-describing - click on it and it describes what it is and how to configure it in the info panel on the right-hand-side. Drag nodes out into the central flow designer panel and link them together by joining output ports to input ports.
 
-Once you are happy with a design, hit the deploy button. This will send the flow to the dynamorse server and the server will attempt to run it. Check the debug tab on the right-hand-side for live debug messages and errors.
+Once you are happy with a design, hit the _Deploy_ button. This will send the flow to the dynamorse server and the server will attempt to run it. Check the debug tab on the right-hand-side for live debug messages and errors.
 
 #### Thread pool size
 
@@ -134,8 +134,8 @@ Configurations that are available for use across a number of different nodes are
 
 Show details of a grain on input.
 
-1. Download an example PCAP file from the NMOS examples, eg. `[rtp-audio-l24-2chan.pcap](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/pcap/rtp-audio-l24-2chan.pcap)`.
-2. Download the corresponding example SDP file from the NMOS examples, eg. `[sdp_L24_2chan.sdp](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/sdp/sdp_L24_2chan.sdp)`.
+1. Download an example PCAP file from the NMOS examples, eg. [`rtp-audio-l24-2chan.pcap`](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/pcap/rtp-audio-l24-2chan.pcap).
+2. Download the corresponding example SDP file from the NMOS examples, eg. [`sdp_L24_2chan.sdp`](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/sdp/sdp_L24_2chan.sdp).
 3. Create the graph shown in the image below, the a _pcap-reader_ funnel connected to a _grain_xray_ gauge (with the valves) that is in turn connected to the testing _spout_. ![grain analyzer wiring](images/grain-analyzer.png)
 4. Configure the the PCAP node as follows:
   * `pcap file` should be the path to the file downloaded in step 1, e.g. `/Users/streampunk/Downloads/rtp-audio-l24-2chan.pcap`.
