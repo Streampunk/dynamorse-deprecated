@@ -1,5 +1,7 @@
 # Dynamorse
 
+![overview graphic](images/overview.png)
+
 IT swiss army knife for professional media infrastructure and production. This is a *prototype* [Node.js](http://nodejs.org/) application that demonstrates:
 
 * Putting the [Joint Taskforce for Networked Media](http://www.jt-nm.org)'s [Reference Architecture](http://www.jt-nm.org/RA-1.0/index.shtml) to work - streaming professional quality media with support for identity, timimg and [NMOS](http://www.nmos.tv) [registration and discovery](https://github.com/AMWA-TV/nmos-discovery-registration);
@@ -56,11 +58,15 @@ As well as being a means to move and process media data through a CPU/GPU and it
 
 Dynamorse is ___redioactive___! This means that it adds a library of features to support [reactive streams](http://www.reactive-streams.org/) to the default behavior of [Node-RED](http://nodered.org). By default, Node-RED uses an event-based model where producers fire update events along the pipelines whether or not the consumer is ready to receive them, or consumers are sat waiting for events because the producer has been throttled back.
 
+![producer to consumer](images/producer-consumer.png)
+
 With reactive streams support, the consumer signals to the producer when it is ready to receive more inputs, a process known as _back pressure_. The producer then pushes the next element down the pipe, which it may have optimistically buffered in advance. Producers and consumers can be chained together so that back pressure goes along the length of a pipe.
 
 As an example, consider a file reader funnel on an SSD feeding a real-time display funnel. The file reader can ready the picture data from the file at around twice real time, whereas the display can only cope with real-time data. With no back-pressure, the display consumer is overloaded and starts to drop frames. With back pressure, the display stops asking for frames when its buffer is full and the file-reader stops reading from the disk when its buffer is full. When the display's buffer starts to clear, it starts asking for frames again. As the file-reader satisfies the requests for frames and its buffer starts to empty, it starts to read another batch from the disk.
 
 With real time streams and a slow consumer, at some point the producer's buffer will overflow and frames will be dropped. This is a symptom of a design problem with a pipeline or resource overload (see monitoring in the next section) that should not occur in normal operation. Errors are produced and can be monitored whenever a buffer is overloaded. Each dynamorse node - other than the spouts - has a buffer size parameter.
+
+![complex interconnection](images/complex-web.png)
 
 Redioactive is designed to support pipelines that are more complex than linking single producers to single consumers:
 
@@ -99,11 +105,11 @@ To run dynamorse when it is installed as a global application (`-g` flag):
 
     dynamorse
 
-To run a local install (Linux/Mac/cygwin flavor):
+To run a local install (Linux/Mac/cygwin flavor): __CHECK THIS__
 
     $(npm bin)/dynamorse
 
-Connect to the user interface via a web browser. By default, the UI runs on port `8000`, so use [http://localhost:8000/]. The NMOS Node API runs on port `3001` be default, so connect in another tab with [http://localhost:3001/x-nmos/node/v1.0/]. Alternatively, connect over HTTP from a another browser.
+Connect to the user interface via a web browser. By default, the UI runs on port `8000`, so use http://localhost:8000/red. The NMOS Node API runs on port `3001` be default, so connect in another tab with http://localhost:3001/x-nmos/node/v1.0/. Alternatively, connect over HTTP from a another browser.
 
 The choice of available nodes is provided down the left-hand-side. Each node is self-describing - click on it and it describes what it is and how to configure it in the info panel on the right-hand-side. Drag nodes out into the central flow designer panel and link them together by joining output ports to input ports.
 
@@ -111,7 +117,7 @@ Once you are happy with a design, hit the _Deploy_ button. This will send the fl
 
 #### Setting port numbers
 
-
+__ADD COMMAND LINE PARAMETERS__
 
 #### Thread pool size
 
@@ -151,7 +157,7 @@ Other things to try ...
 
 * The longer example files provided to members of the AMWA Networked Media Incubator may also be used as an input source, or change to the _wav-in_ funnel and use your a favourite 2 channel WAV file.
 * Try looping the PCAP file and seeing the result. Then try regenerating the grain metadata to see the effect. In each case, change the parameters and redeploy.
-* Examine the NMOS registration and discovery information for the flows available via the NMOS node API, by default at http://localhost:3001/x-nmos/v1.0/node/
+* Examine the NMOS registration and discovery information for the flows available via the NMOS node API, by default at http://localhost:3001/x-nmos/node/v1.0/.
 * Watch back-pressure in action by adjusting the speed of the pipeline by setting the timeout parameter on the spout, which is measure in milliseconds. For realtime (assuming 25 frames per second), set the timeout to 40ms.
 
 #### Create a WAV file
@@ -174,9 +180,9 @@ You can loop the input but this will never close the output file. Add a _take_ f
 
 Take and NMOS video RTP stream as a PCAP file and make an H.264 raw stream that can be played by [VLC](http://www.videolan.org/vlc/).
 
-1. Download an example video PCAP file from the NMOS examples, e.g. [](). This should be 1080i50 material.
-2. Download the corresponding example SDP file from the NMOS examples, eg. [`sdp_L24_2chan.sdp`](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/sdp/sdp_L24_2chan.sdp).
-3. Create the graph shown in the image below, with a _pcap_reader_ funnel connected to a _converter_ valve, then an _encoder_ valve and and _raw-file-out_ spout. [encoding wiring](images/encode.png)
+1. Download an example video PCAP file from the NMOS examples, e.g. [`rtp-video-rfc4175-1080i50.pcap`](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/pcap/rtp-video-rfc4175-1080i50.pcap). This should be 1080i50 material.
+2. Download the corresponding example SDP file from the NMOS examples, eg. [`sdp_rfc4175_10bit_1080i50.sdp`](https://raw.githubusercontent.com/AMWA-TV/nmos-in-stream-id-timing/master/examples/sdp/sdp_rfc4175_10bit_1080i50.sdp).
+3. Create the graph shown in the image below, with a _pcap_reader_ funnel connected to a _converter_ valve, then an _encoder_ valve and and _raw-file-out_ spout. ![encoding wiring](images/encode.png)
 4. Configure the the _pcap-reader_ node as follows:
   * `pcap file` should be the path to the file downloaded in step 1, e.g. `/Users/streampunk/Downloads/rtp-audio-l24-2chan.pcap`.
   * `device` should be the device that starts `pipelines-...`.
@@ -194,7 +200,7 @@ Create an RTP multicast stream and advertise it as an NMOS flow, source and send
 1. Download or select a 2-channel WAV file. How about a [steam train](http://soundbible.com/2102-Steam-Engine-Running.html)?
 2. Create the simple two node graph shown below, connecting a _wav-in_ funnel to a _nmos-rtp-out_ spout. ![nmos flow wiring](images/nmos-flow.png)
 3. Configure the _nmos-rtp-out_ spout with a multicast address and port number. Multicast addresses are in the range `224.0.0.0` to `239.255.255.255`. It is best to choose something randomly within this range and avoiding using `0`, `1`, `254` or `255`. You may need to bind a multicast address to a specific network interface according to instructions specific to your platform.
-4. _Deploy_ the graph. An appropriate SDP file will be created and served from the local web server. AN NMOS flow, source and a sender will be created and advertised via the Node API and pushed to a Registration API if available. 
+4. _Deploy_ the graph. An appropriate SDP file will be created and served from the local web server. AN NMOS flow, source and a sender will be created and advertised via the Node API and pushed to a Registration API if available.
 
 Analyse or record the RTP stream produced using [Wireshark](https://www.wireshark.org/) or set up another dynamorse instance and use the output of this example as the input to another. A filtered PCAP recording containing only the RTP packets can be used as an input to the _pcap-reader_ Node-RED node.
 
