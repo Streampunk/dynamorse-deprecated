@@ -21,7 +21,7 @@ var RFC4175Packet = require('../model/RFC4175Packet.js')
 // exts is an object with the index properties origin_timestamp_id, flow_id_id etc.
 // defined
 module.exports = function (exts, pgroup) {
-  var RTP = pgroup ? RFC4175Packet : RTPPacket; 
+  var RTP = pgroup ? RFC4175Packet : RTPPacket;
   var pushLines = pgroup;
   var rtpCounter = -2;
   var origin_timestamp, smpte_tc, flow_id, source_id,
@@ -29,6 +29,7 @@ module.exports = function (exts, pgroup) {
   var payloads = [];
   var ex = exts;
   var udpConsumer = function (err, x, push, next) {
+    console.log('YEAH!');
     if (err) {
       push(err);
       next();
@@ -39,7 +40,7 @@ module.exports = function (exts, pgroup) {
         var rtp = new RTP(x);
         var nextCounter = (pushLines) ? rtp.getCompleteSequenceNumber() :
           rtp.getSequenceNumber();
-        // console.log(pushLines, nextCounter);
+        console.log('PPP', pushLines, nextCounter);
         if (rtpCounter !== -2) {
           if (nextCounter === 0 && rtpCounter != (pushLines ? 0xffffffff : 0xffff)) {
             push(new Error('Unexpected sequence number at wrap around.'));

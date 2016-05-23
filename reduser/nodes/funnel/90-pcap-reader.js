@@ -44,6 +44,7 @@ module.exports = function (RED) {
     this.tags = {};
     this.exts = RED.nodes.getNode(
       this.context().global.get('rtp_ext_id')).getConfig();
+    console.log('EARLY EXTS', this.exts);
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     this.sdpURLReader(config, function (err, data) {
@@ -55,11 +56,11 @@ module.exports = function (RED) {
       var pipelinesID = config.device ?
         RED.nodes.getNode(config.device).nmos_id :
         this.context().global.get(pipelinesID);
-      console.log('***', RED.nodes.getNode(config.device), this.context().global.get('pipelinesID'));
+      console.log('***', RED.nodes.getNode(config.device), this.tags.format[0]);
       var source = new ledger.Source(null, null, localName, localDescription,
-        ledger.formats.video, null, null, pipelinesID, null);
+        "urn:x-nmos:format:" + this.tags.format[0], null, null, pipelinesID, null);
       var flow = new ledger.Flow(null, null, localName, localDescription,
-        ledger.formats.video, this.tags, source.id, null);
+        "urn:x-nmos:format:" + this.tags.format[0], this.tags, source.id, null);
       nodeAPI.putResource(source, function(err, result) {
         if (err) return node.log(`Unable to register source: ${err}`);
       });
@@ -70,7 +71,8 @@ module.exports = function (RED) {
           .map(function (g) {
             return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
               flow.id, source.id, g.duration);
-          }) // Once the first grain is out, create source and flow
+          })// Once the first grain is out, create source and flow
+          .doto(H.log)
           .pipe(grainConcater(this.tags)));
       }.bind(this), function(err, result) {
         if (err) return node.log(`Unable to register flow: ${err}`);
@@ -155,13 +157,13 @@ module.exports = function (RED) {
   PCAPReader.prototype.sdpToExt = function (sdp) {
     if (!SDP.isSDP(sdp)) return;
     var revExtMap = sdp.getExtMapReverse(0);
-    this.exts.origin_timestamp_id = revExtMap['urn:x-ipstudio:rtp-hdrext:origin-timestamp'];
+    this.exts.origin_timestamp_id = revExtMap['urn:x-nmos:rtp-hdrext:origin-timestamp'];
     this.exts.smpte_tc_id = revExtMap['urn:ietf:params:rtp-hdrext:smpte-tc'];
-    this.exts.flow_id_id = revExtMap['urn:x-ipstudio:rtp-hdrext:flow-id'];
-    this.exts.source_id_id = revExtMap['urn:x-ipstudio:rtp-hdrext:source-id'];
-    this.exts.grain_flags_id = revExtMap['urn:x-ipstudio:rtp-hdrext:grain-flags'];
-    this.exts.sync_timestamp_id = revExtMap['urn:x-ipstudio:rtp-hdrext:sync-timestamp'];
-    this.exts.grain_duration_id = revExtMap['urn:x-ipstudio:rtp-hdrext:grain-duration'];
+    this.exts.flow_id_id = revExtMap['urn:x-nmos:rtp-hdrext:flow-id'];
+    this.exts.source_id_id = revExtMap['urn:x-nmos:rtp-hdrext:source-id'];
+    this.exts.grain_flags_id = revExtMap['urn:x-nmos:rtp-hdrext:grain-flags'];
+    this.exts.sync_timestamp_id = revExtMap['urn:x-nmos:rtp-hdrext:sync-timestamp'];
+    this.exts.grain_duration_id = revExtMap['urn:x-nmos:rtp-hdrext:grain-duration'];
     this.exts.ts_refclk = sdp.getTimestampReferenceClock(0);
     this.exts.smpte_tc_param = sdp.getSMPTETimecodeParameters(0);
     return this.exts;

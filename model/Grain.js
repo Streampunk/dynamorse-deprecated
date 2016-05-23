@@ -152,6 +152,10 @@ Grain.prototype.formatDuration = function (d) {
   return d.readUInt32BE(4) + '/' + d.readUInt32BE(0);
 }
 
+Grain.prototype.audioSamples = function () {
+  return this.duration.readUInt32BE(0);
+}
+
 Grain.isGrain = function (x) {
   return x !== null &&
     typeof x === 'object' &&

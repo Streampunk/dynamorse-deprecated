@@ -53,10 +53,10 @@ function pcapInlet(file, loop) {
         var packetHeader = (breakInHeader) ?
           Buffer.concat([leftOver, b.slice(0, 16 - leftOver.length)], 16) :
           b.slice(packetEnd, packetEnd + 16);
-        // console.log(packetHeader);
         nextLen = packetHeader.readUInt32LE(8);
         packetEnd += (breakInHeader) ? 16 - leftOver.length : 16;
         if (packetEnd + nextLen <= b.length) {
+          console.log('pushing', b.slice(packetEnd + 42, packetEnd + nextLen).length);
           push(null, b.slice(packetEnd + 42, packetEnd + nextLen));
           packets++;
           packetEnd += nextLen;

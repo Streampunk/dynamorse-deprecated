@@ -14,7 +14,7 @@
 */
 
 var Grain = require('../model/Grain.js');
-var codecadon = require('codecadon');
+var codecadon = require('../../codecadon');
 var grainProcessor = require('./grainProcessor.js');
 var H = require('highland');
 
@@ -22,8 +22,9 @@ module.exports = function(srcTags) {
   var concater = new codecadon.Concater(function() {
     console.log('Concater exiting');
   });
-  console.log(srcTags);
-  var dstBufLen = concater.setInfo(srcTags);
+
+  var dstSampleSize = calculateSampleSize(srcTags);
+  var isVideo = srcTags.format[0] === 'video';
 
   var grainMuncher = function (err, x, push, next) {
     if (err) {
@@ -35,7 +36,10 @@ module.exports = function(srcTags) {
       });
     } else {
       if (Grain.isGrain(x)) {
-        var dstBuf = new Buffer(dstBufLen);
+        var dstBuf = isVideo ?
+          new Buffer(dstSampleSize) :
+          new Buffer(x.audioSamples() * dstSampleSize);
+        console.log(dstBuf.length);
         var numQueued = concater.concat(x.buffers, dstBuf, function(err, result) {
           if (err) {
             push(err);
@@ -55,6 +59,17 @@ module.exports = function(srcTags) {
       }
     }
   };
+
+  function calculateSampleSize(tags) {
+    if (tags.format[0] === 'video') {
+      return ((tags.packing[0] === 'pgroup') ?
+        +tags.width[0] * 5 / 2|0 :
+        (+tags.width[0] + (47 - (+tags.width[0] - 1) % 48)) * 8 / 3|0
+      ) * +tags.height[0];
+    } else { // TODO work with ancillary data packets
+      return +tags.channels[0] * +tags.encodingName[0].substring(1) / 8|0;
+    }
+  }
 
   return H.pipeline(H.consume(grainMuncher));
 }

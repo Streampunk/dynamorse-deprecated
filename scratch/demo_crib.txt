@@ -3,3 +3,8 @@ PCAP file: /Users/sparkpunk/Documents/Streampunk/nmi-examples/rtp-video-rfc4175-
 Description: Streampunk Media NAB 2016
 
 SDP file: file:/Users/sparkpunk/Documents/Streampunk/nmi-examples/sdp_rfc4175_10bit_1080i50.sdp
+
+
+/Users/vizigoth/Documents/streampunk/nmos-in-stream-id-timing/examples/pcap/rtp-audio-l24-2chan.pcap
+
+/Users/vizigoth/Documents/streampunk/nmos-in-stream-id-timing/examples/sdp/sdp_L24_2chan.sdp
