@@ -109,6 +109,10 @@ The choice of available nodes is provided down the left-hand-side. Each node is 
 
 Once you are happy with a design, hit the _Deploy_ button. This will send the flow to the dynamorse server and the server will attempt to run it. Check the debug tab on the right-hand-side for live debug messages and errors.
 
+#### Setting port numbers
+
+
+
 #### Thread pool size
 
 The default thread pool size for libuv, an underlying component of node, is only sufficient for 2 or 3 dynamorse nodes. To increase the size of the pool, set the `UV_THREADPOOL_SIZE` environment variable to a number higher than the default of `4`. For example, before running dynamorse on Mac/Linux:
@@ -132,38 +136,67 @@ Configurations that are available for use across a number of different nodes are
 
 #### Grain analyzer
 
-Show details of a grain on input.
+Explore the fundamental building blocks of the JT-NM RA by viewing the details of grains as they flow down pipes.
 
 1. Download an example PCAP file from the NMOS examples, eg. [`rtp-audio-l24-2chan.pcap`](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/pcap/rtp-audio-l24-2chan.pcap).
 2. Download the corresponding example SDP file from the NMOS examples, eg. [`sdp_L24_2chan.sdp`](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/sdp/sdp_L24_2chan.sdp).
 3. Create the graph shown in the image below, the a _pcap-reader_ funnel connected to a _grain_xray_ gauge (with the valves) that is in turn connected to the testing _spout_. ![grain analyzer wiring](images/grain-analyzer.png)
-4. Configure the the PCAP node as follows:
+4. Configure the the _pcap-reader_ node as follows:
   * `pcap file` should be the path to the file downloaded in step 1, e.g. `/Users/streampunk/Downloads/rtp-audio-l24-2chan.pcap`.
   * `device` should be the device that starts `pipelines-...`.
   * `SDP URL` should be a `file:` URL to the SDP file downloaded in step 2, e.g. `file:sdp_L24_2chan.sdp`. Other parameters will be set from the SDP file.
 5. Set to watch the debug tab in the right-hand panel a press the _Deploy_ button. Details of the grains contained in the PCAP file will be displayed in JSON format.
 
-The longer example files provided to members of the AMWA Networked Media Incubator may also be used as an input source.
+Other things to try ...
+
+* The longer example files provided to members of the AMWA Networked Media Incubator may also be used as an input source, or change to the _wav-in_ funnel and use your a favourite 2 channel WAV file.
+* Try looping the PCAP file and seeing the result. Then try regenerating the grain metadata to see the effect. In each case, change the parameters and redeploy.
+* Examine the NMOS registration and discovery information for the flows available via the NMOS node API, by default at http://localhost:3001/x-nmos/v1.0/node/
+* Watch back-pressure in action by adjusting the speed of the pipeline by setting the timeout parameter on the spout, which is measure in milliseconds. For realtime (assuming 25 frames per second), set the timeout to 40ms.
 
 #### Create a WAV file
 
-1.
-2.
-3.
+Take an NMOS audio RTP stream as a PCAP file and make a [WAV file](https://en.wikipedia.org/wiki/WAV) from it. Many of the steps are the same as for the grain analyzer.
+
+1. Download an example audio PCAP file from the NMOS examples, eg. [`rtp-audio-l24-2chan.pcap`](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/pcap/rtp-audio-l24-2chan.pcap).
+2. Download the corresponding example SDP file from the NMOS examples, eg. [`sdp_L24_2chan.sdp`](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/sdp/sdp_L24_2chan.sdp).
+3. Create the graph shown in the image below, with a _pcap-reader_ funnel connected to a _grain_xray_ gauge (with the valves) that is in turn connected to the _wav-out_ spout. ![create WAV wiring](images/wav-file.png)
+4. Configure the the _pcap-reader_ node as follows:
+  * `pcap file` should be the path to the file downloaded in step 1, e.g. `/Users/streampunk/Downloads/rtp-audio-l24-2chan.pcap`.
+  * `device` should be the device that starts `pipelines-...`.
+  * `SDP URL` should be a `file:` URL to the SDP file downloaded in step 2, e.g. `file:sdp_L24_2chan.sdp`. Other parameters will be set from the SDP file.
+5. Configure the _wav-out_ node with a filename in which to store the WAV file, e.g. `dynamorse.wav`.
+6. Press the _Deploy_ button. Once complete, listen to the WAV file with an application such as [VLC](http://www.videolan.org/vlc/) or [Audacity](http://www.audacityteam.org/).
+
+You can loop the input but this will never close the output file. Add a _take_ fitting to the pipeline between the _pcap-reader_ and the _grain_xray_ and set how many grains you want to record into the WAV file. This will take the given number of grains and pass them on, then stop the pipeline and close the file once sufficient grains have been read.
 
 #### Encode an H.264 file
 
-1.
-2.
-3.
+Take and NMOS video RTP stream as a PCAP file and make an H.264 raw stream that can be played by [VLC](http://www.videolan.org/vlc/).
+
+1. Download an example video PCAP file from the NMOS examples, e.g. [](). This should be 1080i50 material.
+2. Download the corresponding example SDP file from the NMOS examples, eg. [`sdp_L24_2chan.sdp`](https://github.com/AMWA-TV/nmos-in-stream-id-timing/raw/master/examples/sdp/sdp_L24_2chan.sdp).
+3. Create the graph shown in the image below, with a _pcap_reader_ funnel connected to a _converter_ valve, then an _encoder_ valve and and _raw-file-out_ spout. [encoding wiring](images/encode.png)
+4. Configure the the _pcap-reader_ node as follows:
+  * `pcap file` should be the path to the file downloaded in step 1, e.g. `/Users/streampunk/Downloads/rtp-audio-l24-2chan.pcap`.
+  * `device` should be the device that starts `pipelines-...`.
+  * `SDP URL` should be a `file:` URL to the SDP file downloaded in step 2, e.g. `file:sdp_L24_2chan.sdp`. Other parameters will be set from the SDP file.
+5. Configure the _converter_ and the _encoder_ `device` to use the one that starts `pipelines-...`. The default parameters for scale and destination format are OK.
+6. Set the `file` parameter of the _ram-file-out_ to the location where you want to store the file. Using a `.raw` extension will help with further playback or conversion, e.g. `dynamorse.raw`. Optionally, set a location to store the grain metadata as a sidecar JSON file, e.g. `dynamorse.json`.
+7. Press the _Deploy_ button. View the output with a tool that support H.264 playback such as [VLC](http://www.videolan.org/vlc/).
+
+The converter tool takes grains in the RFC4175 uncompressed pgroup format, 4:2:2 and at 1080i and converts them to the V210 pixel format, 4:2:0 and at 720p - a suitable input to the [OpenH264](http://www.openh264.org/) encoder.
 
 #### Send a WAV file as an NMOS flow
 
-1.
-2.
-3.
+Create an RTP multicast stream and advertise it as an NMOS flow, source and sender.
 
-Analyse or record the RTP stream produced using Wireshark or set up another dynamorse instance and use the output of this example as the input to another. A filtered PCAP recording containing only the RTP packets can be used as an input to the _pcap-reader_ Node-RED node.
+1. Download or select a 2-channel WAV file. How about a [steam train](http://soundbible.com/2102-Steam-Engine-Running.html)?
+2. Create the simple two node graph shown below, connecting a _wav-in_ funnel to a _nmos-rtp-out_ spout. ![nmos flow wiring](images/nmos-flow.png)
+3. Configure the _nmos-rtp-out_ spout with a multicast address and port number. Multicast addresses are in the range `224.0.0.0` to `239.255.255.255`. It is best to choose something randomly within this range and avoiding using `0`, `1`, `254` or `255`. You may need to bind a multicast address to a specific network interface according to instructions specific to your platform.
+4. _Deploy_ the graph. An appropriate SDP file will be created and served from the local web server. AN NMOS flow, source and a sender will be created and advertised via the Node API and pushed to a Registration API if available. 
+
+Analyse or record the RTP stream produced using [Wireshark](https://www.wireshark.org/) or set up another dynamorse instance and use the output of this example as the input to another. A filtered PCAP recording containing only the RTP packets can be used as an input to the _pcap-reader_ Node-RED node.
 
 ## Support, status and further development
 
