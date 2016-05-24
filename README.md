@@ -140,7 +140,16 @@ Configurations that are available for use across a number of different nodes are
 
 ### Examples to try
 
-#### Grain analyzer
+Try out the following four examples. This is prototype software and not every corner has been rounded off yet. If you get stuck:
+
+* If the server is running away with itself, press Ctrl-C in the window where it is running.
+* If a deployment works but causes an error, try stopping the server with Ctrl-C and restarting with `dynamorse` (or however you ran the tool in the first place).
+* If all else fails:
+  * Stop the server with Ctrl-C.
+  * Delete the current flow configuration file, a JSON file called `flows...json` in the `reduser` folder.
+  * Restart the server and reload the Node-RED configuration interface.
+
+#### Example 1: Grain analyzer
 
 Explore the fundamental building blocks of the JT-NM RA by viewing the details of grains as they flow down pipes.
 
@@ -151,16 +160,16 @@ Explore the fundamental building blocks of the JT-NM RA by viewing the details o
   * `pcap file` should be the path to the file downloaded in step 1, e.g. `/Users/streampunk/Downloads/rtp-audio-l24-2chan.pcap`.
   * `device` should be the device that starts `pipelines-...`.
   * `SDP URL` should be a `file:` URL to the SDP file downloaded in step 2, e.g. `file:sdp_L24_2chan.sdp`. Other parameters will be set from the SDP file.
-5. Set to watch the debug tab in the right-hand panel a press the _Deploy_ button. Details of the grains contained in the PCAP file will be displayed in JSON format.
+5. Set to watch the debug tab in the right-hand panel a press the _Deploy_ button. Details of the grain(s) contained in the PCAP file will be displayed in JSON format.
 
 Other things to try ...
 
 * The longer example files provided to members of the AMWA Networked Media Incubator may also be used as an input source, or change to the _wav-in_ funnel and use your a favourite 2 channel WAV file.
 * Try looping the PCAP file and seeing the result. Then try regenerating the grain metadata to see the effect. In each case, change the parameters and redeploy.
-* Examine the NMOS registration and discovery information for the flows available via the NMOS node API, by default at http://localhost:3001/x-nmos/node/v1.0/.
-* Watch back-pressure in action by adjusting the speed of the pipeline by setting the timeout parameter on the spout, which is measure in milliseconds. For realtime (assuming 25 frames per second), set the timeout to 40ms.
+* Examine the NMOS registration and discovery information for the flows available via the NMOS node API, by default at http://localhost:3001/x-nmos/node/v1.0/ .
+* Watch back-pressure in action by adjusting the speed of the pipeline by setting the timeout parameter on the spout, which is measure in milliseconds. For realtime (assuming 25 frames per second), set the timeout to 40ms. For a more dramatic effect, set even higher.
 
-#### Create a WAV file
+#### Example 2: Create a WAV file
 
 Take an NMOS audio RTP stream as a PCAP file and make a [WAV file](https://en.wikipedia.org/wiki/WAV) from it. Many of the steps are the same as for the grain analyzer.
 
@@ -176,7 +185,7 @@ Take an NMOS audio RTP stream as a PCAP file and make a [WAV file](https://en.wi
 
 You can loop the input but this will never close the output file. Add a _take_ fitting to the pipeline between the _pcap-reader_ and the _grain_xray_ and set how many grains you want to record into the WAV file. This will take the given number of grains and pass them on, then stop the pipeline and close the file once sufficient grains have been read.
 
-#### Encode an H.264 file
+#### Example 3: Encode an H.264 file
 
 Take and NMOS video RTP stream as a PCAP file and make an H.264 raw stream that can be played by [VLC](http://www.videolan.org/vlc/).
 
@@ -193,7 +202,7 @@ Take and NMOS video RTP stream as a PCAP file and make an H.264 raw stream that 
 
 The converter tool takes grains in the RFC4175 uncompressed pgroup format, 4:2:2 and at 1080i and converts them to the V210 pixel format, 4:2:0 and at 720p - a suitable input to the [OpenH264](http://www.openh264.org/) encoder.
 
-#### Send a WAV file as an NMOS flow
+#### Example 4: Send a WAV file as an NMOS flow
 
 Create an RTP multicast stream and advertise it as an NMOS flow, source and sender.
 

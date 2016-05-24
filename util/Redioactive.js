@@ -18,6 +18,7 @@
 var Queue = require('fastqueue');
 var dgram = require('dgram');
 var util = require('util');
+var H = require('highland');
 
 var hostname = require('os').hostname();
 var pid = process.pid;
@@ -162,21 +163,25 @@ function Funnel (config) {
   var highlandStream = null;
   this.highland = function (stream) {
     highlandStream = stream;
-    stream
-      .errors(function (err, hpush) {
+    stream.consume(function (err, x, hpush, hnext) {
+      if (err) {
         push(err);
-      })
-      .each(function (x) {
+        hnext();
+      } else if (x === H.nil) {
+        hpush (null, H.nil);
+      } else {
         if (workStart) { workTimes.push(process.hrtime(workStart)); }
         push(null, x);
         workStart = process.hrtime();
         if (queue.length > 0.8 * maxBuffer) {
           paused = true;
-          highlandStream.pause();
-          node.log('Pausing.');
+          next = function () { node.log('Resuming highland.'); hnext(); };
+          node.log('Pausing highland.')
+        } else {
+          hnext();
         }
-      })
-      .done(function () {
+      }
+    }).done(function () {
         push(null, theEnd);
       });
     next = function () { highlandStream.resume(); }
@@ -407,6 +412,11 @@ function Spout (config) {
       }
     }
   });
+  this.getNMOSFlow = function (grain, cb) {
+    var nodeAPI = node.context().global.get('nodeAPI');
+    var flow_id = require('uuid').unparse(grain.flow_id);
+    nodeAPI.getResource(flow_id, 'flow', cb);
+  }
 
   var configName = safeStatString(node.type + (nodeCount++));
   var nodeType = safeStatString(node.type);

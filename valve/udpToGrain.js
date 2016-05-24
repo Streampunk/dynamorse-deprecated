@@ -29,7 +29,6 @@ module.exports = function (exts, pgroup) {
   var payloads = [];
   var ex = exts;
   var udpConsumer = function (err, x, push, next) {
-    console.log('YEAH!');
     if (err) {
       push(err);
       next();
@@ -40,7 +39,6 @@ module.exports = function (exts, pgroup) {
         var rtp = new RTP(x);
         var nextCounter = (pushLines) ? rtp.getCompleteSequenceNumber() :
           rtp.getSequenceNumber();
-        console.log('PPP', pushLines, nextCounter);
         if (rtpCounter !== -2) {
           if (nextCounter === 0 && rtpCounter != (pushLines ? 0xffffffff : 0xffff)) {
             push(new Error('Unexpected sequence number at wrap around.'));

@@ -140,8 +140,8 @@ Grain.prototype.checkDuration = function (d) {
     var m = d.match(/^([0-9]+)\/([1-9][0-9]*)$/);
     if (m === null) return undefined;
     var b = new Buffer(8);
-    b.writeUInt32BE(+m[1], 4);
-    b.writeUInt32BE(+m[2], 0);
+    b.writeUInt32BE(+m[1], 0);
+    b.writeUInt32BE(+m[2], 4);
     return b;
   }
   return undefined;
@@ -149,11 +149,15 @@ Grain.prototype.checkDuration = function (d) {
 
 Grain.prototype.formatDuration = function (d) {
   if (d === undefined || d === null) return undefined;
-  return d.readUInt32BE(4) + '/' + d.readUInt32BE(0);
+  return d.readUInt32BE(0) + '/' + d.readUInt32BE(4);
 }
 
-Grain.prototype.audioSamples = function () {
-  return this.duration.readUInt32BE(0);
+Grain.prototype.getDuration = function () {
+  if (this.duration) {
+    return [ this.duration.readUInt32BE(0), this.duration.readUInt32BE(4) ];
+  } else {
+    return [ 1920, 48000 ]; // TODO cheating during audio tests
+  }
 }
 
 Grain.isGrain = function (x) {

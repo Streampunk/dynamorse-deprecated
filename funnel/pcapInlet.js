@@ -56,7 +56,6 @@ function pcapInlet(file, loop) {
         nextLen = packetHeader.readUInt32LE(8);
         packetEnd += (breakInHeader) ? 16 - leftOver.length : 16;
         if (packetEnd + nextLen <= b.length) {
-          console.log('pushing', b.slice(packetEnd + 42, packetEnd + nextLen).length);
           push(null, b.slice(packetEnd + 42, packetEnd + nextLen));
           packets++;
           packetEnd += nextLen;
@@ -73,11 +72,13 @@ function pcapInlet(file, loop) {
         }
       }
 
+      // console.log('Calling Highland next');
       next();
     }
   }
 
-  return H(function(push, next) {
+  var lumps = 0;
+  return H(function (push, next) {
       push(null, H(fs.createReadStream(file)));
       next();
     })

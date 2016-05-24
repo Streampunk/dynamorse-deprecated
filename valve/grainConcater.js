@@ -31,28 +31,32 @@ module.exports = function(srcTags) {
       push(err);
       next();
     } else if (x === H.nil) {
+      console.log('Concater: Requesting Quit.');
       concater.quit(function() {
         push(null, H.nil);
       });
     } else {
       if (Grain.isGrain(x)) {
+        console.log(JSON.stringify(x));
         var dstBuf = isVideo ?
           new Buffer(dstSampleSize) :
-          new Buffer(x.audioSamples() * dstSampleSize);
+          new Buffer(x.getDuration()[0] * dstSampleSize);
         console.log(dstBuf.length);
         var numQueued = concater.concat(x.buffers, dstBuf, function(err, result) {
           if (err) {
             push(err);
           } else if (result) {
+            console.log('Pushing grain', numQueued);
             push(null, new Grain(result, x.ptpSync, x.ptpOrigin,
                                  x.timecode, x.flow_id, x.source_id, x.duration));
           }
           next();
         });
+        // Removing .. was causing back pressure to fail
         // allow a number of packets to queue ahead
-        if (numQueued < 2) {
-          next();
-        }
+        // if (numQueued < 2) {
+        //   next();
+        // }
       } else {
         push(null, x);
         next();

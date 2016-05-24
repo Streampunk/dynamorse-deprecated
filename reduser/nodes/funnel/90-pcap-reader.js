@@ -42,9 +42,10 @@ module.exports = function (RED) {
     }.bind(this));
     var node = this;
     this.tags = {};
+    this.grainCount = 0;
+    this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ]
     this.exts = RED.nodes.getNode(
       this.context().global.get('rtp_ext_id')).getConfig();
-    console.log('EARLY EXTS', this.exts);
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     this.sdpURLReader(config, function (err, data) {
@@ -56,7 +57,6 @@ module.exports = function (RED) {
       var pipelinesID = config.device ?
         RED.nodes.getNode(config.device).nmos_id :
         this.context().global.get(pipelinesID);
-      console.log('***', RED.nodes.getNode(config.device), this.tags.format[0]);
       var source = new ledger.Source(null, null, localName, localDescription,
         "urn:x-nmos:format:" + this.tags.format[0], null, null, pipelinesID, null);
       var flow = new ledger.Flow(null, null, localName, localDescription,
@@ -69,10 +69,21 @@ module.exports = function (RED) {
           pcapInlet(config.file, config.loop)
           .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
           .map(function (g) {
-            return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
+            if (!config.regenerate) {
+              return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
+                flow.id, source.id, g.duration);
+            }
+            var grainTime = new Buffer(10);
+            grainTime.writeUIntBE(this.baseTime[0], 0, 6);
+            grainTime.writeUInt32BE(this.baseTime[1], 6);
+            var grainDuration = g.getDuration();
+            this.baseTime[1] = ( this.baseTime[1] +
+              grainDuration[0] * 1000000000 / grainDuration[1]|0 );
+            this.baseTime = [ this.baseTime[0] + this.baseTime[1] / 1000000000|0,
+              this.baseTime[1] % 1000000000];
+            return new Grain(g.buffers, grainTime, g.ptpOrigin, g.timecode,
               flow.id, source.id, g.duration);
-          })// Once the first grain is out, create source and flow
-          .doto(H.log)
+          }.bind(this))
           .pipe(grainConcater(this.tags)));
       }.bind(this), function(err, result) {
         if (err) return node.log(`Unable to register flow: ${err}`);

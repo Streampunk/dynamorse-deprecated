@@ -88,9 +88,9 @@ module.exports = function (RED) {
             next();
           });
           // allow a number of packets to queue ahead
-          if (numQueued < +config.maxBuffer) {
-            next();
-          }
+          // if (numQueued < +config.maxBuffer) {
+          //   next();
+          // }
         } else {
           push(null, x);
           next();
