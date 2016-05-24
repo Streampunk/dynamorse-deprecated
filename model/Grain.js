@@ -156,7 +156,7 @@ Grain.prototype.getDuration = function () {
   if (this.duration) {
     return [ this.duration.readUInt32BE(0), this.duration.readUInt32BE(4) ];
   } else {
-    return [ 1920, 48000 ]; // TODO cheating during audio tests
+    return [ NaN, NaN ]; 
   }
 }
 

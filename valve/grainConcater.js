@@ -37,11 +37,11 @@ module.exports = function(srcTags) {
       });
     } else {
       if (Grain.isGrain(x)) {
-        console.log(JSON.stringify(x));
-        var dstBuf = isVideo ?
-          new Buffer(dstSampleSize) :
-          new Buffer(x.getDuration()[0] * dstSampleSize);
-        console.log(dstBuf.length);
+        var dstBufSize = isVideo ? dstSampleSize : x.getDuration()[0] * dstSampleSize;
+        if (isNaN(dstBufSize)) {
+          dstBufSize = x.buffers.reduce(function (x, y) { return x + y.length; }, 0);
+        }
+        var dstBuf = new Buffer(dstBufSize);
         var numQueued = concater.concat(x.buffers, dstBuf, function(err, result) {
           if (err) {
             push(err);

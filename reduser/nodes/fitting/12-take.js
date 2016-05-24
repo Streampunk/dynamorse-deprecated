@@ -20,7 +20,25 @@ module.exports = function (RED) {
   function Take (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
-    // Go figure
+    this.count = 0;
+
+    this.consume(function (err, x, push, next) {
+      if (err) {
+        push (err);
+        next();
+      } else if (redioactive.isEnd(x)) {
+        push (null, x);
+      } else {
+        if (this.count < config.limit) {
+          push(null, x);
+          next();
+        } else {
+          push(null, redioactive.end);
+        }
+        this.count++;
+      }
+    }.bind(this));
+
   }
   util.inherits(Take, redioactive.Valve);
   RED.nodes.registerType("take", Take);

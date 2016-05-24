@@ -20,6 +20,7 @@
     color: '#CC8A7C',
     defaults: {
       name: { value : "" },
+      limit : { value : 100, validate : RED.validators.number() },
       maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:1,
@@ -41,11 +42,14 @@
   <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
   <input type="number" id="node-input-maxBuffer" placeholder="10">
 </div>
+<div class="form-row">
+  <label for="node-input-limit"><i class="fa fa-hand-paper-o" aria-hidden="true"></i> limit</label>
+  <input type="number" id="node-input-limit" min="0" placeholder="100">
+</div>
 </script>
 
 <script type="text/x-red" data-help-name="take">
   <h1>Take grains</h1>
-  <p>Take the specified number of grains from the beginning of the stream.
-  Includes an option to repeat the frames taken a given number of times or in
-  a continuous loop.</p>
+  <p>Take the specified number of grains from the beginning of the stream up
+  to the specified <em>limit</em>.</p>
 </script>
