@@ -56,19 +56,19 @@ As well as being a means to move and process media data through a CPU/GPU and it
 
 ### Redioactive
 
-Dynamorse is ___redioactive___! This means that it adds a library of features to support [reactive streams](http://www.reactive-streams.org/) to the default behavior of [Node-RED](http://nodered.org). By default, Node-RED uses an event-based model where producers fire update events along the pipelines whether or not the consumer is ready to receive them, or consumers are sat waiting for events because the producer has been throttled back.
+Dynamorse is ___redioactive___! This means that it adds a library of features to support [reactive streams](http://www.reactive-streams.org/) to the default behavior of [Node-RED](http://nodered.org). By default, Node-RED uses an event-based model where producers fire update events along the pipelines whether or not the consumer is ready to receive them. Alternatively, consumers are sat waiting for events because the producer has been throttled back.
 
 ![producer to consumer](images/producer-consumer.png)
 
 With reactive streams support, the consumer signals to the producer when it is ready to receive more inputs, a process known as _back pressure_. The producer then pushes the next element down the pipe, which it may have optimistically buffered in advance. Producers and consumers can be chained together so that back pressure goes along the length of a pipe.
 
-As an example, consider a file reader funnel on an SSD feeding a real-time display funnel. The file reader can ready the picture data from the file at around twice real time, whereas the display can only cope with real-time data. With no back-pressure, the display consumer is overloaded and starts to drop frames. With back pressure, the display stops asking for frames when its buffer is full and the file-reader stops reading from the disk when its buffer is full. When the display's buffer starts to clear, it starts asking for frames again. As the file-reader satisfies the requests for frames and its buffer starts to empty, it starts to read another batch from the disk.
+As an example, consider a file reader funnel on an SSD feeding a real-time display funnel. The file reader can read the picture data from the file at around twice real time, whereas the display can only cope with real-time data. With no back-pressure, the display consumer is overloaded and starts to drop frames. With back pressure, the display stops asking for frames when its buffer is full and the file-reader stops reading from the disk when its buffer is full. When the display's buffer starts to clear, it starts asking for frames again. As the file-reader satisfies the requests for frames and its buffer starts to empty, it starts to read another batch from the disk.
 
-With real time streams and a slow consumer, at some point the producer's buffer will overflow and frames will be dropped. This is a symptom of a design problem with a pipeline or resource overload (see monitoring in the next section) that should not occur in normal operation. Errors are produced and can be monitored whenever a buffer is overloaded. Each dynamorse node - other than the spouts - has a buffer size parameter.
+With real time streams and a slow consumer, at some point the producer's buffer will overflow and frames will be dropped. This is a symptom of a design problem with a pipeline or resource overload (see monitoring in the next section) that should not occur in normal operation. Errors are produced and can be monitored whenever a buffer is overloaded. Each dynamorse producer node (everything but the spouts) has a buffer size parameter.
 
 ![complex interconnection](images/complex-web.png)
 
-Redioactive is designed to support pipelines that are more complex than linking single producers to single consumers:
+Redioactive is designed to support pipelines that are more complex than just linking single producers to consumers:
 
 * One, two or more consumers may be connected to a single producer. In this case, the producer will be throttled to run at the speed of the slowest consumer.
 * One, two or more producers may be connected to a single consumer, in which case each producer receives the same back-pressure and the inputs to the consumer are interleaved.
@@ -93,7 +93,7 @@ Install Node.js for your plarform. This software has been developed against the 
 
 Mac and linux users may have to prepend `sudo` to the above.
 
-Dynamorse depends on modules that use native C++ bindings that compile with node-gyp. To use these modules, you many need to install a C++ compiler and python on your system if these are not present. On Windows, compilation has been tested using the community edition of Microsoft Visual Studio.
+Dynamorse depends on modules that use native C++ bindings that compile with node-gyp. To use these modules, you many need to install a C++ compiler and python on your system. On Windows, compilation has been tested using the community edition of Microsoft Visual Studio.
 
 At this time, dynamorse is not intended for use as dependency in other projects. However, you may wish to install dynamorse locally in a `node_modules` sub-folder. In which case:
 
@@ -109,7 +109,7 @@ To run a local install (Linux/Mac/cygwin flavor): __CHECK THIS__
 
     $(npm bin)/dynamorse
 
-Connect to the user interface via a web browser. By default, the UI runs on port `8000`, so use http://localhost:8000/red. The NMOS Node API runs on port `3001` be default, so connect in another tab with http://localhost:3001/x-nmos/node/v1.0/. Alternatively, connect over HTTP from a another browser.
+Connect to the user interface via a web browser. By default, the UI runs on port `8000`, so use http://localhost:8000/red. The NMOS Node API runs on port `3001` be default, so connect in another tab with http://localhost:3001/x-nmos/node/v1.0/. Alternatively, connect over HTTP from a another browser on a different computer.
 
 The choice of available nodes is provided down the left-hand-side. Each node is self-describing - click on it and it describes what it is and how to configure it in the info panel on the right-hand-side. Drag nodes out into the central flow designer panel and link them together by joining output ports to input ports.
 
@@ -121,7 +121,7 @@ __ADD COMMAND LINE PARAMETERS__
 
 #### Thread pool size
 
-The default thread pool size for libuv, an underlying component of node, is only sufficient for 2 or 3 dynamorse nodes. To increase the size of the pool, set the `UV_THREADPOOL_SIZE` environment variable to a number higher than the default of `4`. For example, before running dynamorse on Mac/Linux:
+The default thread pool size for _libuv_, an underlying component of Node.js, is only sufficient for 2 or 3 dynamorse nodes. To increase the size of the pool, set the `UV_THREADPOOL_SIZE` environment variable to a number higher than the default of `4`. For example, before running dynamorse on Mac/Linux:
 
     export UV_THREADPOOL_SIZE=32
 
@@ -140,12 +140,12 @@ Configurations that are available for use across a number of different nodes are
 
 ### Examples to try
 
-Try out the following four examples. This is prototype software and not every corner has been rounded off yet. If you get stuck:
+Why not try out the following four examples? This is prototype software and not every corner has been rounded off yet, so if you get stuck:
 
-* If the server is running away with itself, press Ctrl-C in the window where it is running.
-* If a deployment works but causes an error, try stopping the server with Ctrl-C and restarting with `dynamorse` (or however you ran the tool in the first place).
+* If the server is running away with itself, press `Ctrl-C` in the window where it is running.
+* If a deployment works but causes an error, try stopping the server with `Ctrl-C` and restarting with `dynamorse` (or however you ran the tool in the first place).
 * If all else fails:
-  * Stop the server with Ctrl-C.
+  * Stop the server with `Ctrl-C`.
   * Delete the current flow configuration file, a JSON file called `flows...json` in the `reduser` folder.
   * Restart the server and reload the Node-RED configuration interface.
 
@@ -200,7 +200,7 @@ Take and NMOS video RTP stream as a PCAP file and make an H.264 raw stream that 
 6. Set the `file` parameter of the _ram-file-out_ to the location where you want to store the file. Using a `.raw` extension will help with further playback or conversion, e.g. `dynamorse.raw`. Optionally, set a location to store the grain metadata as a sidecar JSON file, e.g. `dynamorse.json`.
 7. Press the _Deploy_ button. View the output with a tool that support H.264 playback such as [VLC](http://www.videolan.org/vlc/).
 
-The converter tool takes grains in the RFC4175 uncompressed pgroup format, 4:2:2 and at 1080i and converts them to the V210 pixel format, 4:2:0 and at 720p - a suitable input to the [OpenH264](http://www.openh264.org/) encoder.
+The converter tool takes grains in the RFC4175 uncompressed pgroup format, 4:2:2 and at 1080i and converts them to 8-bit planar format, 4:2:0 and at 720p - a suitable input to the [OpenH264](http://www.openh264.org/) encoder.
 
 #### Example 4: Send a WAV file as an NMOS flow
 
