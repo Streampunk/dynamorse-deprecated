@@ -26,13 +26,13 @@ a=source-filter:incl IN IP4 232.226.253.166 172.29.80.68
 a=rtpmap:96 L24/48000/2
 a=control:trackID=1
 a=mediaclk:direct=1970351840 rate=48000
-a=extmap:1 urn:x-ipstudio:rtp-hdrext:origin-timestamp
+a=extmap:1 urn:x-nmos:rtp-hdrext:origin-timestamp
 a=extmap:2 urn:ietf:params:rtp-hdrext:smpte-tc 1920@48000/25
-a=extmap:3 urn:x-ipstudio:rtp-hdrext:flow-id
-a=extmap:4 urn:x-ipstudio:rtp-hdrext:source-id
-a=extmap:5 urn:x-ipstudio:rtp-hdrext:grain-flags
-a=extmap:7 urn:x-ipstudio:rtp-hdrext:sync-timestamp
-a=extmap:9 urn:x-ipstudio:rtp-hdrext:grain-duration
+a=extmap:3 urn:x-nmos:rtp-hdrext:flow-id
+a=extmap:4 urn:x-nmos:rtp-hdrext:source-id
+a=extmap:5 urn:x-nmos:rtp-hdrext:grain-flags
+a=extmap:7 urn:x-nmos:rtp-hdrext:sync-timestamp
+a=extmap:9 urn:x-nmos:rtp-hdrext:grain-duration
 a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`;
 
 test('An audio SDP file is parsed', function (t) {
@@ -56,13 +56,13 @@ a=source-filter:incl IN IP4 232.121.83.127 172.29.82.50
 a=rtpmap:96 raw/90000
 a=fmtp:96 sampling=YCbCr-4:2:2; width=1920; height=1080; depth=10; colorimetry=BT709-2; interlace=1
 a=mediaclk:direct=1119082333 rate=90000
-a=extmap:1 urn:x-ipstudio:rtp-hdrext:origin-timestamp
+a=extmap:1 urn:x-nmos:rtp-hdrext:origin-timestamp
 a=extmap:2 urn:ietf:params:rtp-hdrext:smpte-tc 3600@90000/25
-a=extmap:3 urn:x-ipstudio:rtp-hdrext:flow-id
-a=extmap:4 urn:x-ipstudio:rtp-hdrext:source-id
-a=extmap:5 urn:x-ipstudio:rtp-hdrext:grain-flags
-a=extmap:7 urn:x-ipstudio:rtp-hdrext:sync-timestamp
-a=extmap:9 urn:x-ipstudio:rtp-hdrext:grain-duration
+a=extmap:3 urn:x-nmos:rtp-hdrext:flow-id
+a=extmap:4 urn:x-nmos:rtp-hdrext:source-id
+a=extmap:5 urn:x-nmos:rtp-hdrext:grain-flags
+a=extmap:7 urn:x-nmos:rtp-hdrext:sync-timestamp
+a=extmap:9 urn:x-nmos:rtp-hdrext:grain-duration
 a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`;
 
 test('A video SDP file is parsed', function(t) {
@@ -70,7 +70,7 @@ test('A video SDP file is parsed', function(t) {
   // console.log(JSON.stringify(sdp, null, 2));
   t.deepEqual(sdp.getMediaHeaders(), [ 'video 5000 RTP/AVP 96' ],
     'has correct media headers');
-  t.equal(sdp.getExtMapReverse(0)['urn:x-ipstudio:rtp-hdrext:sync-timestamp'],
+  t.equal(sdp.getExtMapReverse(0)['urn:x-nmos:rtp-hdrext:sync-timestamp'],
     7, 'does a correct reverse lookup on ext map.');
   t.equal(sdp.toString().trim(), videoSDP, 'and roundtrips.');
   t.equal(sdp.getEncodingName(0), 'raw', 'retrieves correct encoding name.');
@@ -89,31 +89,31 @@ a=fmtp:98 profile-level-id=7a1029;packetization-mode=1
 a=ts-refclk:ptp=IEEE1588-2008:39-A7-94-FF-FE-07-CB-D0
 a=mediaclk:direct=1909987554
 a=extmap:2 urn:ietf:params:rtp-hdrext:smpte-tc 3600@90000/25
-a=extmap:7 urn:x-ipstudio:rtp-hdrext:sync-timestamp
-a=extmap:8 urn:x-ipstudio:rtp-hdrext:origin-timestamp
-a=extmap:9 urn:x-ipstudio:rtp-hdrext:flow-id
-a=extmap:10 urn:x-ipstudio:rtp-hdrext:source-id
-a=extmap:11 urn:x-ipstudio:rtp-hdrext:grain-flags
-a=extmap:12 urn:x-ipstudio:rtp-hdrext:grain-duration
+a=extmap:7 urn:x-nmos:rtp-hdrext:sync-timestamp
+a=extmap:8 urn:x-nmos:rtp-hdrext:origin-timestamp
+a=extmap:9 urn:x-nmos:rtp-hdrext:flow-id
+a=extmap:10 urn:x-nmos:rtp-hdrext:source-id
+a=extmap:11 urn:x-nmos:rtp-hdrext:grain-flags
+a=extmap:12 urn:x-nmos:rtp-hdrext:grain-duration
 m=audio 5006 RTP/AVP 99
 i=Channels 1-2
 a=rtpmap:99 L16/48000/2
 a=ts-refclk:ptp=IEEE1588-2008:39-A7-94-FF-FE-07-CB-D0
 a=mediaclk:direct=1985293029
 a=extmap:2 urn:ietf:params:rtp-hdrext:smpte-tc 1920@48000/25
-a=extmap:7 urn:x-ipstudio:rtp-hdrext:sync-timestamp
-a=extmap:8 urn:x-ipstudio:rtp-hdrext:origin-timestamp
-a=extmap:9 urn:x-ipstudio:rtp-hdrext:flow-id
-a=extmap:10 urn:x-ipstudio:rtp-hdrext:source-id
-a=extmap:11 urn:x-ipstudio:rtp-hdrext:grain-flags
-a=extmap:12 urn:x-ipstudio:rtp-hdrext:grain-duration`;
+a=extmap:7 urn:x-nmos:rtp-hdrext:sync-timestamp
+a=extmap:8 urn:x-nmos:rtp-hdrext:origin-timestamp
+a=extmap:9 urn:x-nmos:rtp-hdrext:flow-id
+a=extmap:10 urn:x-nmos:rtp-hdrext:source-id
+a=extmap:11 urn:x-nmos:rtp-hdrext:grain-flags
+a=extmap:12 urn:x-nmos:rtp-hdrext:grain-duration`;
 
 test('A mixed SDP file is parsed', function (t) {
   var sdp = new SDP(mixedSDP);
   t.deepEqual(sdp.getMediaHeaders(),
     [ 'video 5004 RTP/AVP 98', 'audio 5006 RTP/AVP 99' ],
     'has expected media headers.');
-  t.equal(sdp.getExtMapReverse(1)['urn:x-ipstudio:rtp-hdrext:grain-flags'],
+  t.equal(sdp.getExtMapReverse(1)['urn:x-nmos:rtp-hdrext:grain-flags'],
     11, 'does a correct reverse lookup on ext map.');
   t.equal(sdp.toString().trim(), mixedSDP, 'and roundtrips.');
   t.equal(sdp.getEncodingName(0), 'H264', 'has expected encoding name for video.');

@@ -20,13 +20,13 @@ var Grain = require('../model/Grain.js');
 var H = require('highland');
 
 var defaultExtMap = {
-  'urn:x-ipstudio:rtp-hdrext:origin-timestamp' : 1,
+  'urn:x-nmos:rtp-hdrext:origin-timestamp' : 1,
   'urn:ietf:params:rtp-hdrext:smpte-tc' : 2,
-  'urn:x-ipstudio:rtp-hdrext:flow-id' : 3,
-  'urn:x-ipstudio:rtp-hdrext:source-id' : 4,
-  'urn:x-ipstudio:rtp-hdrext:grain-flags' : 5,
-  'urn:x-ipstudio:rtp-hdrext:sync-timestamp' : 7,
-  'urn:x-ipstudio:rtp-hdrext:grain-duration' : 9
+  'urn:x-nmos:rtp-hdrext:flow-id' : 3,
+  'urn:x-nmos:rtp-hdrext:source-id' : 4,
+  'urn:x-nmos:rtp-hdrext:grain-flags' : 5,
+  'urn:x-nmos:rtp-hdrext:sync-timestamp' : 7,
+  'urn:x-nmos:rtp-hdrext:grain-duration' : 9
 };
 
 var fieldMap = {

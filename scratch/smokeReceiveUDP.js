@@ -31,13 +31,13 @@ a=source-filter:incl IN IP4 232.226.253.166 172.29.80.68
 a=rtpmap:96 L24/48000/2
 a=control:trackID=1
 a=mediaclk:direct=1970351840 rate=48000
-a=extmap:1 urn:x-ipstudio:rtp-hdrext:origin-timestamp
+a=extmap:1 urn:x-nmos:rtp-hdrext:origin-timestamp
 a=extmap:2 urn:ietf:params:rtp-hdrext:smpte-tc 1920@48000/25
-a=extmap:3 urn:x-ipstudio:rtp-hdrext:flow-id
-a=extmap:4 urn:x-ipstudio:rtp-hdrext:source-id
-a=extmap:5 urn:x-ipstudio:rtp-hdrext:grain-flags
-a=extmap:7 urn:x-ipstudio:rtp-hdrext:sync-timestamp
-a=extmap:9 urn:x-ipstudio:rtp-hdrext:grain-duration
+a=extmap:3 urn:x-nmos:rtp-hdrext:flow-id
+a=extmap:4 urn:x-nmos:rtp-hdrext:source-id
+a=extmap:5 urn:x-nmos:rtp-hdrext:grain-flags
+a=extmap:7 urn:x-nmos:rtp-hdrext:sync-timestamp
+a=extmap:9 urn:x-nmos:rtp-hdrext:grain-duration
 a=ts-refclk:ptp=IEEE1588-2008:ec-46-70-ff-fe-00-42-c4`
 
 var mcastAddress = '224.1.1.1';
