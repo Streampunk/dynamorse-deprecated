@@ -32,7 +32,7 @@ module.exports = function (RED) {
     redioactive.Funnel.call(this, config);
     // Do not run unless global config has been established
     if (!this.context().global.get('updated')) {
-      this.log('False start.');
+      this.log('False start for PCAP reader funnel.');
       return;
     }
     fs.access(config.file, fs.R_OK, function (e) {
@@ -42,6 +42,7 @@ module.exports = function (RED) {
     }.bind(this));
     var node = this;
     this.tags = {};
+    console.log(config);
     this.grainCount = 0;
     this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ]
     this.exts = RED.nodes.getNode(
@@ -98,7 +99,7 @@ module.exports = function (RED) {
     if (typeof sdp === 'string') {
       sdp = new SDP(sdp);
     }
-    this.setTag('format', sdp, sdp.getMedia, config, 'urn:x-nmos:format:');
+    this.setTag('format', sdp, sdp.getMedia, config);
     this.setTag('encodingName', sdp, sdp.getEncodingName, config);
     this.setTag('clockRate', sdp, sdp.getClockRate, config);
     if (this.tags.format[0].endsWith('video')) {
@@ -117,7 +118,7 @@ module.exports = function (RED) {
     return this.tags;
   }
 
-  PCAPReader.prototype.setTag = function (name, sdp, valueFn, config, prepend) {
+  PCAPReader.prototype.setTag = function (name, sdp, valueFn, config) {
     if (!name) return;
     var value = (valueFn) ? valueFn.call(sdp, 0) : undefined;
     if (!value) {
@@ -126,9 +127,6 @@ module.exports = function (RED) {
         this.warn(`Did not set property ${name} as it is not defined by SDP or config.`);
         return;
       }
-      if (prepend && typeof present === 'string') value = prepend + value;
-    } else if (prepend && typeof present === 'string') {
-      value = prepend + value;
     }
     if (typeof value === 'number') {
       this.tags[name] = [ `${value}` ];
