@@ -42,9 +42,8 @@ module.exports = function (RED) {
     }.bind(this));
     var node = this;
     this.tags = {};
-    console.log(config);
     this.grainCount = 0;
-    this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ]
+    this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ];
     this.exts = RED.nodes.getNode(
       this.context().global.get('rtp_ext_id')).getConfig();
     var nodeAPI = this.context().global.get('nodeAPI');

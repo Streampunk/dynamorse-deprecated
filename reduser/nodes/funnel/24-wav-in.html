@@ -19,7 +19,12 @@
     category: 'funnel',
     color: '#D79748',
     defaults: {
-      name: { value : "" },
+      name : { value : '' },
+      file : { value : "", required : true },
+      description : { value : "" },
+      device : { value : "", type : "device" },
+      loop : { value : false },
+      grps : { value : 25, validate : RED.validators.number() },
       maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:0,
@@ -38,9 +43,31 @@
   <input type="text" id="node-input-name" placeholder="name">
 </div>
 <div class="form-row">
+  <label for="node-input-file"><i class="fa fa-file"></i> WAV file</label>
+  <input type="text" id="node-input-file" placeholder="dynamorse.wav">
+</div>
+<div class="form-row">
+  <label for="node-input-loop"><i class="fa fa-repeat"></i> loop?</label>
+  <input type="checkbox" id="node-input-loop" style="width: 100px">
+  <label for="node-input-grps"><i class="fa fa-heart-o" aria-hidden="true"></i> grains/s</label>
+  <select id="node-input-grps" style="width: 100px" type="number">
+    <option value="25" selected>25</option>
+    <option value="29.97">29.97</option>
+  </select>
+</div>
+<div class="form-row">
+  <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+  <input type="text" id="node-input-description" placeholder="source and flow description">
+</div>
+<div class="form-row">
+  <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
+  <input type="text" id="node-input-device">
+</div>
+<div class="form-row">
   <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
   <input type="number" id="node-input-maxBuffer" placeholder="10">
 </div>
+
 </script>
 
 <script type="text/x-red" data-help-name="wav-in">

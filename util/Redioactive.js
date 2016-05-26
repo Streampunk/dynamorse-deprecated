@@ -162,8 +162,7 @@ function Funnel (config) {
   }
   var highlandStream = null;
   this.highland = function (stream) {
-    highlandStream = stream;
-    stream.consume(function (err, x, hpush, hnext) {
+    highlandStream = stream.consume(function (err, x, hpush, hnext) {
       if (err) {
         push(err);
         hnext();
@@ -184,7 +183,6 @@ function Funnel (config) {
     }).done(function () {
         push(null, theEnd);
       });
-    next = function () { highlandStream.resume(); }
     node.setStatus('green', 'dot', 'generating');
   }
   this.preFlightError = function (e) {

@@ -136,6 +136,12 @@ Grain.prototype.checkDuration = function (d) {
     if (d.readUInt32BE(0) === 0) d[3] = 0x01;
     return d;
   }
+  if (Array.isArray(d)) {
+    var b = new Buffer(8);
+    b.writeUInt32BE(d[0]|0, 0);
+    b.writeUInt32BE(d[1]|0, 4);
+    return b;
+  }
   if (typeof d === 'string') {
     var m = d.match(/^([0-9]+)\/([1-9][0-9]*)$/);
     if (m === null) return undefined;
@@ -156,7 +162,7 @@ Grain.prototype.getDuration = function () {
   if (this.duration) {
     return [ this.duration.readUInt32BE(0), this.duration.readUInt32BE(4) ];
   } else {
-    return [ NaN, NaN ]; 
+    return [ NaN, NaN ];
   }
 }
 
