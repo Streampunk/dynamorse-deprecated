@@ -77,20 +77,20 @@ RFC4175Packet.prototype.setLineDataHeaders = function (lineStatus, remaining) {
     if (bytesLeftOnLine <= remaining) {
       this.buffer.writeUInt16BE(bytesLeftOnLine, lineDataStart);
       this.buffer.writeUInt16BE(lineStatus.lineNo++ & 0x7fff, lineDataStart + 2);
-      this.buffer.writeUInt16BE((lineStatus.linePos / lineStatus.stride) & 0x7fff,
-          lineDataStart + 6);
-      if (lineNo >= lineStatus.fieldBreaks.field2Start) {
+      this.buffer.writeUInt16BE((lineStatus.linePos / lineStatus.byteFactor) & 0x7fff,
+          lineDataStart + 4);
+      if (lineStatus.fieldBreaks.field2Start && lineStatus.lineNo >= lineStatus.fieldBreaks.field2Start) {
         this.buffer[lineDataStart + 2] = this.buffer[lineDataStart + 2] & 0x80;
       }
-      if (bytesLeftOnLine <= remaining) {
-        this.buffer[lineDataStart + 4] = this.buffer[lineDataStart + 4] | 0x80;
-      }
+      // Short line - must have continuation
+      this.buffer[lineDataStart + 4] = this.buffer[lineDataStart + 4] | 0x80;
       if (lineStatus.lineNo === lineStatus.fieldBreaks.field1End + 1) {
         lineStatus.lineNo = lineStatus.fieldBreaks.field2Start;
         this.setMarker(true);
         packetPos = remaining;
       }
-      if (lineStatus.lineNo === lineStatus.fieldBreaks.field2End + 1) {
+      if (lineStatus.fieldBreaks.field2End &&
+          lineStatus.lineNo === lineStatus.fieldBreaks.field2End + 1) {
         this.setMarker(true);
         packetPos = remaining;
       }
@@ -98,27 +98,29 @@ RFC4175Packet.prototype.setLineDataHeaders = function (lineStatus, remaining) {
       lineDataStart += 6;
       lineStatus.linePos = 0;
     } else {
-      this.buffer.writeUInt16BE(remaining - packetPos, lineDataStart);
+      var space = remaining - packetPos;
+      this.buffer.writeUInt16BE(space - space % lineStatus.stride, lineDataStart);
       this.buffer.writeUInt16BE(lineStatus.lineNo & 0x7fff, lineDataStart + 2);
-      this.buffer.writeUInt16BE((lineStatus.linePos / stride) & 0x7fff,
-          lineDataStart + 6);
-      if (lineNo > lineStatus.fieldBreaks.field2Start) {
+      this.buffer.writeUInt16BE((lineStatus.linePos / lineStatus.byteFactor) & 0x7fff,
+          lineDataStart + 4);
+      if (lineStatus.fieldBreaks.field2Start &&
+          lineStatus.lineNo > lineStatus.fieldBreaks.field2Start) {
         this.buffer[lineDataStart + 2] = this.buffer[lineDataStart + 2] & 0x80;
       }
+      lineStatus.linePos += space - space % lineStatus.stride;
       packetPos = remaining;
       lineDataStart += 6;
-      lineStatus.linePos += remaining - packetPos;
-    }
+      }
     this.lineCount++;
   }
   return lineStatus;
 }
 
 RFC4175Packet.prototype.setPayload = function (b) {
-  if (!p || !Buffer.isBuffer(p))
+  if (!b || !Buffer.isBuffer(b))
     return new Error('Cannot set the payload with anything other than a Buffer.');
-  var start = this.getPayloadStart() + this.lineCount * 6;
-  var copied = p.copy(this.buffer, start);
+  var start = this.getPayloadStart() + this.lineCount * 6 + 2;
+  var copied = b.copy(this.buffer, start);
   if (this.buffer.length > start + copied) {
     this.buffer = this.buffer.slice(0, start + copied);
   }

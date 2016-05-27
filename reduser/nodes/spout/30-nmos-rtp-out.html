@@ -19,7 +19,11 @@
     category: 'spout',
     color: '#E59D63',
     defaults: {
-      name: { value : "" }
+      name : { value : '' },
+      address : { value : '', validate : RED.validators.regex(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/) },
+      port : { value : 5001, validate : RED.validators.number() },
+      ttl : { value : 127, validate : RED.validators.number() },
+      payloadType : { value : 96, validate : RED.validators.number() }
     },
     inputs:1,
     outputs:0,
@@ -35,6 +39,18 @@
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
     <input type="text" id="node-input-name" placeholder="name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-address"><i class="fa fa-external-link-square" aria-hidden="true"></i> address</label>
+    <input type="text" id="node-input-address" placeholder="224.1.2.3" style="width: 120px">
+    <label for="node-input-port" style="width: 60px"><i class="fa fa-ship" aria-hidden="true"></i> port</label>
+    <input type="number" min="1024" max="65536" id="node-input-port" placeholder="5001" style="width: 80px">
+  </div>
+  <div class="form-row">
+    <label for="node-input-payloadType"><i class="fa fa-briefcase" aria-hidden="true"></i> payload type</label>
+    <input type="number" min="96" max="127" id="node-input-payloadType" placeholder="96" style="width: 120px">
+    <label for="node-input-ttl" style="width: 60px"><i class="fa fa-heart" aria-hidden="true"></i> ttl</label>
+    <input type="number" min="0" max="255" id="node-input-ttl" placeholder="127" style="width: 80px">
   </div>
 </script>
 

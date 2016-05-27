@@ -32,7 +32,7 @@ var defaultExtMap = {
 var fieldMap = {
   '576i'  : { field1Start : 23, field1End : 310, field2Start : 336, field2End : 623 },
   '720p'  : { field1Start : 26, field1End : 745 },
-  '1080i' : { field1Start : 21, field1End : 560, field2Start : 384, field2End : 1123 },
+  '1080i' : { field1Start : 21, field1End : 560, field2Start : 584, field2End : 1123 },
   '1080p' : { field1Start : 42, field1End : 1121 },
   '2160p' : { field1Start : 0, field1End : 2159 },
   '4320p' : { field1Start : 0, field1End : 4319 }
@@ -94,7 +94,7 @@ module.exports = function (sdp, seq) {
           bytesPerLine: width * stride, linePos: 0,
           fieldBreaks: fieldMap[height + 'i'], field : 1 // TODO determine i vs p
         } : undefined;
-        function makePacket() {
+        function makePacket (g) {
           var packet = (is4175) ? new RFC4175Packet(new Buffer(1452)) :
             new RTPPacket(new Buffer(1452));
           packet.setVersion(2);

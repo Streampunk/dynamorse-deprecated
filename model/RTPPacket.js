@@ -157,7 +157,7 @@ RTPPacket.prototype.getTimestamp = function () {
 RTPPacket.prototype.setTimestamp = function (t) {
   if (typeof t !== 'number' || t < 0 || t > 0xffffffff)
     return new Error('Timestamp must be a 32-bit unsigned integer.');
-  t = t|0;
+  t = t>>>0;
   this.buffer.writeUInt32BE(t, 4);
   return t;
 }

@@ -48,8 +48,6 @@ module.exports = function (RED) {
           if (err) return push("Failed to resolve NMOS flow.");
           this.srcFlow = f;
 
-          console.log(f.tags);
-
           var h = new Buffer(44);
           h.writeUInt32BE(0x52494646, 0); // RIFF
           h.writeUInt32LE(0xffffffff, 4); // Dummy length to be replaced
