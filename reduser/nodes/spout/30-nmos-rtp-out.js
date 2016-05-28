@@ -88,7 +88,7 @@ module.exports = function (RED) {
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     var rtpExtDefID = this.context().global.get('rtp_ext_id');
-    var rtpExts = RED.nodes.getNode(rtpExtDefID);
+    var rtpExts = RED.nodes.getNode(rtpExtDefID).getConfig();
     this.each(function (g, next) {
       if (!Grain.isGrain(g)) return node.warn('Received a non-grain on the input.');
       if (!this.tags) {
@@ -124,23 +124,30 @@ module.exports = function (RED) {
 
       // Make grain start RTP header extension
       var startExt = { profile : 0xbede };
-      startExt[rtpExts.grain_flags_id] = 0x80;
-      startExt[rtpExts.origin_timestamp_id] = g.ptpOrigin;
-      startExt[rtpExts.sync_timestamp_id] = g.ptpSync;
-      startExt[rtpExts.grain_duration_id] = g.duration;
-      startExt[rtpExts.flow_id_id] = g.flow_id;
-      startExt[rtpExts.source_id_id] = g.source_id;
-      startExt[rtpExts.smpte_id_id] = g.timecode;
-      packet.setExtension(startExt);
+      startExt['id' + rtpExts.grain_flags_id] = new Buffer([0x80]);
+      startExt['id' + rtpExts.origin_timestamp_id] = g.ptpOrigin;
+      startExt['id' + rtpExts.sync_timestamp_id] = g.ptpSync;
+      startExt['id' + rtpExts.grain_duration_id] = g.duration;
+      startExt['id' + rtpExts.flow_id_id] = g.flow_id;
+      startExt['id' + rtpExts.source_id_id] = g.source_id;
+      startExt['id' + rtpExts.smpte_tc_id] = g.timecode;
+      var actualExts = packet.setExtensions(startExt);
+      if (actualExts.prototype && actualExts.prototype.name === 'Error')
+        node.warn(`Failed to set header extensions: ${actualExts}`);
+
+      var sumt = 0;
 
       var i = 0, o = 0;
       var b = g.buffers[i];
       while (i < g.buffers.length) {
-        var t = remaining - remaining % stride;
+        var t = (!is4175 || !packet.getMarker()) ? remaining - remaining % stride :
+          packet.getLineData()[0].length;
+        console.log('HAT', packet.getLineData()[0].lineNo, (b.length - o) % 4800, 4800 - lineStatus.linePos,
+          ((b.length - o) % 4800) - (4800 - lineStatus.linePos));
         if ((b.length - o) >= t) {
           packet.setPayload(b.slice(o, o + t));
           o += t;
-          sendPacket(packet, remaining);
+          sendPacket(packet, remaining); // May want to spread packets
           // FIXME: probably won't work for compressed video
           if (!is4175) tsAdjust += t / stride;
           remaining = 1410; // Slightly short so last header fits
@@ -154,15 +161,15 @@ module.exports = function (RED) {
         }
       }
       var endExt = { profile : 0xbede };
-      endExt[rtpExts.grain_flags_id] = 0x40;
+      endExt['id' + rtpExts.grain_flags_id] = new Buffer([0x40]);
+      console.log('B4', packet.getLineData());
       packet.setExtensions(endExt);
-      if (is4175) {
-        packet.setMarker(true);
-        // TODO
-      } else {
-        packet.setPayload(b);
-      }
-      sendPacket(packet); // May want to spread packets
+      packet.setMarker(true);
+      packet.setPayload(b);
+      console.log('ARF', packet.getLineData());
+
+      console.log('!!!! Last one!');
+      sendPacket(packet, remaining);
       if (config.timeout === 0) setImmediate(next);
       else setTimeout(next, config.timeout);
     }
@@ -184,7 +191,7 @@ module.exports = function (RED) {
       packet.setSyncSourceID(syncSourceID);
       if (is4175) {
         lineStatus = packet.setLineDataHeaders(lineStatus, remaining);
-        console.log(lineStatus);
+        // console.log(lineStatus);
         if (lineStatus.field == 2) {
           tsAdjust = 1800; // TODO Find a frame rate adjust
         }

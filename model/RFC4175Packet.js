@@ -80,21 +80,21 @@ RFC4175Packet.prototype.setLineDataHeaders = function (lineStatus, remaining) {
       this.buffer.writeUInt16BE((lineStatus.linePos / lineStatus.byteFactor) & 0x7fff,
           lineDataStart + 4);
       if (lineStatus.fieldBreaks.field2Start && lineStatus.lineNo >= lineStatus.fieldBreaks.field2Start) {
-        this.buffer[lineDataStart + 2] = this.buffer[lineDataStart + 2] & 0x80;
+        this.buffer[lineDataStart + 2] = this.buffer[lineDataStart + 2] | 0x80;
       }
-      // Short line - must have continuation
-      this.buffer[lineDataStart + 4] = this.buffer[lineDataStart + 4] | 0x80;
       if (lineStatus.lineNo === lineStatus.fieldBreaks.field1End + 1) {
         lineStatus.lineNo = lineStatus.fieldBreaks.field2Start;
-        this.setMarker(true);
+        this.setMarker(true); // Marker set a field boundaries
         packetPos = remaining;
-      }
-      if (lineStatus.fieldBreaks.field2End &&
+      } else if (lineStatus.fieldBreaks.field2End &&
           lineStatus.lineNo === lineStatus.fieldBreaks.field2End + 1) {
-        this.setMarker(true);
+        // this.setMarker(true); // Set at the grain level
         packetPos = remaining;
+      } else {
+        packetPos += bytesLeftOnLine;
+        // Short line - must have continuation
+        this.buffer[lineDataStart + 4] = this.buffer[lineDataStart + 4] | 0x80;
       }
-      packetPos += bytesLeftOnLine;
       lineDataStart += 6;
       lineStatus.linePos = 0;
     } else {
@@ -105,12 +105,12 @@ RFC4175Packet.prototype.setLineDataHeaders = function (lineStatus, remaining) {
           lineDataStart + 4);
       if (lineStatus.fieldBreaks.field2Start &&
           lineStatus.lineNo > lineStatus.fieldBreaks.field2Start) {
-        this.buffer[lineDataStart + 2] = this.buffer[lineDataStart + 2] & 0x80;
+        this.buffer[lineDataStart + 2] = this.buffer[lineDataStart + 2] | 0x80;
       }
       lineStatus.linePos += space - space % lineStatus.stride;
       packetPos = remaining;
       lineDataStart += 6;
-      }
+    }
     this.lineCount++;
   }
   return lineStatus;
@@ -129,7 +129,7 @@ RFC4175Packet.prototype.setPayload = function (b) {
 
 RFC4175Packet.prototype.toJSON = function () {
   var j = RTPPacket.prototype.toJSON.call(this);
-  console.log(this, this.shrinkPayload);
+  // console.log(this, this.shrinkPayload);
   j.extendedSequenceNumber = this.getExtendedSequenceNumber();
   j.lines = this.getLineData().map(function (l) {
     return { length : l.length, lineNo : l.lineNo, offset : l.offset,

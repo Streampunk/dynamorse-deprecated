@@ -233,11 +233,13 @@ RTPPacket.prototype.setExtensions = function (x) {
       x.profile > 65535)
     return new Error('Cannot set extensions unless a profile property exists, ' +
         'is a number in the range 0 to 65535.');
-  if (!x.extensionData || !Buffer.isBuffer(x.extensionData))
-    return new Error('Extension data must be provided as property extensionData ' +
-        'of type Buffer.');
   var extensionBase = 12 + this.getCSRCCount() * 4;
+  var preserveLineData = new Buffer(this.buffer.slice(this.getPayloadStart(),
+    this.getPayloadStart() + 30));
   if (x.profile !== 0xbede) {
+    if (!x.extensionData || !Buffer.isBuffer(x.extensionData))
+      return new Error('Extension data must be provided as property extensionData ' +
+          'of type Buffer.');
     var length = (x.length && typeof x.length === 'number' &&
         x.length > 0 && x.length <= x.extensionData.length) ? x.length : x.extensionData.length;
     length = (length <= 65535) ? length : 65535;
@@ -246,6 +248,7 @@ RTPPacket.prototype.setExtensions = function (x) {
     this.buffer.writeUInt16BE(length, extensionBase + 2);
     x.extensionData.copy(this.buffer, extensionBase, 0, length);
     this.setExtension(true);
+    preserveLineData.copy(this.buffer, this.getPayloadStart());
     return x;
   } else {
     var position = extensionBase + 4;
@@ -253,7 +256,7 @@ RTPPacket.prototype.setExtensions = function (x) {
       var id = k.match(/id([1-9][1-4]?)/);
       if (id) {
         id = +id[1];
-        var buf = x[id];
+        var buf = x[`id${id}`];
         if (buf && Buffer.isBuffer(buf)) {
           var len = (buf.length < 17) ? buf.length - 1 : 15; // 15 == 16
           this.buffer[position] = (id << 4) | len;
@@ -261,12 +264,13 @@ RTPPacket.prototype.setExtensions = function (x) {
           position += len + 2;
         }
       }
-    });
-    while ((position - extensionBase) % 4 !== 0) { this.buffer[poisiton++] = 0; }
+    }.bind(this));
+    while ((position - extensionBase) % 4 !== 0) { this.buffer[position++] = 0; }
     this.buffer.writeUInt16BE(x.profile, extensionBase);
     this.buffer.writeUInt16BE((position - extensionBase - 4) / 4, extensionBase + 2);
     this.setExtension(true);
-    return x;
+    preserveLineData.copy(this.buffer, this.getPayloadStart());
+    return this.getExtensions();
   }
 }
 
