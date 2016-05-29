@@ -195,7 +195,6 @@ var audio_tags = {
 
 test('Creating an audio SDP file', function (t) {
   var sdp = SDP.makeSDP(connection, audio_tags, exts, tsOffset, '192.192.192.192');
-  console.log(sdp.toString());
   t.ok(SDP.isSDP(sdp), 'is an SDP object.');
   t.ok(/-\s[0-9]+\s[0-9]+\sIN\sIP4\s([0-2]?[0-9]?[0-9]\.){3}([0-2]?[0-9]?[0-9])/.test(sdp.o),
     'has a matching origin line.');
@@ -238,7 +237,6 @@ test('Creating an audio SDP file', function (t) {
 test('Create SDP with unicast address', function (t) {
   var uniConn = { address: '10.11.12.13', port: 5001, ttl : 7, payloadType: 96 };
   var sdp = SDP.makeSDP(uniConn, audio_tags, exts, tsOffset, '192.192.192.192');
-  console.log(sdp.toString());
   t.ok(SDP.isSDP(sdp), 'is an SDP object.');
   t.equal(sdp.getConnectionAddress(0), '10.11.12.13', 'has the expected connection address.');
   t.equal(sdp.getConnectionTTL(0), undefined, 'has undefined multicast TTL.');

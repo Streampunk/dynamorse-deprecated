@@ -396,6 +396,26 @@ function isMulticast (addr) {
   return false;
 }
 
+/**
+ * Create an SDP file from connection, media type and extension schemd details.
+ * @param  {Object} connection Object with properties describing the stream
+ *                             connection, including address, port, ttl and
+ *                             payloadType.
+ * @param  {Object} mediaType  Object with properties that describe the media type
+ *                             of the stream. Must include clockRate, encodingName
+ *                             and format.
+ * @param  {Object} exts       Object defining the schema for RTP header extensions,
+ *                             with timecode rate and reference clock identifier.
+ *                             Properties include: origin_timestamp_id, smpte_tc_id,
+ *                             smpte_tc_param, flow_id_id, source_id_id,
+ *                             grain_flags_id, sync_timestamp_id, grain_duration_id,
+ *                             ts_refclk.
+ * @param  {Number=} tsOffset  Media clock direct parameter that described the
+ *                             RTP timestamp offset for the stream.
+ * @param  {string=} netif     Address of the interface card that the multicast
+ *                             address is bound to.
+ * @return {SDP}               [description]
+ */
 SDP.makeSDP = function (connection, mediaType, exts, tsOffset, netif) {
   function getParam(name) {
     return (mediaType[name]) ? `${name}=${mediaType[name][0]}; ` : '';
