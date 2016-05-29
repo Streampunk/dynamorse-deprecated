@@ -23,7 +23,8 @@
       address : { value : '', validate : RED.validators.regex(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/) },
       port : { value : 5001, validate : RED.validators.number() },
       ttl : { value : 127, validate : RED.validators.number() },
-      payloadType : { value : 96, validate : RED.validators.number() }
+      payloadType : { value : 96, validate : RED.validators.number() },
+      timeout : { value : 0, validate : RED.validators.number() }
     },
     inputs:1,
     outputs:0,
@@ -51,6 +52,10 @@
     <input type="number" min="96" max="127" id="node-input-payloadType" placeholder="96" style="width: 120px">
     <label for="node-input-ttl" style="width: 60px"><i class="fa fa-heart" aria-hidden="true"></i> ttl</label>
     <input type="number" min="0" max="255" id="node-input-ttl" placeholder="127" style="width: 80px">
+  </div>
+  <div class="form-row">
+    <label for="node-input-timeout"><i class="fa fa-clock-o"></i> timeout</label>
+    <input type="number" min="0" id="node-input-timeout" placeholder="0">
   </div>
 </script>
 

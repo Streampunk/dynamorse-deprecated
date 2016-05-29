@@ -61,9 +61,9 @@ module.exports = function (RED) {
   function NMOSRTPOut (config) {
     RED.nodes.createNode(this, config);
     redioactive.Spout.call(this, config);
-    var seq = Math.random() * 0xffffffff|0;
+    var seq = (Math.random() * 0xffffffff) >>> 0;
     var payloadType = 96;
-    var rtpTsOffset = 0;
+    var rtpTsOffset = (Math.random() * 0xffffffff) >>> 0;
     var is4175 = false;
     var width = undefined;
     var height = undefined;
@@ -71,7 +71,7 @@ module.exports = function (RED) {
     var interlace = false;
     var clockRate = 48000;
     var stride = 1;
-    var syncSourceID = Math.random() * 0xffffffff|0;
+    var syncSourceID = (Math.random() * 0xffffffff) >>> 0;
     var initState = true;
     var tsAdjust = 0; // Per packet timestamp adjustment - for samples / fields
     var lineStatus = null;
@@ -142,8 +142,8 @@ module.exports = function (RED) {
       while (i < g.buffers.length) {
         var t = (!is4175 || !packet.getMarker()) ? remaining - remaining % stride :
           packet.getLineData()[0].length;
-        console.log('HAT', packet.getLineData()[0].lineNo, (b.length - o) % 4800, 4800 - lineStatus.linePos,
-          ((b.length - o) % 4800) - (4800 - lineStatus.linePos));
+        // console.log('HAT', packet.getLineData()[0].lineNo, (b.length - o) % 4800, 4800 - lineStatus.linePos,
+        //   ((b.length - o) % 4800) - (4800 - lineStatus.linePos));
         if ((b.length - o) >= t) {
           packet.setPayload(b.slice(o, o + t));
           o += t;
@@ -162,11 +162,11 @@ module.exports = function (RED) {
       }
       var endExt = { profile : 0xbede };
       endExt['id' + rtpExts.grain_flags_id] = new Buffer([0x40]);
-      console.log('B4', packet.getLineData());
+      // console.log('B4', packet.getLineData());
       packet.setExtensions(endExt);
       packet.setMarker(true);
       packet.setPayload(b);
-      console.log('ARF', packet.getLineData());
+      // console.log('ARF', packet.getLineData());
 
       console.log('!!!! Last one!');
       sendPacket(packet, remaining);
@@ -184,6 +184,7 @@ module.exports = function (RED) {
       packet.setMarker(false);
       packet.setPayloadType(payloadType);
       packet.setSequenceNumber(seq & 65535);
+      if (is4175) packet.setExtendedSequenceNumber(seq >>> 16);
       seq = (seq <= 0xffffffff) ? seq + 1 : 0;
       // Special shift >>> 0 is a cheat to get a UInt32
       // Not updating audio timestamps as per pcaps

@@ -244,7 +244,7 @@ SDP.prototype.getConnectionTTL = function (i) {
   var c = (this.m[i].c !== undefined) ? this.m[i].c : this.c;
   if (c !== undefined) {
     var cm = this.m[i].c.match(/\w+\s\w+\s[0-9\.]+\/([0-9]+).*/);
-    if (cm !== null) return cm[1];
+    if (cm !== null) return +cm[1];
     else return undefined;
   }
   return undefined;
@@ -371,11 +371,67 @@ SDP.prototype.getInterlace = function (i) {
   return undefined;
 }
 
-
 SDP.isSDP = function (x) {
   return x !== null &&
     typeof x === 'object' &&
     x.constructor === SDP.prototype.constructor;
+}
+
+function getFirstRealIP4Interface() {
+  var ifaces = require('os').networkInterfaces();
+  var bumpy =  Object.keys(ifaces).map(function (iname) {
+    var iface = ifaces[iname]; return iface.map(function (x) {
+      x.ifname = iname; return x;
+    });
+  });
+  var flatter = Array.prototype.concat.apply([], bumpy);
+  return flatter.find(function (x) { return x.family === 'IPv4' && !x.internal; });
+}
+
+function isMulticast (addr) {
+  var check = addr.match(/([0-2]?[0-9]?[0-9])\./);
+  if (check) {
+    return +check[1] >= 224 && +check[1] <= 239;
+  }
+  return false;
+}
+
+SDP.makeSDP = function (connection, mediaType, exts, tsOffset, netif) {
+  function getParam(name) {
+    return (mediaType[name]) ? `${name}=${mediaType[name][0]}; ` : '';
+  }
+  if (!connection && !mediaType && !exts)
+    return new Error('Connection details, media type details and extension schema ' +
+      'must be provided to make an SDP file.');
+  var dateNow = Date.now();
+  netif = netif ? netif : getFirstRealIP4Interface();
+  netif = typeof netif !== 'string' ?
+    (typeof netif === 'object' ? netif.address : '127.0.0.1') : netif;
+  tsOffset = typeof tsOffset === 'number' ? tsOffset >>> 0 : 0;
+  var fmtp = (mediaType.format[0] === 'video') ?
+    `a=fmtp:${connection.payloadType} ${getParam('sampling')}${getParam('width')}` +
+    `${getParam('height')}${getParam('depth')}${getParam('colorimetry')}` +
+    `${getParam('interlace')}`.slice(0, -2) + '\n' : '';
+  var channels = (mediaType.format[0] === 'audio') ? `/${mediaType.channels[0]}` : '';
+  var ttl = isMulticast(connection.address) ? `/${connection.ttl}` : '';
+  var sdp = `v=0
+  o=- ${dateNow} ${dateNow} IN IP4 ${netif}
+  s=Dynamorse NMOS Stream
+  t=0 0
+  m=${mediaType.format[0]} ${connection.port} RTP/AVP ${connection.payloadType}
+  c=IN IP4 ${connection.address}${ttl}
+  a=source-filter:incl IN IP4 ${connection.address} ${netif}
+  a=rtpmap:${connection.payloadType} ${mediaType.encodingName}/${mediaType.clockRate}${channels}
+  ${fmtp}a=mediaclk:direct=${tsOffset} rate=${mediaType.clockRate}
+  a=extmap:${exts.origin_timestamp_id} urn:x-nmos:rtp-hdrext:origin-timestamp
+  a=extmap:${exts.smpte_tc_id} urn:ietf:params:rtp-hdrext:smpte-tc ${exts.smpte_tc_param}
+  a=extmap:${exts.flow_id_id} urn:x-nmos:rtp-hdrext:flow-id
+  a=extmap:${exts.source_id_id} urn:x-nmos:rtp-hdrext:source-id
+  a=extmap:${exts.grain_flags_id} urn:x-nmos:rtp-hdrext:grain-flags
+  a=extmap:${exts.sync_timestamp_id} urn:x-nmos:rtp-hdrext:sync-timestamp
+  a=extmap:${exts.grain_duration_id} urn:x-nmos:rtp-hdrext:grain-duration
+  a=ts-refclk:${exts.ts_refclk}`
+  return new SDP(sdp);
 }
 
 module.exports = SDP;

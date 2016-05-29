@@ -120,3 +120,127 @@ test('A mixed SDP file is parsed', function (t) {
   t.equal(sdp.getEncodingName(1), 'L16', 'has expected encoding name for audio.');
   t.end();
 });
+
+var exts = {
+  origin_timestamp_id: 1,
+  smpte_tc_id: 2,
+  smpte_tc_param: '3600@90000/25',
+  flow_id_id: 3,
+  source_id_id: 4,
+  grain_flags_id: 5,
+  sync_timestamp_id: 7,
+  grain_duration_id: 9,
+  ts_refclk: 'ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc' };
+var video_tags = {
+  encodingName: [ 'raw' ],
+  clockRate: [ '90000' ],
+  sampling: [ 'YCbCr-4:2:2' ],
+  width: [ '1920' ],
+  height: [ '1080' ],
+  depth: [ '10' ],
+  colorimetry: [ 'BT709-2' ],
+  interlace: [ '1' ],
+  packing: [ 'pgroup' ],
+  format: [ 'video' ] };
+var connection = { address: '225.6.7.8', port: 5001, ttl: 127, payloadType: 96 };
+var tsOffset = (Math.random() * 0xffffffff) >>> 0;
+
+test('Creating a video SDP file', function (t) {
+  var sdp = SDP.makeSDP(connection, video_tags, exts, tsOffset);
+  t.ok(SDP.isSDP(sdp), 'is an SDP object.');
+  t.ok(/-\s[0-9]+\s[0-9]+\sIN\sIP4\s([0-2]?[0-9]?[0-9]\.){3}([0-2]?[0-9]?[0-9])/.test(sdp.o),
+    'has a matching origin line.');
+  t.equal(sdp.s, 'Dynamorse NMOS Stream', 'has expected session name.');
+  t.equal(sdp.t, '0 0', 'has expectd timing line.');
+  t.equal(sdp.getMediaHeaders().length, 1, 'has one media record.');
+  t.equal(sdp.getEncodingName(0), 'raw', 'has expected encoding name.');
+  t.equal(sdp.getMedia(0), 'video', 'has expected media type.');
+  t.equal(sdp.getClockRate(0), 90000, 'has expected clock rate.');
+  t.equal(sdp.getEncodingParameters(0), undefined, 'has no encoding paramters, as expected.');
+  t.equal(sdp.getPort(0), 5001, 'has the expected port.');
+  t.equal(sdp.getPayloadType(0), 96, 'has the expected payload type.');
+  t.equal(sdp.getConnectionAddress(0), '225.6.7.8', 'has the expected connection address.');
+  t.equal(sdp.getConnectionTTL(0), 127, 'has the expected multicast TTL.');
+  t.ok(/([0-2]?[0-9]?[0-9]\.){3}([0-2]?[0-9]?[0-9])/.test(sdp.getOriginUnicastAddress(0)),
+    'has a reasonable origin unicast address.');
+  t.equal(sdp.getClockOffset(0), tsOffset, 'has the expected clock offset.');
+  t.equal(sdp.getTimestampReferenceClock(0), 'ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc',
+    'has the expected timestamp reference clock.');
+  t.equal(sdp.getSMPTETimecodeParameters(0), '3600@90000/25', 'has the expected timecode parameters.');
+  var extMap = sdp.getExtMapReverse(0);
+  Object.keys(exts).forEach(function (k) {
+    if (k.endsWith('_id')) {
+      var j = k.slice(0, -3).replace(/_/, '-');
+      t.ok(Object.keys(extMap).some(x => x.indexOf(j) >= 0),
+        `extension map contains a key including ${j}.`);
+      t.equal(extMap[Object.keys(extMap).find(x => x.indexOf(j) >= 0)],
+        exts[k], `extension map has expected value for ${j}.`);
+    };
+  });
+  t.equal(sdp.getWidth(0), 1920, 'has the expected width.');
+  t.equal(sdp.getHeight(0), 1080, 'has the expected height.');
+  t.equal(sdp.getInterlace(0), 1, 'has the expected interlace value.');
+  t.equal(sdp.getColorimetry(0), 'BT709-2', 'has the expected colorimetry.');
+  t.equal(sdp.getSampling(0), 'YCbCr-4:2:2', 'has the expected sampling.');
+  t.equal(sdp.getDepth(0), 10, 'has the expected depth.');
+  t.end();
+});
+
+var audio_tags = {
+  encodingName: [ "L24" ],
+  clockRate: [ "48000" ],
+  channels: [ "2" ],
+  format: [ "audio" ]
+};
+
+test('Creating an audio SDP file', function (t) {
+  var sdp = SDP.makeSDP(connection, audio_tags, exts, tsOffset, '192.192.192.192');
+  console.log(sdp.toString());
+  t.ok(SDP.isSDP(sdp), 'is an SDP object.');
+  t.ok(/-\s[0-9]+\s[0-9]+\sIN\sIP4\s([0-2]?[0-9]?[0-9]\.){3}([0-2]?[0-9]?[0-9])/.test(sdp.o),
+    'has a matching origin line.');
+  t.equal(sdp.s, 'Dynamorse NMOS Stream', 'has expected session name.');
+  t.equal(sdp.t, '0 0', 'has expectd timing line.');
+  t.equal(sdp.getMediaHeaders().length, 1, 'has one media record.');
+  t.equal(sdp.getEncodingName(0), 'L24', 'has expected encoding name.');
+  t.equal(sdp.getMedia(0), 'audio', 'has expected media type.');
+  t.equal(sdp.getClockRate(0), 48000, 'has expected clock rate.');
+  t.equal(sdp.getEncodingParameters(0), '2', 'has channels as encoding paramters.');
+  t.equal(sdp.getPort(0), 5001, 'has the expected port.');
+  t.equal(sdp.getPayloadType(0), 96, 'has the expected payload type.');
+  t.equal(sdp.getConnectionAddress(0), '225.6.7.8', 'has the expected connection address.');
+  t.equal(sdp.getConnectionTTL(0), 127, 'has the expected multicast TTL.');
+  t.equal(sdp.getOriginUnicastAddress(0), '192.192.192.192',
+    'has the expected origin unicast address.');
+  t.equal(sdp.getClockOffset(0), tsOffset, 'has the expected clock offset.');
+  t.equal(sdp.getTimestampReferenceClock(0), 'ptp=IEEE1588-2008:dd-a9-3e-5d-c7-28-28-dc',
+    'has the expected timestamp reference clock.');
+  t.equal(sdp.getSMPTETimecodeParameters(0), '3600@90000/25', 'has the expected timecode parameters.');
+  var extMap = sdp.getExtMapReverse(0);
+  Object.keys(exts).forEach(function (k) {
+    if (k.endsWith('_id')) {
+      var j = k.slice(0, -3).replace(/_/, '-');
+      t.ok(Object.keys(extMap).some(x => x.indexOf(j) >= 0),
+        `extension map contains a key including ${j}.`);
+      t.equal(extMap[Object.keys(extMap).find(x => x.indexOf(j) >= 0)],
+        exts[k], `extension map has expected value for ${j}.`);
+    };
+  });
+  t.equal(sdp.getWidth(0), undefined, 'has undefined width.');
+  t.equal(sdp.getHeight(0), undefined, 'has undefined height.');
+  t.equal(sdp.getInterlace(0), undefined, 'has undefined interlace value.');
+  t.equal(sdp.getColorimetry(0), undefined, 'has undefined colorimetry.');
+  t.equal(sdp.getSampling(0), undefined, 'has undefined sampling.');
+  t.equal(sdp.getDepth(0), undefined, 'has undefined depth.');
+  t.end();
+});
+
+test('Create SDP with unicast address', function (t) {
+  var uniConn = { address: '10.11.12.13', port: 5001, ttl : 7, payloadType: 96 };
+  var sdp = SDP.makeSDP(uniConn, audio_tags, exts, tsOffset, '192.192.192.192');
+  console.log(sdp.toString());
+  t.ok(SDP.isSDP(sdp), 'is an SDP object.');
+  t.equal(sdp.getConnectionAddress(0), '10.11.12.13', 'has the expected connection address.');
+  t.equal(sdp.getConnectionTTL(0), undefined, 'has undefined multicast TTL.');
+  t.end();
+});
