@@ -22,9 +22,9 @@
       name: { value : '' },
       maxBuffer : { value : 10, validate : RED.validators.number() },
       description : { value : '' },
-      device : { value : '', type : "device" },
-      sender { value : '' },
-      sdpURL : { value : '' },
+      device : { value : '', type : 'device' },
+      sender : { value : '', validate : function (v) { return v.length > 0 || this.sdpURL.length > 0; } },
+      sdpURL : { value : '', validate : function (v) { return v.length > 0 || this.sender.length > 0; } },
       regenerate : { value : false }
     },
     inputs:0,
@@ -71,5 +71,6 @@
 
 <script type="text/x-red" data-help-name="nmos-rtp-in">
   <h1>NMOS RTP stream input</h1>
-  <p>Recieve an NMOS RTP stream, discovered by querying an NMOS query API.</p>
+  <p>Recieve an NMOS RTP stream, either discovered by querying an NMOS query API
+  or by receiving an SDP file.</p>
 </script>

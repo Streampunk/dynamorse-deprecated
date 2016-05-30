@@ -18,7 +18,7 @@ var express = require("express");
 var RED = require("node-red");
 var fs = require('fs');
 var dgram = require('dgram');
-var ledger = require('nmos-ledger');
+var ledger = require('../ledger');
 var util = require('util');
 
 var hostname = require('os').hostname();
@@ -103,7 +103,7 @@ var EE = require('events').EventEmitter;
 var logger = new EE();
 RED.log.addHandler(logger);
 logger.on('log', function (x) { if (x.msg === 'Starting flows') {
-  logger.removeAllListeners();
+  // logger.removeAllListeners();
   nodeAPI.putResource(device).catch(RED.log.error);
   nodeAPI.putResource(pipelines).then(function () {
     RED.log.info('Devices and self registred with ledger.');
