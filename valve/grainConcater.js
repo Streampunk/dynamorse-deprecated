@@ -14,7 +14,7 @@
 */
 
 var Grain = require('../model/Grain.js');
-var codecadon = require('../../codecadon');
+var codecadon = require('codecadon');
 var grainProcessor = require('./grainProcessor.js');
 var H = require('highland');
 
