@@ -117,7 +117,11 @@ Once you are happy with a design, hit the _Deploy_ button. This will send the fl
 
 #### Setting port numbers
 
-__ADD COMMAND LINE PARAMETERS__
+The default port settings can be changed using command line parameters `redPort=...` and `ledgerPort=...`. For example:
+
+    dynamorse redPort=8888 ledgerPort=8889
+
+By changing port numbers, it is possible to run more than one instance of dynamorse on the same computer.
 
 #### Thread pool size
 

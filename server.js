@@ -25,8 +25,19 @@ var hostname = require('os').hostname();
 var shortHostname = hostname.match(/([^\.]*)\.?.*/)[1];
 var pid = process.pid;
 
+var properties = {
+  redPort : '8000',
+  nodePort : '3001'
+};
+
+for ( var i = 2 ; i < process.argv.length ; i++ ) {
+  var arg = /(\S+)=([0-9]+)/.exec(process.argv[i]);
+  if (arg) properties[arg[1]] = arg[2];
+  else console.error(`Could not process argument ${i - 1}: '${process.argv[i]}'`);
+}
+
 var node = new ledger.Node(null, null, `Dynamorse ${shortHostname} ${pid}`,
-  `http://dynamorse-${shortHostname}-${pid}.local:3001`,
+  `http://dynamorse-${shortHostname}-${pid}.local:${properties.nodePort}`,
   `${hostname}`);
 // Externally advertised ... sources etc are registered with discovered registration
 // services
@@ -36,7 +47,7 @@ var device = new ledger.Device(null, null, `device-${shortHostname}-${pid}`,
 var pipelines = new ledger.Device(null, null, `pipelines-${shortHostname}-${pid}`,
   ledger.deviceTypes.pipeline, node.id, null, null);
 var store = new ledger.NodeRAMStore(node);
-var nodeAPI = new ledger.NodeAPI(3001, store);
+var nodeAPI = new ledger.NodeAPI(+properties.ledgerPort, store);
 nodeAPI.init().start();
 
 // Fixed identifiers for global config nodes
@@ -91,7 +102,7 @@ app.use(settings.httpAdminRoot, RED.httpAdmin);
 // Serve the http nodes UI from /api
 app.use(settings.httpNodeRoot, RED.httpNode);
 
-server.listen(8000);
+server.listen(+properties.redPort);
 
 // Start the runtime - function can be used to do work after types are loaded
 RED.start().then(function () {
