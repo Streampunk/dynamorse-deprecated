@@ -19,8 +19,13 @@
     category: 'funnel',
     color: '#E59D63',
     defaults: {
-      name: { value : "" },
-      maxBuffer : { value : 10, validate : RED.validators.number() }
+      name: { value : '' },
+      maxBuffer : { value : 10, validate : RED.validators.number() },
+      description : { value : '' },
+      device : { value : '', type : "device" },
+      sender { value : '' },
+      sdpURL : { value : '' },
+      regenerate : { value : false }
     },
     inputs:0,
     outputs:1,
@@ -38,8 +43,29 @@
     <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="10">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
+  </div>
+  <div class="form-row">
+    <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+    <input type="text" id="node-input-description" placeholder="source and flow description">
+  </div>
+  <div class="form-row">
+    <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
+    <input type="text" id="node-input-device">
+  </div>
+  <p>Either enter an href, id or query string for a NMOS sender or a link to a SDP file.</p>
+  <div class="form-row">
+    <label for="node-input-sender"><i class="fa fa-paper-plane" aria-hidden="true"></i> sender</label>
+    <input type="text" id="node-input-sender" placeholder="label=news3-mic7">
+  </div>
+  <div class="form-row">
+    <label for="node-input-sdpURL"><i class="fa fa-external-link-square"></i> SDP URL</label>
+    <input type="text" id="node-input-sdpURL" placeholder="file:video.sdp">
+  </div>
+  <div class="form-row">
+    <label for="node-input-regenerate"><i class="fa fa-clock-o"></i> regenerate?</label>
+    <input type="checkbox" id="node-input-regenerate" style="width: 100px">
   </div>
 </script>
 
