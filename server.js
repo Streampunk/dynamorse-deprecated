@@ -18,7 +18,7 @@ var express = require("express");
 var RED = require("node-red");
 var fs = require('fs');
 var dgram = require('dgram');
-var ledger = require('../ledger');
+var ledger = require('nmos-ledger');
 var util = require('util');
 
 var hostname = require('os').hostname();
