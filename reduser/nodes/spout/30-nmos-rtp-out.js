@@ -195,7 +195,7 @@ module.exports = function (RED) {
         var gap = process.hrtime(lastSend);
         // console.log('Waiting gap', gap);
         if (gap[0] * 1000 + gap[1] / 1000000 < config.timeout * count) {
-          timeoutTune++;
+          // timeoutTune++;
           setTimeout(waitNext, 1);
         } else {
           // console.log('Waiting', timeoutTune, (gap[0] * 1000 + gap[1] / 1000000) / count);
@@ -213,9 +213,8 @@ module.exports = function (RED) {
           lastSend = process.hrtime(); count = 0;
         }
         count++;
-        timeoutTune = 0;
-
-        setTimeout(waitNext, 0.8 * config.timeout);
+        // timeoutTune = 0;
+        setTimeout(waitNext, config.timeout - 5);
       }
     }
     function makePacket (g, remaining) {
