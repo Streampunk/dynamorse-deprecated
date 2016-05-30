@@ -53,8 +53,50 @@
   </div>
 </script>
 
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
 <script type="text/x-red" data-help-name="raw-file-out">
   <h1>Raw file data output</h1>
-  <p>Write a file that is a sequence of concatenated raw data for grains, where each of
-  the grains has the same number of bytes.</p>
+  <p>Write a file that is a sequence of concatenated raw data for grains. Either:</p>
+  <ul>
+   <li>each of the grains has the same number of bytes;</li>
+   <li>a sidecar JSON file is provided with the size of each payload.</li>
+  </ul>
+  <p>Grain metadata can be stored in a sidecar file.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node - default is <code>raw-file-out</code>.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-file" aria-hidden="true"></i> file</td>
+    <td>Path location for the file where the grain payload is to be stored.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-file-text" aria-hidden="true"></i> headers</td>
+    <td>Path location for the sidecar file containing the grain headers and individual
+     grain payload size.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-clock-o"></i> timeout</td>
+    <td>Time to wait between writing each grain. Controls the back-pressure.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>File path locations are relative to the folder where the dynamorse server was started.</p>
+
+  <p>Implemented and awaiting roundtrip testing -
+  <a href="https://github.com/Streampunk/dynamorse/issues/6">status</a>.
 </script>

@@ -215,7 +215,7 @@ Create an RTP multicast stream and advertise it as an NMOS flow, source and send
 1. Download or select a 2-channel 48kHz WAV file. How about a [steam train](https://freesound.org/people/MidEngine4Life/sounds/127966/#)?
 2. Create the simple two node graph shown below, connecting a _wav-in_ funnel to a _nmos-rtp-out_ spout. ![nmos flow wiring](images/nmos-flow.png)
 3. Configure the _nmos-rtp-out_ spout with a multicast address and port number. Multicast addresses are in the range `224.0.0.0` to `239.255.255.255`. It is best to choose something randomly within this range and avoiding using `0`, `1`, `254` or `255`. You may need to bind a multicast address to a specific network interface according to instructions specific to your platform.
-4. _Deploy_ the graph. An appropriate SDP file will be created and served from the local web server. AN NMOS flow, source and a sender will be created and advertised via the Node API and pushed to a Registration API if available.
+4. _Deploy_ the graph. An appropriate SDP file will be created and served from the local web server. An NMOS flow, source and a sender will be created and advertised via the Node API and pushed to a Registration API if available.
 
 Analyse or record the RTP stream produced using [Wireshark](https://www.wireshark.org/) or set up another dynamorse instance and use the output of this example as the input to another. A filtered PCAP recording containing only the RTP packets can be used as an input to the _pcap-reader_ Node-RED node.
 

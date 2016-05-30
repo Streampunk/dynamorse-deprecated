@@ -45,6 +45,13 @@
 
 <script type="text/x-red" data-help-name="raw-file-in">
   <h1>Raw file data input</h1>
-  <p>Read a file that is a sequence of concatenated raw data for grains, where each of
-  the grains has the same number of bytes.</p>
+  <p>Read a file that is a sequence of concatenated raw data for grains. ither:</p>
+  <ul>
+   <li>each of the grains has the same number of bytes;</li>
+   <li>a sidecar JSON file is provided with the size of each payload.</li>
+  </ul>
+  <p>Grain metadata can be read from a sidecar file or regenerated on-the-fly. The input
+  file may be looped.</p>
+
+  <p>Not implemented - <a href="https://github.com/Streampunk/dynamorse/issues/6">status</a>.</p>
 </script>
