@@ -31,14 +31,11 @@ module.exports = function (client, sdpOrAddress, port, netif) {
   var messageStream = H('message', client, ['msg', 'rinfo']).map(function (o) { return o.msg; });
   var listenStream = H('listening', client).map(function () { return { state: 'listening' }; });
   var closeStream = H('close', client).map(function () { return { state: 'closed' }; })
-  if (netif !== undefined && typeof netif === 'string') {
-    client.bind(port, function(err) {
-      if (err) consle.error('Client bind error', err);
-      client.addMembership(address, netif);
-      if (typeof ttl === 'number') client.setMulticastTTL(ttl);
-    });
-  } else {
-    client.bind(port);
-  }
+  client.bind(port, function(err) {
+    if (err) return console.error('Client bind error', err);
+    // console.log('Successfully bound!');
+    client.addMembership(address, netif);
+    // if (typeof ttl === 'number') client.setMulticastTTL(ttl);
+  });
   return sdpStream.concat(H.merge([errorStream, messageStream, listenStream, closeStream]));
 }

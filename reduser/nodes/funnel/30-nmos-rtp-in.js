@@ -17,6 +17,10 @@ var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
 var SDPProcessing = require('../../../util/SDPProcessing.js');
 var dgram = require('dgram');
+var udpInlet = require('../../../funnel/udpInlet.js');
+var udpToGrain = require('../../../valve/udpToGrain.js');
+var grainConcater = require('../../../valve/grainConcater.js');
+var Grain = require('../../../model/Grain.js');
 
 module.exports = function (RED) {
   function NmosRTPIn (config) {

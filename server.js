@@ -27,13 +27,37 @@ var pid = process.pid;
 
 var properties = {
   redPort : '8000',
-  nodePort : '3001'
+  ledgerPort : '3001',
+  userDir : 'reduser'
 };
 
+var flowFileSet = false;
+
 for ( var i = 2 ; i < process.argv.length ; i++ ) {
-  var arg = /(\S+)=([0-9]+)/.exec(process.argv[i]);
+  var arg = /(\S+)=(\S+)/.exec(process.argv[i]);
   if (arg) properties[arg[1]] = arg[2];
   else console.error(`Could not process argument ${i - 1}: '${process.argv[i]}'`);
+}
+
+if (!properties.flowFile) {
+  properties.flowFile = `flows_${hostname}_${properties.redPort}.json`;
+}
+
+if (isNaN(+properties.redPort) || +properties.redPort > 65535 ||
+    properties.redPort < 0) {
+  console.error('Parameter redPort must be a number between 0 and 65535.');
+  process.exit(1);
+}
+
+if (isNaN(+properties.ledgerPort) || +properties.ledgerPort > 65535 ||
+  +properties.ledgerPort < 0) {
+  console.error('Parameter ledgerPort must be a number between 0 and 65535.');
+  process.exit(1);
+}
+
+if (!properties.flowFile.endsWith('.json')) {
+  console.error('Parameter flowFile must end with .json.');
+  process.exit(1);
 }
 
 var node = new ledger.Node(null, null, `Dynamorse ${shortHostname} ${pid}`,
@@ -76,9 +100,10 @@ var server = http.createServer(app);
 
 // Create the settings object - see default settings.js file for other options
 var settings = {
-    httpAdminRoot:"/red",
+    httpAdminRoot: "/red",
     httpNodeRoot: "/api",
-    userDir:"reduser",
+    userDir: properties.userDir,
+    flowFile: properties.flowFile,
     nodesDir: process.cwd() + "/reduser/nodes/",
     functionGlobalContext: {
       node : node,

@@ -121,7 +121,9 @@ The default port settings can be changed using command line parameters `redPort=
 
     dynamorse redPort=8888 ledgerPort=8889
 
-By changing port numbers, it is possible to run more than one instance of dynamorse on the same computer.
+By changing port numbers, it is possible to run more than one instance of dynamorse on the same computer. By default, dynamorse will create a Node-RED flow file name `flow_<hostname>_<redPort>.json` in the `reduser` folder. You must provide an alternative name for the file using the `flowFile=...` parameter. For example:
+
+    dynamorse redPort=8888 ledgerPort=8889 flowFile=instance_two.json
 
 #### Thread pool size
 

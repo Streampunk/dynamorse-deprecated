@@ -101,7 +101,7 @@ module.exports = function (RED) {
     var sdp = null;
     var lastSend = null;
     this.each(function (g, next) {
-      this.log(`${process.hrtime()}: Received ${util.inspect(g)}.`);
+      this.log(`Received grain ${Grain.prototype.formatTimestamp(g.ptpSync)}.`);
       if (!Grain.isGrain(g)) return node.warn('Received a non-grain on the input.');
       if (!this.tags) {
         this.getNMOSFlow(g, function (err, f) {
