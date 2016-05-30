@@ -15,6 +15,8 @@
 
 // TODO: Does not parse the t and r groups correctly
 
+var Net = require('../util/Net.js');
+
 var moreThanOne = {
   v: false, o: false, s : false, i: false, u: false, e: false,
   p: false, c: false, b: true, t: false, r: true, z: false,
@@ -377,30 +379,12 @@ SDP.isSDP = function (x) {
     x.constructor === SDP.prototype.constructor;
 }
 
-function getFirstRealIP4Interface() {
-  var ifaces = require('os').networkInterfaces();
-  var bumpy =  Object.keys(ifaces).map(function (iname) {
-    var iface = ifaces[iname]; return iface.map(function (x) {
-      x.ifname = iname; return x;
-    });
-  });
-  var flatter = Array.prototype.concat.apply([], bumpy);
-  return flatter.find(function (x) { return x.family === 'IPv4' && !x.internal; });
-}
-
-function isMulticast (addr) {
-  var check = addr.match(/([0-2]?[0-9]?[0-9])\./);
-  if (check) {
-    return +check[1] >= 224 && +check[1] <= 239;
-  }
-  return false;
-}
-
 /**
  * Create an SDP file from connection, media type and extension schemd details.
  * @param  {Object} connection Object with properties describing the stream
- *                             connection, including address, port, ttl and
- *                             payloadType.
+ *                             connection, including address, port, ttl, netif
+ *                             (the network interface the multicast address is
+ *                             bound to) and payloadType.
  * @param  {Object} mediaType  Object with properties that describe the media type
  *                             of the stream. Must include clockRate, encodingName
  *                             and format.
@@ -412,11 +396,9 @@ function isMulticast (addr) {
  *                             ts_refclk.
  * @param  {Number=} tsOffset  Media clock direct parameter that described the
  *                             RTP timestamp offset for the stream.
- * @param  {string=} netif     Address of the interface card that the multicast
- *                             address is bound to.
  * @return {SDP}               [description]
  */
-SDP.makeSDP = function (connection, mediaType, exts, tsOffset, netif) {
+SDP.makeSDP = function (connection, mediaType, exts, tsOffset) {
   function getParam(name) {
     return (mediaType[name]) ? `${name}=${mediaType[name][0]}; ` : '';
   }
@@ -424,7 +406,7 @@ SDP.makeSDP = function (connection, mediaType, exts, tsOffset, netif) {
     return new Error('Connection details, media type details and extension schema ' +
       'must be provided to make an SDP file.');
   var dateNow = Date.now();
-  netif = netif ? netif : getFirstRealIP4Interface();
+  var netif = connection.netif ? connection.netif : Net.getFirstRealIP4Interface();
   netif = typeof netif !== 'string' ?
     (typeof netif === 'object' ? netif.address : '127.0.0.1') : netif;
   tsOffset = typeof tsOffset === 'number' ? tsOffset >>> 0 : 0;
@@ -433,7 +415,7 @@ SDP.makeSDP = function (connection, mediaType, exts, tsOffset, netif) {
     `${getParam('height')}${getParam('depth')}${getParam('colorimetry')}` +
     `${getParam('interlace')}`.slice(0, -2) + '\n' : '';
   var channels = (mediaType.format[0] === 'audio') ? `/${mediaType.channels[0]}` : '';
-  var ttl = isMulticast(connection.address) ? `/${connection.ttl}` : '';
+  var ttl = Net.isMulticast(connection.address) ? `/${connection.ttl}` : '';
   var sdp = `v=0
   o=- ${dateNow} ${dateNow} IN IP4 ${netif}
   s=Dynamorse NMOS Stream

@@ -18,7 +18,11 @@ var util = require('util');
 var RFC4175Packet = require('../../../model/RFC4175Packet.js');
 var RTPPacket = require('../../../model/RTPPacket.js');
 var Grain = require('../../../model/Grain.js');
+var SDP = require('../../../model/SDP.js');
 var dgram = require('dgram');
+var uuid = require('uuid');
+var Net = require('../../../util/Net.js');
+var util = require('util');
 
 // TODO add IPv6 support
 
@@ -82,14 +86,22 @@ module.exports = function (RED) {
     var sock = dgram.createSocket({type  :'udp4', reuseAddr : true});
     sock.bind(config.port, function (err) {
       if (err) return node.warn(err);
-      console.log('Binding bounded.');
       sock.setMulticastTTL(config.ttl);
     });
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     var rtpExtDefID = this.context().global.get('rtp_ext_id');
     var rtpExts = RED.nodes.getNode(rtpExtDefID).getConfig();
+    var localName = config.name || `${config.type}-${config.id}`;
+    var localDescription = config.description || `${config.type}-${config.id}`;
+    var genericID = this.context().global.get('genericID');
+    var source = null;
+    var flow = null;
+    var sender = null;
+    var sdp = null;
+    var lastSend = null;
     this.each(function (g, next) {
+      this.log(`${process.hrtime()}: Received ${util.inspect(g)}.`);
       if (!Grain.isGrain(g)) return node.warn('Received a non-grain on the input.');
       if (!this.tags) {
         this.getNMOSFlow(g, function (err, f) {
@@ -105,14 +117,29 @@ module.exports = function (RED) {
             interlace = f.tags.interlace && f.tags.interlace[0] === '1';
           }
           stride = getStride(f.tags);
+          source = new ledger.Source(null, null, localName, localDescription,
+            "urn:x-nmos:format:" + this.tags.format[0], null, null, genericID, null);
+          flow = new ledger.Flow(null, null, localName, localDescription,
+            "urn:x-nmos:format:" + this.tags.format[0], this.tags, source.id, [ this.srcFlow.id ]);
+          var senderID = uuid.v4();
+          sender = new ledger.Sender(senderID, null, localName, localDescription,
+            flow.id, Net.isMulticast(config.address) ?
+              "urn:x-nmos:transport:rtp.mcast" : "urn:x-nmos:transport:rtp.ucast",
+            genericID, // TODO do better at binding to an address
+            `http://${Net.getFirstRealIP4Interface().address}:${nodeAPI.getPort()}/sdp/${senderID}.sdp`);
+          nodeAPI.putResource(source).catch(node.warn);
+          nodeAPI.putResource(flow).catch(node.warn);
+          nodeAPI.putResource(sender).catch(node.warn);
+          sdp = SDP.makeSDP(config, this.tags, rtpExts, rtpTsOffset);
+          nodeAPI.putSDP(senderID, sdp.toString());
           pushGrain(g, next);
         }.bind(this));
       } else {
         pushGrain(g, next);
       }
     }.bind(this));
+    var count = 0, timeoutTune = 0;;
     function pushGrain (g, next) {
-      console.log('***', height + ((interlace) ? 'i' : 'p'), interlace);
       lineStatus = (is4175) ? {
         width: width, stride: stride, lineNo: 21,
         bytesPerLine: width * byteFactor, byteFactor: byteFactor, linePos: 0,
@@ -134,8 +161,6 @@ module.exports = function (RED) {
       var actualExts = packet.setExtensions(startExt);
       if (actualExts.prototype && actualExts.prototype.name === 'Error')
         node.warn(`Failed to set header extensions: ${actualExts}`);
-
-      var sumt = 0;
 
       var i = 0, o = 0;
       var b = g.buffers[i];
@@ -162,18 +187,37 @@ module.exports = function (RED) {
       }
       var endExt = { profile : 0xbede };
       endExt['id' + rtpExts.grain_flags_id] = new Buffer([0x40]);
-      // console.log('B4', packet.getLineData());
       packet.setExtensions(endExt);
       packet.setMarker(true);
       packet.setPayload(b);
-      // console.log('ARF', packet.getLineData());
 
-      console.log('!!!! Last one!');
+      function waitNext() {
+        var gap = process.hrtime(lastSend);
+        // console.log('Waiting gap', gap);
+        if (gap[0] * 1000 + gap[1] / 1000000 < config.timeout * count) {
+          timeoutTune++;
+          setTimeout(waitNext, 1);
+        } else {
+          // console.log('Waiting', timeoutTune, (gap[0] * 1000 + gap[1] / 1000000) / count);
+          next();
+        }
+      }
+
       sendPacket(packet, remaining);
-      if (config.timeout === 0) setImmediate(next);
-      else setTimeout(next, config.timeout);
-    }
 
+      if (config.timeout === 0) {
+        setImmediate(next);
+      } else {
+        if (!lastSend || process.hrtime(lastSend)[0] > config.timeout * (count + 2) / 1000) {
+          node.log('Resetting timer at start or due to large gap.');
+          lastSend = process.hrtime(); count = 0;
+        }
+        count++;
+        timeoutTune = 0;
+
+        setTimeout(waitNext, 0.8 * config.timeout);
+      }
+    }
     function makePacket (g, remaining) {
       var packet = (is4175) ? new RFC4175Packet(new Buffer(1452)) :
         new RTPPacket(new Buffer(1452));
@@ -192,7 +236,6 @@ module.exports = function (RED) {
       packet.setSyncSourceID(syncSourceID);
       if (is4175) {
         lineStatus = packet.setLineDataHeaders(lineStatus, remaining);
-        // console.log(lineStatus);
         if (lineStatus.field == 2) {
           tsAdjust = 1800; // TODO Find a frame rate adjust
         }
@@ -202,7 +245,7 @@ module.exports = function (RED) {
 
     function sendPacket (p) {
       sock.send(p.buffer, 0, p.buffer.length, config.port, config.address);
-      console.log(JSON.stringify(p, null, 2));
+      // console.log(JSON.stringify(p, null, 2));
     }
     this.errors(function (e, next) {
       this.warn(`Received unhandled error: ${e.message}.`);
@@ -212,6 +255,8 @@ module.exports = function (RED) {
     this.done(function () {
       this.log('Stream has all dried up!');
       if (sock) sock.close();
+      nodeAPI.deleteResource(source.id, 'source').catch(node.warn);
+      // TODO remove other resources?
     }.bind(this));
   }
   util.inherits(NMOSRTPOut, redioactive.Spout);

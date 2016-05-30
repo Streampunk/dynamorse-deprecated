@@ -75,6 +75,7 @@ var settings = {
       ledger : ledger,
       rtp_ext_id : extDefNodeID,
       pipelinesID : pipelines.id,
+      genericID : device.id,
       updated : false
     },    // enables global context
     paletteCategories: ['subflows', 'funnel', 'valve', 'fitting', 'spout', 'testing', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],

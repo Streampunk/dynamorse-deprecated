@@ -56,7 +56,7 @@ module.exports = function (RED) {
       var localDescription = config.description || `${config.type}-${config.id}`;
       var pipelinesID = config.device ?
         RED.nodes.getNode(config.device).nmos_id :
-        this.context().global.get(pipelinesID);
+        this.context().global.get('pipelinesID');
       var source = new ledger.Source(null, null, localName, localDescription,
         "urn:x-nmos:format:" + this.tags.format[0], null, null, pipelinesID, null);
       var flow = new ledger.Flow(null, null, localName, localDescription,
