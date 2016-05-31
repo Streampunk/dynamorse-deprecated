@@ -20,15 +20,6 @@
     color: '#FDE8C3',
     defaults: {
       name : { value : "" },
-      folder : { value : "." },
-      glob : { value : "%n.raw" },
-      loop : { value : false },
-      in : { value : 0 , validate : RED.validators.number() },
-      out : {
-        value : Number.MAX_SAFE_INTEGER /*,
-        validate : function (v) {
-          return Red.validators.number()(v) && v > this.in; } */
-      },
       maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:0,
@@ -46,45 +37,18 @@
     <input type="text" id="node-input-folder" placeholder=".">
   </div>
   <div class="form-row">
-    <label for="node-input-glob"><i class="fa fa-cogs"></i> Glob</label>
-    <input type="text" id="node-input-glob" placeholder="%.raw">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
   </div>
-  <div class="form-row">
-    <label for="node-input-loop"><i class="fa fa-repeat"></i> Loop?</label>
-    <input type="checkbox" id="node-input-loop" unchecked>
-  </div>
-  <div class="form-row">
-    <label for="node-input-wibble"><i class="fa fa-paw"></i> Wibble?</label>
-    <select name="node-input-wibble" id="node-input-wibble">
-      <option value="value1">Value 1</option>
-      <option value="value2" selected>Value 2</option>
-      <option value="value3">Value 3</option>
-    </select>
-  </div>
-  <div class="form-row">
-    <div>
-      <label for="node-input-in"><i class="fa fa-sign-in"></i> In</label>
-      <input type="text" id="node-input-in" placeholder="0">
-    </div>
-    <div>
-      <label for="node-input-out"><i class="fa fa-sign-out"></i> Out</label>
-      <input type="text" id="node-input-out" placeholder="Number.MAX_SAFE_INTEGER">
-    </div>
-  </div>
-  <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="name">
-  </div>
-  <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="10">
-  </div>
-
 </script>
 
 <script type="text/x-red" data-help-name="glob-in">
   <h1>Files-by-glob input</h1>
-  <p>Reads raw essence from a sequence of files in a folder, where the sequence
-  in which the grains are read is given by a <em>glob</em> (file name with
-  wildcard) pattern.</p>
+  <p>Read grain payloads from a sequence of files in a folder, where
+  the sequence in which the grains are read is given by a <em>glob</em>
+  (file name with wildcard) pattern.</p>
+
+  <h3>Maturity</h3>
+  <p>Not implemented -
+  <a href="https://github.com/Streampunk/dynamorse/issues/8">status</a>.
 </script>

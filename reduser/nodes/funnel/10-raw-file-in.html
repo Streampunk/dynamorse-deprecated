@@ -19,7 +19,11 @@
     category: 'funnel',
     color: '#FDE8C3',
     defaults: {
-      name: { value : "" },
+      name: { value : '' },
+      file : { value : '', required : true },
+      headers : { value : '' },
+      description : { value : '' },
+      device : { value : '', type : 'device' },
       maxBuffer : { value : 10, validate : RED.validators.number() }
     },
     inputs:0,
@@ -38,10 +42,33 @@
     <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="10">
+    <label for="node-input-file"><i class="fa fa-file"></i> file</label>
+    <input type="text" id="node-input-file" placeholder="dynamorse.wav">
+  </div>
+  <div class="form-row">
+    <label for="node-input-headers"><i class="fa fa-file-text" aria-hidden="true"></i> headers</label>
+    <input type="text" id="node-input-headers" placeholder="">
+  </div>
+  <div class="form-row">
+    <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+    <input type="text" id="node-input-description" placeholder="source and flow description">
+  </div>
+  <div class="form-row">
+    <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
+    <input type="text" id="node-input-device">
+  </div>
+  <div class="form-row">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
   </div>
 </script>
+
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
 
 <script type="text/x-red" data-help-name="raw-file-in">
   <h1>Raw file data input</h1>
@@ -53,5 +80,44 @@
   <p>Grain metadata can be read from a sidecar file or regenerated on-the-fly. The input
   file may be looped.</p>
 
-  <p>Not implemented - <a href="https://github.com/Streampunk/dynamorse/issues/6">status</a>.</p>
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node - default is <code>raw-file-in</code>.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-file"></i> WAV file</td>
+    <td>Path location for the raw input file.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-file-text" aria-hidden="true"></i> headers</td>
+    <td>Optional path location for the sidecar file containing the grain headers
+     and individual grain payload size.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of the this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tablet"></i> device</td>
+    <td>Select or create an NMOS device for this source and flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>File path locations are relative to the folder where the dynamorse server was
+  started.</p>
+
+  <h3>Maturity</h3>
+  <p>Not implemented -
+  <a href="https://github.com/Streampunk/dynamorse/issues/6">status</a>.</p>
 </script>

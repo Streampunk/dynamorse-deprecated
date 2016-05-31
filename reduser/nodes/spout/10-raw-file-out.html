@@ -49,7 +49,7 @@
   </div>
   <div class="form-row">
     <label for="node-input-timeout"><i class="fa fa-clock-o"></i> timeout</label>
-    <input type="number" min="0" id="node-input-timeout" placeholder="0">
+    <input type="number" min="0" id="node-input-timeout" placeholder="0" style="width: 100px">
   </div>
 </script>
 
@@ -85,8 +85,8 @@
    </tr>
    <tr>
     <td><i class="fa fa-file-text" aria-hidden="true"></i> headers</td>
-    <td>Path location for the sidecar file containing the grain headers and individual
-     grain payload size.</td>
+    <td>Optional path location for the sidecar file containing the grain headers
+     and individual grain payload size.</td>
    </tr>
    <tr>
     <td><i class="fa fa-clock-o"></i> timeout</td>
@@ -95,8 +95,10 @@
   </table>
   </div>
 
-  <p>File path locations are relative to the folder where the dynamorse server was started.</p>
+  <p>File path locations are relative to the folder where the dynamorse server was
+  started.</p>
 
+  <h3>Maturity</h3>
   <p>Implemented and awaiting roundtrip testing -
   <a href="https://github.com/Streampunk/dynamorse/issues/6">status</a>.
 </script>

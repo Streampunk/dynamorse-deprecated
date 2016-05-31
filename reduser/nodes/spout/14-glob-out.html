@@ -18,8 +18,8 @@
   RED.nodes.registerType('glob-out', {
     category: 'spout',
     color: '#FDE8C3',
-    defaults: {
-      name: { value : "" }
+    defaults : {
+      name: { value : '' }
     },
     inputs:1,
     outputs:0,
@@ -40,7 +40,11 @@
 
 <script type="text/x-red" data-help-name="glob-out">
   <h1>Files-by-glob output</h1>
-  <p>Writes raw essence from a sequence of files in a folder, where the sequence
-  in which the grains are written is given by a <em>glob</em> (file name with
-  wildcard) pattern.</p>
+  <p>Writes grain payloads to a sequence of files in a folder, where the
+  sequence in which the grains are written is given by a <em>glob</em>
+  (file name with wildcard) pattern.</p>
+
+  <h3>Maturity</h3>
+  <p>Not implemented -
+  <a href="https://github.com/Streampunk/dynamorse/issues/8">status</a>.
 </script>

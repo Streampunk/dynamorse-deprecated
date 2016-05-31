@@ -47,15 +47,6 @@
   <input type="text" id="node-input-file" placeholder="dynamorse.wav">
 </div>
 <div class="form-row">
-  <label for="node-input-loop"><i class="fa fa-repeat"></i> loop?</label>
-  <input type="checkbox" id="node-input-loop" style="width: 100px">
-  <label for="node-input-grps"><i class="fa fa-heart-o" aria-hidden="true"></i> grains/s</label>
-  <select id="node-input-grps" style="width: 100px" type="number">
-    <option value="25" selected>25</option>
-    <option value="29.97">29.97</option>
-  </select>
-</div>
-<div class="form-row">
   <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
   <input type="text" id="node-input-description" placeholder="source and flow description">
 </div>
@@ -64,14 +55,72 @@
   <input type="text" id="node-input-device">
 </div>
 <div class="form-row">
-  <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
-  <input type="number" id="node-input-maxBuffer" placeholder="10">
+  <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
+  <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
 </div>
-
+<div class="form-row">
+  <label for="node-input-loop"><i class="fa fa-repeat"></i> loop?</label>
+  <input type="checkbox" id="node-input-loop" style="width: 100px">
+  <label for="node-input-grps"><i class="fa fa-heart-o" aria-hidden="true"></i> grains/s</label>
+  <select id="node-input-grps" style="width: 100px" type="number">
+    <option value="25" selected>25</option>
+    <option value="29.97">29.97</option>
+  </select>
+</div>
 </script>
 
 <script type="text/x-red" data-help-name="wav-in">
   <h1>WAVE audio file input</h1>
   <p>Read grains from a WAVE audio (<code>.wav</code>) file, creating one NMOS
-  flows with the given number of samples per grain.</p>
+  flows with the number of samples-per-frame matched to a grains-per-second
+  rate.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used a source &amp; flow label.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-file"></i> WAV file</td>
+    <td>Path location for the WAVE format input file.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of the this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tablet"></i> device</td>
+    <td>Select or create an NMOS device for this source and flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-repeat"></i> loop?</td>
+    <td>Should the WAV file be repeated indefiaitely?</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-heart-o" aria-hidden="true"></i> grains/s</td>
+    <td>How many grains per second to create? 25 and 29.97 are supported.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>A grains-per-second rate of 29.97 creates a pattern of 1602, 1601, 1602,
+  1601, 1602 samples per grain. This equates to 5 video frames at 30000/1001 or
+  10 frames at 60000/1001.</p>
+
+  <p>Metadata about the audio file, such as the number of channels, bits per sample
+  and sample rate will be extracted from the WAVE file headers and attached as
+  tags to the associated NMOS flow.</p>
+
+  <h3>Maturity</h3>
+  <p>Implemented and partially tested. Awaiting automated testing -
+  <a href="">status</a>.
 </script>
