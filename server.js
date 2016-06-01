@@ -104,7 +104,7 @@ var settings = {
     httpNodeRoot: "/api",
     userDir: properties.userDir,
     flowFile: properties.flowFile,
-    nodesDir: process.cwd() + "/reduser/nodes/",
+    nodesDir: __dirname + "/reduser/nodes/",
     functionGlobalContext: {
       node : node,
       nodeAPI : nodeAPI,

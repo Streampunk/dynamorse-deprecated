@@ -4,7 +4,7 @@
 
 IT swiss army knife for professional media infrastructure and production. This is a *prototype* [Node.js](http://nodejs.org/) application that demonstrates:
 
-* Putting the [Joint Taskforce for Networked Media](http://www.jt-nm.org)'s [Reference Architecture](http://www.jt-nm.org/RA-1.0/index.shtml) to work - streaming professional quality media with support for identity, timimg and [NMOS](http://www.nmos.tv) [registration and discovery](https://github.com/AMWA-TV/nmos-discovery-registration);
+* Putting the [Joint Taskforce for Networked Media](http://www.jt-nm.org)'s [Reference Architecture](http://www.jt-nm.org/RA-1.0/index.shtml) to work - streaming professional quality media with support for identity, timing and [NMOS](http://www.nmos.tv) [registration and discovery](https://github.com/AMWA-TV/nmos-discovery-registration);
 * Applying Internet of Things concepts (IBM's [Node-RED](http://nodered.org)) to running media infrastructure on commodity IT systems, changing traditional infrastructure into drag-and-drop interfaces and JSON REST APIs;
 * Using [reactive streams](http://www.reactive-streams.org/) concepts from big data to manage, monitor and balance collaborative resources, including CPU load. Reactive streams are similar in concept to the [adaptive bitrate streams](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming) commonly used in streaming media delivery.
 
@@ -38,7 +38,7 @@ Create pipelines between the funnels and spouts and add _valves_ that transform 
 
 ### Fittings
 
-The final piece of the dynamorse jigsaw puzzle are the pipe _fittings_ - a set of utilities that allow flows to be combined. This is the beginning of a journey towards the development of a stream-based creation and delivery tool, enabling _Immersive Social TV_ experiences that can personalized to who is watching. Features include:
+The final piece of the dynamorse jigsaw puzzle are the pipe _fittings_ - a set of utilities that allow flows to be combined. This is the beginning of a journey towards the development of a stream-based creation and delivery tool, enabling _Immersive Social TV_ experiences that can be personalized to who is watching. Features include:
 
 * Constrain the number of grains that flow down a pipe;
 * Sequence a set of _flows_ one after the other;
@@ -93,7 +93,7 @@ Install Node.js for your plarform. This software has been developed against the 
 
 Mac and linux users may have to prepend `sudo` to the above.
 
-Dynamorse depends on modules that use native C++ bindings that compile with node-gyp. To use these modules, you many need to install a C++ compiler and python on your system. On Windows, compilation has been tested using the community edition of Microsoft Visual Studio.
+Dynamorse depends on modules that use native C++ bindings that compile with node-gyp. To use these modules, you many need to install a C++ compiler and python on your system. On Windows, compilation has been tested using the community edition of Microsoft Visual Studio 2015.
 
 At this time, dynamorse is not intended for use as dependency in other projects. However, you may wish to install dynamorse locally in a `node_modules` sub-folder. In which case:
 
@@ -165,12 +165,12 @@ Explore the fundamental building blocks of the JT-NM RA by viewing the details o
 4. Configure the the _pcap-reader_ node as follows:
   * `pcap file` should be the path to the file downloaded in step 1, e.g. `/Users/streampunk/Downloads/rtp-audio-l24-2chan.pcap`.
   * `device` should be the device that starts `pipelines-...`.
-  * `SDP URL` should be a `file:` URL to the SDP file downloaded in step 2, e.g. `file:sdp_L24_2chan.sdp`. Other parameters will be set from the SDP file.
+  * `SDP URL` should be a `file:` URL to the SDP file downloaded in step 2, e.g. `file:/Users/streampunk/Downloads/sdp_L24_2chan.sdp`. Other parameters will be set from the SDP file.
 5. Set to watch the debug tab in the right-hand panel a press the _Deploy_ button. Details of the grain(s) contained in the PCAP file will be displayed in JSON format.
 
 Other things to try ...
 
-* The longer example files provided to members of the AMWA Networked Media Incubator may also be used as an input source, or change to the _wav-in_ funnel and use your a favourite 2 channel WAV file.
+* The longer example files provided to members of the AMWA Networked Media Incubator may also be used as an input source, or change to the _wav-in_ funnel and use your favourite 2 channel WAV file.
 * Try looping the PCAP file and seeing the result. Then try regenerating the grain metadata to see the effect. In each case, change the parameters and redeploy.
 * Examine the NMOS registration and discovery information for the flows available via the NMOS node API, by default at http://localhost:3001/x-nmos/node/v1.0/ .
 * Watch back-pressure in action by adjusting the speed of the pipeline by setting the timeout parameter on the spout, which is measure in milliseconds. For realtime (assuming 25 frames per second), set the timeout to 40ms. For a more dramatic effect, set even higher.
@@ -201,7 +201,7 @@ Take and NMOS video RTP stream as a PCAP file and make an H.264 raw stream that 
 4. Configure the the _pcap-reader_ node as follows:
   * `pcap file` should be the path to the file downloaded in step 1, e.g. `/Users/streampunk/Downloads/rtp-audio-l24-2chan.pcap`.
   * `device` should be the device that starts `pipelines-...`.
-  * `SDP URL` should be a `file:` URL to the SDP file downloaded in step 2, e.g. `file:sdp_L24_2chan.sdp`. Other parameters will be set from the SDP file.
+  * `SDP URL` should be a `file:` URL to the SDP file downloaded in step 2, e.g. `file:/Users/streampunk/Downloads/sdp_rfc4175_10bit_1080i50.sdp`. Other parameters will be set from the SDP file.
 5. Configure the _converter_ and the _encoder_ `device` to use the one that starts `pipelines-...`. The default parameters for scale and destination format are OK.
 6. Set the `file` parameter of the _ram-file-out_ to the location where you want to store the file. Using a `.raw` extension will help with further playback or conversion, e.g. `dynamorse.raw`. Optionally, set a location to store the grain metadata as a sidecar JSON file, e.g. `dynamorse.json`.
 7. Press the _Deploy_ button. View the output with a tool that support H.264 playback such as [VLC](http://www.videolan.org/vlc/).
