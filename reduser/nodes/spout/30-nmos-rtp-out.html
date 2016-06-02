@@ -38,6 +38,13 @@
   });
 </script>
 
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
 <script type="text/x-red" data-template-name="nmos-rtp-out">
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
@@ -68,6 +75,51 @@
 </script>
 
 <script type="text/x-red" data-help-name="nmos-rtp-out">
-  <h1>NMOS RTP stream input</h1>
-  <p>Send an NMOS RTP stream, advertised via an NMOS registration API.</p>
+  <h1>NMOS RTP output</h1>
+  <p>Send an NMOS RTP stream, advertised via NMOS APIs.</p>
+
+  <p>Audio streams are sent as RFC 3190 with NMOS header extensions. Uncompressed video
+  streams are sent according to RFC 4175 with NMOS header extensions.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as the label for the flow, source and sender
+    of the output.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of the this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-at" aria-hidden="true"></i> address</td>
+    <td>Address for the RTP output stream.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-ship" aria-hidden="true"></i> port</td>
+    <td>Port for the RTP output stream.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-external-link-square" aria-hidden="true"></i> interface</td>
+    <td>Network interface card the stream is bound to.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-heart" aria-hidden="true"></i> ttl</td>
+    <td>Multicast TTL to set in all output packets.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-clock-o"></i> timeout</td>
+    <td>Time to wait between writing each grain. Controls the back-pressure.</td>
+   </tr>
+  </table>
+  </div>
+
+  <h3>Maturity</h3>
+  <p>Mostly implemented with some features to add. Implementation
+  <a href="https://github.com/Streampunk/dynamorse/issues/2">status</a>.</p>
 </script>

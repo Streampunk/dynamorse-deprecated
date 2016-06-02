@@ -69,8 +69,72 @@
   </div>
 </script>
 
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
 <script type="text/x-red" data-help-name="nmos-rtp-in">
-  <h1>NMOS RTP stream input</h1>
+  <h1>NMOS RTP input</h1>
   <p>Recieve an NMOS RTP stream, either discovered by querying an NMOS query API
   or by receiving an SDP file.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of the this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tablet"></i> device</td>
+    <td>Select or create an NMOS device for the output source and flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-paper-plane" aria-hidden="true"></i> sender</td>
+    <td>Means to locate details of the RTP stream sender via NMOS APIs. See below
+    table for details.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-external-link-square"></i> SDP URL</td>
+    <td>URL (<code>file:</code> or <code>http:</code>) to be used to locate the
+    SDP file that describes the stream.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-clock-o"></i> regenerate?</td>
+    <td>Should the grain metadata be regenerated? Otherwise, the existing metadata
+    will be passed through.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>Enter either information about a sender or an SDP URL. If you enter both, the details
+  of the sender will be used before those read from the SDP URL.</p>
+
+  <p>Sender details will be matched as follows:</p>
+  <ol>
+   <li>If the value is a full URL, this will be used as an explicit path to look up a sender
+   via the NMOS NodeAPI.</li>
+   <li>If the value is a UUID, an NMOS QueryAPI will be discovered via MDNS and the sender
+   will be looked up using that.</li>
+   <li>Values containing equals signs (<code>=</code>) and ampersands (<code>&amp;</code>) will
+   be treated as query strings to an MDNS-discoverd QueryAPI, e.g. <code>label=Microphone6</label></code>.</li>
+  </ol>
+
+  <h3>Maturity</h3>
+  <p>Mostly implemented with some features to add. Implementation
+  <a href="https://github.com/Streampunk/dynamorse/issues/1">status</a>.</p>
 </script>

@@ -34,26 +34,66 @@
   </script>
 
   <script type="text/x-red" data-template-name="grain-xray">
-  <div class="form-row">
-    <label for="node-input-showEvery"><i class="fa fa-camera-retro"></i> show every</label>
-    <input type="number" id="node-input-showEvery" placeholder="1" minimum="1">
-  </div>
-  <div class="form-row">
-    <label for="node-input-toConsole"><i class="fa fa-desktop"></i> console?</label>
-    <input type="checkbox" id="node-input-toConsole" unchecked>
-  </div>
   <!-- Common to all valve nodes -->
   <div class="form-row">
-    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
-    <input type="text" id="node-input-name" placeholder="Name">
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+    <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="100">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
+  </div>
+  <div class="form-row">
+    <label for="node-input-showEvery"><i class="fa fa-camera-retro"></i> show every</label>
+    <input type="number" id="node-input-showEvery" placeholder="1" minimum="1" style="width: 100px">
+    <label for="node-input-toConsole" style="width: 80px">&nbsp;<i class="fa fa-desktop"></i> console?</label>
+    <input type="checkbox" id="node-input-toConsole" unchecked style="width: 80px">
   </div>
   </script>
 
+  <style>
+  .param-table table, th, td {
+    vertical-align: top;
+    padding: 3px;
+  }
+  </style>
+
   <script type="text/x-red" data-help-name="grain-xray">
-    <p>Examine details of the flowing grains on the debug tab and console as it
-    they pass through this valve. Backpressure is passed through this node.</p>
+    <h1>Grain x-ray</h1>
+    <p>Examine details of the flowing grains on the debug tab and/or the console as it
+    they pass through this valve. Back pressure is passed through this node and
+    no additional sources or flows are created.</p>
+
+    <h3>Parameters</h3>
+    <div class="param-table">
+    <table>
+     <tr>
+      <th>parameter</th><th>description</th>
+     </tr>
+     <tr>
+      <td><i class="fa fa-suitcase"></i> max buffer</td>
+      <td>Maximum number of grains to buffer before overflowing.</td>
+     </tr>
+     <tr>
+      <td><i class="fa fa-camera-retro"></i> show every</td>
+      <td>Show every <em>given number</em> of grains.</td>
+     </tr>
+     <tr>
+      <td><i class="fa fa-desktop"></i> console?</td>
+      <td>As well as the debug tab, also display the grain information on the console
+      of the server?</td>
+     </tr>
+    </table>
+    </div>
+
+    <p>To avoid generating a large amount of logging data and the impact of logging
+    affecting application performance, set the <em>show every</em> parameter to a value
+    that represents about once or twice a second. For example, 25 for a grain rate of
+    25&nbsp;grains/second.</p>
+
+    <p>The grain x-ray is bundled with the valvues for now. It may be moved into its
+    own category of <em>gauge</em> nodes in a future refactor.</p>
+
+    <h3>Maturity</h3>
+    <p>Implemented.</p>
   </script>
