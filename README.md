@@ -1,3 +1,31 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Dynamorse](#dynamorse)
+    - [Funnels and spouts](#funnels-and-spouts)
+    - [Valves](#valves)
+    - [Fittings](#fittings)
+    - [NMOS-inside](#nmos-inside)
+    - [Redioactive](#redioactive)
+    - [Watchful eye](#watchful-eye)
+  - [Getting started](#getting-started)
+    - [Installation](#installation)
+    - [Running](#running)
+      - [Setting port numbers](#setting-port-numbers)
+      - [Thread pool size](#thread-pool-size)
+      - [Maturing - behind the scenes](#maturing---behind-the-scenes)
+      - [Configuration nodes](#configuration-nodes)
+    - [Examples to try](#examples-to-try)
+      - [Example 1: Grain analyzer](#example-1-grain-analyzer)
+      - [Example 2: Create a WAV file](#example-2-create-a-wav-file)
+      - [Example 3: Encode an H.264 file](#example-3-encode-an-h264-file)
+      - [Example 4: Send a WAV file as an NMOS flow](#example-4-send-a-wav-file-as-an-nmos-flow)
+  - [Support, status and further development](#support-status-and-further-development)
+  - [License](#license)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # Dynamorse
 
 ![overview graphic](images/overview.png)
