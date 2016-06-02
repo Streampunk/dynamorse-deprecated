@@ -41,11 +41,6 @@
     <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="10">
-  </div>
-
-  <div class="form-row">
     <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
     <input type="text" id="node-input-description" placeholder="source and flow description">
   </div>
@@ -54,7 +49,12 @@
     <input type="text" id="node-input-device">
   </div>
   <div class="form-row">
-    <label for="node-input-dstFormat"><i class="fa fa-paw"></i> Dest Format</label>
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="10">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-dstFormat"><i class="fa fa-paw"></i> dest format</label>
     <select name="node-input-dstFormat" id="node-input-dstFormat">
       <option value="h264" selected>h264</option>
       <option value="vp8">VP8</option>
@@ -62,6 +62,49 @@
   </div>
 </script>
 
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
 <script type="text/x-red" data-help-name="encoder">
-  <p>Encodes uncompressed grains to the specified format.</p>
+  <h1>Video encoder</h1>
+  <p>Encodes uncompressed grains to the specified format, creating a new NMOS flow with the correct attributes.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as source &amp; flow label.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tablet"></i> device</td>
+    <td>Select or create an NMOS device for this source and flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-paw"></i> dest format</td>
+    <td>Select the encoding type to be performed.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>Metadata from the source flow will be passed through to the new flow with relevant modifications concerning the encoding.</p>
+
+  <h3>Maturity</h3>
+  <p>Implemented and partially tested. Awaiting automated testing -
+  <a href="https://github.com/Streampunk/dynamorse/issues/5">status</a>.
 </script>

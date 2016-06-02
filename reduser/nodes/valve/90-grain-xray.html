@@ -48,12 +48,48 @@
     <input type="text" id="node-input-name" placeholder="Name">
   </div>
   <div class="form-row">
-    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> maximum buffer</label>
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
     <input type="number" id="node-input-maxBuffer" placeholder="100">
   </div>
   </script>
 
-  <script type="text/x-red" data-help-name="grain-xray">
-    <p>Examine details of the flowing grains on the debug tab and console as it
-    they pass through this valve. Backpressure is passed through this node.</p>
-  </script>
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
+<script type="text/x-red" data-help-name="grain-xray">
+  <h1>Examine grains</h1>
+  <p>Examine details of the flowing grains on the debug tab and console as they pass through this valve. Backpressure is passed through this node.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-camera-retro"></i> show every</td>
+    <td>Interval between grains that are to be examined.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-desktop"></i> console?</td>
+    <td>Select the checkbox to have the grain details printed in the console log.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as source &amp; flow label.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+  </table>
+  </div>
+
+  <h3>Maturity</h3>
+  <p>Implemented and partially tested. Awaiting automated testing -
+  <a href="https://github.com/Streampunk/dynamorse/issues/5">status</a>.
+</script>
