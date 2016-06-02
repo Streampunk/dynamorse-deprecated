@@ -44,12 +44,47 @@
   </div>
   <div class="form-row">
     <label for="node-input-timeout"><i class="fa fa-clock-o"></i> timeout</label>
-    <input type="number" min="0" id="node-input-timeout" placeholder="0">
+    <input type="number" min="0" id="node-input-timeout" placeholder="0" style="width: 100px">
   </div>
 </script>
 
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
 <script type="text/x-red" data-help-name="wav-out">
   <h1>WAVE audio file output</h1>
-  <p>Write audio grains to a WAVE audio (<code>.wav</code>) file, streaming input
+  <p>Write audio grains to a WAVE audio (<code>.wav</code>) file, with streaming input
   from one or more NMOS-style flows.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-file"></i> WAV file</td>
+    <td>Path location for the WAVE format output file.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-clock-o"></i> timeout</td>
+    <td>Time to wait between writing each grain. Controls the back-pressure.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>File path locations are relative to the folder where the dynamorse server was
+  started.</p>
+
+  <h3>Maturity</h3>
+  <p>Implemented and partially tested. Awaiting automated testing -
+  <a href="https://github.com/Streampunk/dynamorse/issues/5">status</a>.
 </script>

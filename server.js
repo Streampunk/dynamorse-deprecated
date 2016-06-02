@@ -201,7 +201,9 @@ logger.on('log', function (x) { if (x.msg === 'Starting flows') {
           id : RED.util.generateId(),
           type: 'comment',
           name: 'Streampunk Media',
-          info: 'Design and deploy professional media workflows with _Dynamorse_.',
+          info: 'Design and deploy professional media workflows with [_Dynamorse_](https://github.com/Streampunk/dynamorse/blob/master/README.md).\n\n' +
+            'For support, development or further information, please e-mail [Streampunk Media Ltd](http://www.streampunk.media) on [furnace@streampunk.media](mailto: furnace@streampunk.media).\n\n' +
+            'Dynamorse depends on [codecadon](https://github.com/Streampunk/codecadon) that incorprates binaries compiled from unmodified [LGPL v3 licensed code](https://github.com/Streampunk/codecadon/tree/master/licenses) from the FFMPEG project.',
           x: 122,
           y: 45,
           wires: []

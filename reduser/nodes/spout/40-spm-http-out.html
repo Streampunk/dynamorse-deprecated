@@ -27,7 +27,8 @@
       pushURL : { value : '' },
       path : { value : '' },
       port : { value : 8712, validate : RED.validators.number() },
-      regenerate : { value : false }
+      regenerate : { value : false },
+      parallel : { value : 1, validate : RED.validators.number() }
     },
     inputs:1,
     outputs:0,
@@ -45,6 +46,10 @@
     <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
+    <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+    <input type="text" id="node-input-description" placeholder="source and flow description">
+  </div>
+  <div class="form-row">
     <label for="node-input-regenerate"><i class="fa fa-clock-o"></i> regenerate?</label>
     <input type="checkbox" id="node-input-regenerate" style="width: 100px">
   </div>
@@ -54,14 +59,12 @@
   </div>
   <div class="form-row">
     <label for="node-input-protocol"><i class="fa fa-video-camera"></i> protocol</label>
-    <select id="node-input-protocol">
+    <select id="node-input-protocol" style="width: 110px">
       <option value="HTTP" selected>HTTP</option>
       <option value="HTTPS">HTTPS</option>
     </select>
-  </div>
-  <div class="form-row">
-    <label for="node-input-mode"><i class="fa fa-video-camera"></i> mode</label>
-    <select id="node-input-mode">
+    <label for="node-input-mode" style="width: 80px">&nbsp;<i class="fa fa-arrows-h" aria-hidden="true"></i> mode</label>
+    <select id="node-input-mode" style="width: 110px">
       <option value="push" selected>push</option>
       <option value="pull">pull</option>
     </select>
@@ -75,14 +78,87 @@
     <input type="text" id="node-input-path" placeholder="/flow/flowID/grains">
   </div>
   <div class="form-row">
-    <label for="node-input-port"><i class="fa fa-suitcase"></i> port</label>
+    <label for="node-input-port"><i class="fa fa-ship" aria-hidden="true"></i> port</label>
     <input type="number" id="node-input-port" min="1024" placeholder="8712" style="width: 100px">
+    <label for="node-input-parallel" style="width: 80px">&nbsp;<i class="fa fa-fighter-jet" aria-hidden="true"></i> parallel</label>
+    <input type="number" id="node-input-parallel" min="1" max="6" placeholder="1" style="width: 100px">
   </div>
 </script>
 
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
 <script type="text/x-red" data-help-name="spm-http-out">
-  <h1>Streampunk Media HTTP output</h1>
-  <p>Send a Streampunk Media HTTP stream, providing a simple media transport
-  using a simple HTTP encapslation, push or pull, with an option to secure with
-  HTTPS.</p>
+  <h1>HTTP output</h1>
+  <h2>Streampunk Media arachnid</h2>
+  <p>Send an <a href="http://github.com/Streampunk/arachnid">arachnid</a> HTTP(S)
+  stream, providing a simple media transport using a simple HTTP encapslation,
+  push or pull, from an NMOS-style flow.</p>
+
+  <p>In <em>pull</em> mode, this instance of dynamorse becomes an HTTP(S) server.
+  In <em>push</em> mode, dynamorse is an HTTP(S) client using POST requests.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as source &amp; flow label.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of the this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-clock-o"></i> regenerate?</td>
+    <td>Should grain metadata be regenerated? Otherwise, it will be passed on
+    unmodified.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tablet"></i> device</td>
+    <td>Select or create an NMOS device for this source &amp; flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-video-camera"></i> protocol</td>
+    <td>Use the unsecure HTTP or the secure HTTPS protocols.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-arrows-h" aria-hidden="true"></i> mode</td>
+    <td>Stream by pulling - receive HTTP GET requests - or pushing - make HTTP POST
+    requests.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-external-link-square"></i> pull URL</td>
+    <td>For push mode only, base URL to push to.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-external-link-square"></i> path</td>
+    <td>For push and pull, path part of the URL.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-ship" aria-hidden="true"></i> port</td>
+    <td>Port number to make POST requests to in push mode or to listen on for GET
+    requests in pull mode.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-fighter-jet" aria-hidden="true"></i> parallel</td>
+    <td>Number of parallel pipelines of HTTP to make or receive.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>Using HTTPS will create more processor load than using HTTP.</p>
+
+  <h3>Maturity</h3>
+  <p>Work in progress. A prototype implementation of
+  <a href="http://github.com/Streampunk/arachnid">arachnid</a>
+  exists and is being ported into dynamorse. Implementation
+  <a href="https://github.com/Streampunk/dynamorse/issues/15">status</a>.</p>
 </script>

@@ -39,6 +39,16 @@
 </script>
 
 <script type="text/x-red" data-help-name="sdi-out">
-  <h1>SDI output via Blackmagic DecLink API</h1>
-  <p>Send an SDI stream via the Blackmagic Decklink API.</p>
+  <h1>SDI output</h1>
+  <h2>via Blackmagic Desktop Video SDK</h2>
+  <p>Send an SDI stream via <a href="https://www.npmjs.com/package/macadam">macadam</a>,
+  a Node.js mmodule providing bindings to the Blackmagic Desktop Video SDK.</p>
+
+  <h3>Maturity</h3>
+  <p>The <a href="https://www.npmjs.com/package/macadam">macadam</a> library is
+  implemented with support for streaming frames of video from Node.js buffers to
+  Backmagic hardware. The work to integrate this library into dynamorse has
+  not yet started -
+  <a href="https://github.com/Streampunk/dynamorse/issues/12">status</a>.</p>
+
 </script>

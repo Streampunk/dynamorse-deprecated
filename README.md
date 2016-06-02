@@ -22,7 +22,7 @@ Dynamorse treats all of the following kinds of media as streaming equals, turnin
 * HTTP streams - [Arachnid](https://github.com/Streampunk/arachnid) (Streampunk Media defined) and MPEG-DASH;
 * Raw files - H.264 bytestream, uncompressed - DPX-style, WAV;
 * Container file formats - MXF, MOV;
-* SDI streams - [Blackmagic Design](https://www.blackmagicdesign.com/) capture and playback devices, SMPTE 2022-6 (to follow).
+* SDI streams - [Blackmagic Design](https://www.blackmagicdesign.com/) capture and playback devices, SMPTE 2022-6 (to follow - [issue](https://github.com/Streampunk/dynamorse/issues/12)).
 
 Inputs are called _funnels_, outputs are called _spouts_.
 
@@ -111,7 +111,7 @@ To run a local install (Linux/Mac/cygwin flavor):
 
 The Windows flavor is a bit more involved:
 
-    for /a %a in ('"npm bin"') do %a\\dynamorse
+    for /a %a in ('"npm bin"') do %a\dynamorse
 
 Connect to the user interface via a web browser. By default, the UI runs on port `8000`, so use http://localhost:8000/red. The NMOS Node API runs on port `3001` be default, so connect in another tab with http://localhost:3001/x-nmos/node/v1.0/. Alternatively, connect over HTTP from a another browser on a different computer.
 
@@ -232,7 +232,7 @@ Analyse or record the RTP stream produced using [Wireshark](https://www.wireshar
 
 ## Support, status and further development
 
-Streampunk Media have released dynamorse as open source so that interested users can try out the project's unique approach, track its progress and provide feedback. This is prototype software that is not yet suitable for production use in its current form. To date, the authors have focused on de-risking the platform as they build from the ground up, proving ideas such as combining reactive streams with IoT and asynchronous access with media-processing C++ libraries. As a result, many of the dynamorse nodes are not fully functional and - in some cases - not even implemented at all. It is the authors' intention to complete this work. The status of the implementation and the current next-step plan can be viewed via [github issues](https://github.com/Streampunk/dynamorse/issues) and [milestones](https://github.com/Streampunk/dynamorse/milestones).
+Streampunk Media have released dynamorse as open source so that interested users can try out the project's unique approach, track its progress and provide feedback. This is prototype software that is not yet suitable for production use in its current form. To date, the authors have focused on de-risking the platform as they build from the ground up, proving ideas such as combining reactive streams with IoT and asynchronous access with media-processing C++ libraries. As a result, many of the dynamorse nodes are not fully functional and - in some cases - not even implemented at all. It is the authors' intention to complete this work. The status of the implementation and the current next-step plan can be viewed via [github issues](https://github.com/Streampunk/dynamorse/issues), [milestones](https://github.com/Streampunk/dynamorse/milestones) and from the _Maturity_ section of the documentation provided in the UI documentation alongside each node.
 
 Contributions can be made via pull requests and will be considered by the authors on their merits. Enhancement requests and bug reports should be raised as [github issues](https://github.com/Streampunk/dynamorse/issues). For support, to request development priority or for bespoke node development, please contact [Streampunk Media](http://www.streampunk.media/) at [furnace@streampunk.media](mailto:furnace@streampunk.media). For updates, follow [@StrmPunkd](https://twitter.com/StrmPunkd) on Twitter.
 

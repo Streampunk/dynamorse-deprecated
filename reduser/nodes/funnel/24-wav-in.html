@@ -69,6 +69,13 @@
 </div>
 </script>
 
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
 <script type="text/x-red" data-help-name="wav-in">
   <h1>WAVE audio file input</h1>
   <p>Read grains from a WAVE audio (<code>.wav</code>) file, creating one NMOS
@@ -83,7 +90,7 @@
    </tr>
    <tr>
     <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
-    <td>Name of the node. Also used a source &amp; flow label.</td>
+    <td>Name of the node. Also used as source &amp; flow label.</td>
    </tr>
    <tr>
     <td><i class="fa fa-file"></i> WAV file</td>
@@ -103,7 +110,7 @@
    </tr>
    <tr>
     <td><i class="fa fa-repeat"></i> loop?</td>
-    <td>Should the WAV file be repeated indefiaitely?</td>
+    <td>Should the WAV file be repeated indefinitely?</td>
    </tr>
    <tr>
     <td><i class="fa fa-heart-o" aria-hidden="true"></i> grains/s</td>
@@ -111,6 +118,9 @@
    </tr>
   </table>
   </div>
+
+  <p>File path locations are relative to the folder where the dynamorse server was
+  started.</p>
 
   <p>A grains-per-second rate of 29.97 creates a pattern of 1602, 1601, 1602,
   1601, 1602 samples per grain. This equates to 5 video frames at 30000/1001 or
@@ -122,5 +132,5 @@
 
   <h3>Maturity</h3>
   <p>Implemented and partially tested. Awaiting automated testing -
-  <a href="">status</a>.
+  <a href="https://github.com/Streampunk/dynamorse/issues/5">status</a>.
 </script>
