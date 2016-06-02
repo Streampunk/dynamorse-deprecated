@@ -72,7 +72,7 @@
 
 <script type="text/x-red" data-template-name="pcap-reader">
   <!-- Common to all funnel nodes -->
-  <div class="form-row"> <!-- Used as the name for the flow and source. -->
+  <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
     <input type="text" id="node-input-name" placeholder="source and flow label">
   </div>
@@ -206,8 +206,110 @@
   </div>
 </script>
 
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
 <script type="text/x-red" data-help-name="pcap-reader">
   <h2>PCAP File Reader</h1>
   <p>Read UDP packet payloads from a Wireshark packet capture (PCAP) file and convert them
-  into grains.</p>
+  into grains. The PCAP file is expected to consist of only RTP packets for the same stream
+  and that those packets are in sequence.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as source &amp; flow label.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-file"></i> pcap file</td>
+    <td>Path location for the PCAP input file.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-repeat"></i> loop?</td>
+    <td>Should the PCAP file be repeated indefinitely?</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-video-camera"></i> format</td>
+    <td>Media format of the stream.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of the this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tablet"></i> device</td>
+    <td>Select or create an NMOS device for this source and flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-external-link-square"></i> SDP URL</td>
+    <td>URL (<code>file:</code> or <code>http:</code>) to be used to locate the
+    SDP file that describes the stream.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-map-signs"></i> encoding name</td>
+    <td>Encoding name for the media, with <code>raw</code> for uncompressed video,
+    <code>L16</code>/<code>L24</code> for uncompressed audio and <code>smpte291</code>
+    for ancillary data.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-arrows"></i> dimensions</td>
+    <td>Width and height of video.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-heartbeat"></i> clock rate</td>
+    <td>Clock rate used to measure RTP timings.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-eye"></i> sampling</td>
+    <td>Sampling pattern for video.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-picture-o"></i> depth</td>
+    <td>Number of bits per sample for video, typically 8, 10 or 16.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-pencil-square-o"></i> colorimetry</td>
+    <td>Video colorimetry.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-bars"></i> interlace?</td>
+    <td>Is the video signal interlaced?</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-music"></i> channels</td>
+    <td>Number of audio channels.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-long-arrow-right"></i> bitrate</td>
+    <td>Audio bitrate.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>File path locations are relative to the folder where the dynamorse server was
+  started.</p>
+
+  <p>Parameters are further defined by their equivalent definitions in RFC&nbsp;4566,
+  RFC&nbsp;3190 and RFC&nbsp;4175.</p>
+
+  <p>If an SDP file is specified, the following parameters are overriden by values
+  in that file: format, encoding name, width, height, clock rate, sampling, depth,
+  colorimetry, interlace, packing, channels and bitrate.</p>
+
+  <h3>Maturity</h3>
+  <p>Implemented and partially tested. Awaiting automated testing -
+   <a href="https://github.com/Streampunk/dynamorse/issues/5">status</a>.</p>
 </script>
