@@ -1,6 +1,6 @@
 {
   "name": "dynamorse",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "IT swiss army knife for professional media infrastructure and production.",
   "main": "server.js",
   "scripts": {
@@ -15,6 +15,14 @@
   "bugs": {
     "url": "https://github.com/Streampunk/dynamorse/issues"
   },
+  "keywords": [
+    "AMWA",
+    "incubator",
+    "Node-RED",
+    "reactive",
+    "JT-NM",
+    "NMOS"
+  ],
   "homepage": "https://github.com/Streampunk/dynamorse#readme",
   "dependencies": {
     "body-parser": "^1.15.0",
@@ -23,12 +31,11 @@
     "highland": "^2.5.1",
     "nmos-ledger": "^1.0.8",
     "node-red": "^0.13.1",
-    "ole-doc": "^0.1.1",
     "seamless-immutable": "^4.1.1",
     "tape": "^4.2.2",
     "uuid": "^2.0.1",
     "xml2js": "^0.4.16",
-    "codecadon": "^0.0.1"  },
+    "codecadon": "^0.0.4"  },
   "bin": {
     "dynamorse": "./server.js"
   }

@@ -5,7 +5,7 @@
 IT swiss army knife for professional media infrastructure and production. This is a *prototype* [Node.js](http://nodejs.org/) application that demonstrates:
 
 * Putting the [Joint Taskforce for Networked Media](http://www.jt-nm.org)'s [Reference Architecture](http://www.jt-nm.org/RA-1.0/index.shtml) to work - streaming professional quality media with support for identity, timing and [NMOS](http://www.nmos.tv) [registration and discovery](https://github.com/AMWA-TV/nmos-discovery-registration);
-* Applying Internet of Things concepts (IBM's [Node-RED](http://nodered.org)) to running media infrastructure on commodity IT systems, changing traditional infrastructure into drag-and-drop interfaces and JSON REST APIs;
+* Applying [Internet of Things](https://en.wikipedia.org/wiki/Internet_of_things) concepts (IBM's [Node-RED](http://nodered.org)) to running media infrastructure on commodity IT systems, changing traditional infrastructure into drag-and-drop interfaces and JSON REST APIs;
 * Using [reactive streams](http://www.reactive-streams.org/) concepts from big data to manage, monitor and balance collaborative resources, including CPU load. Reactive streams are similar in concept to the [adaptive bitrate streams](https://en.wikipedia.org/wiki/Adaptive_bitrate_streaming) commonly used in streaming media delivery.
 
 The name _dynamorse_ is a reference to dynamic morse code - still a stream of information but conveyed and controlled dynamically. With dynamorse, you can create streaming workflows on-the-fly by building pipelines that connect inputs (_funnels_) to outputs (_spouts_) via transformations (_valves_) under the control of _fittings_. Everything is measured in real time by a set of _gauges_. Everything that flows down a dynamorse pipe is an NMOS _grain_ and every pipe contains an NMOS _flow_.
@@ -105,9 +105,13 @@ To run dynamorse when it is installed as a global application (`-g` flag):
 
     dynamorse
 
-To run a local install (Linux/Mac/cygwin flavor): __CHECK THIS__
+To run a local install (Linux/Mac/cygwin flavor):
 
     $(npm bin)/dynamorse
+
+The Windows flavor is a bit more involved:
+
+    for /a %a in ('"npm bin"') do %a\\dynamorse
 
 Connect to the user interface via a web browser. By default, the UI runs on port `8000`, so use http://localhost:8000/red. The NMOS Node API runs on port `3001` be default, so connect in another tab with http://localhost:3001/x-nmos/node/v1.0/. Alternatively, connect over HTTP from a another browser on a different computer.
 
@@ -135,6 +139,13 @@ On Windows:
 
     set UV_THREADPOOL_SIZE=32
 
+#### Maturing - behind the scenes
+
+Using the Node-RED drag-and-drop user interface to define a large scale infrastructure will quickly become tiresome. Fortunately, this UI is not the only way to work deploy and configure virtual infrastructure with Node-RED. Behind the scenes is a REST API -the [Node-RED Admin HTTP API](http://nodered.org/docs/api/admin/) - that can be used to inspect and deploy nodes. For example, to see the currently deployed flows on a local instance on the default port, browse to
+http://localhost:8000/red/flows. As use of the API matures at an installation, infrastructure can be orchestrated through this API using standard IT tools, including business process orchestration, resource managers and rules engines.
+
+As a half way house, it is possible to create and manage _subflows_, accessed via the menu icon in the top-right corner of the screen.#### Configuration nodes
+
 #### Configuration nodes
 
 Configurations that are available for use across a number of different nodes are configured via Node-RED _configuration nodes_. These are not visible by default but can be viewed by selecting the drop down menu icon on the top right-hand-side of the Node-RED user interface (icon is three parallel horizontal lines) and selecting configuration nodes. A config tab will appear alongside the _info_ and _debug_ tabs in the right-hand panel. Configurations are available to:
@@ -142,7 +153,7 @@ Configurations that are available for use across a number of different nodes are
 * Set the name and description of the NMOS node that is advertised as the self node.
 * Set the names and descriptions for the NMOS devices represented by this NMOS node, with the _generic_ device representing edge flows that are exposed or consumed externally and the _pipelines_ device representing internal flows. When detected, the _generic_ flows are registered with a local registration API.
 * Defaults for the RTP extension headers found in streams supporting the [NMOS in stream timing and identity](https://github.com/AMWA-TV/nmos-in-stream-id-timing) specification. These defaults are used where no SDP is available on input or when a new stream in created as an output.
-* Configure the address and port of the connection for sending metrics data to an influx database.
+* Configure the address and port of the connection for sending metrics data to an influx database (to follow - [issue](https://github.com/Streampunk/dynamorse/issues/11)).
 
 ### Examples to try
 
