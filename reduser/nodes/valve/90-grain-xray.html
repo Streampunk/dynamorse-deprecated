@@ -58,42 +58,46 @@
   }
   </style>
 
-  <script type="text/x-red" data-help-name="grain-xray">
-    <h1>Grain x-ray</h1>
-    <p>Examine details of the flowing grains on the debug tab and/or the console as it
-    they pass through this valve. Back pressure is passed through this node and
-    no additional sources or flows are created.</p>
+<script type="text/x-red" data-help-name="grain-xray">
+  <h1>Grain x-ray</h1>
+  <p>Examine details of the flowing grains on the debug tab and/or the console as it
+  they pass through this valve. Back pressure is passed through this node and
+  no additional sources or flows are created.</p>
 
-    <h3>Parameters</h3>
-    <div class="param-table">
-    <table>
-     <tr>
-      <th>parameter</th><th>description</th>
-     </tr>
-     <tr>
-      <td><i class="fa fa-suitcase"></i> max buffer</td>
-      <td>Maximum number of grains to buffer before overflowing.</td>
-     </tr>
-     <tr>
-      <td><i class="fa fa-camera-retro"></i> show every</td>
-      <td>Show every <em>given number</em> of grains.</td>
-     </tr>
-     <tr>
-      <td><i class="fa fa-desktop"></i> console?</td>
-      <td>As well as the debug tab, also display the grain information on the console
-      of the server?</td>
-     </tr>
-    </table>
-    </div>
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-camera-retro"></i> show every</td>
+    <td>Show every <em>given number</em> of grains.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-desktop"></i> console?</td>
+    <td>As well as the debug tab, also display the grain information on the console
+    of the server?</td>
+   </tr>
+  </table>
+  </div>
 
-    <p>To avoid generating a large amount of logging data and the impact of logging
-    affecting application performance, set the <em>show every</em> parameter to a value
-    that represents about once or twice a second. For example, 25 for a grain rate of
-    25&nbsp;grains/second.</p>
+  <p>To avoid generating a large amount of logging data and the impact of logging
+  affecting application performance, set the <em>show every</em> parameter to a value
+  that represents about once or twice a second. For example, 25 for a grain rate of
+  25&nbsp;grains/second.</p>
 
-    <p>The grain x-ray is bundled with the valvues for now. It may be moved into its
-    own category of <em>gauge</em> nodes in a future refactor.</p>
+  <p>The grain x-ray is bundled with the valvues for now. It may be moved into its
+  own category of <em>gauge</em> nodes in a future refactor.</p>
 
-    <h3>Maturity</h3>
-    <p>Implemented.</p>
-  </script>
+  <h3>Maturity</h3>
+  <p>Implemented.</p>
+</script>

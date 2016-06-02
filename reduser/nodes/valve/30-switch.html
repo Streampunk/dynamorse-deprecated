@@ -20,6 +20,7 @@
     color: '#62806A',
     defaults: {
       name: { value : "" },
+      description : { value : "" },
       maxBuffer : { value : 10, validate : RED.validators.number() },
       active: { value : true }
     },
@@ -61,18 +62,55 @@
 </script>
 
 <script type="text/x-red" data-template-name="switch">
-<!-- Common to all funnel nodes -->
-<div class="form-row">
-  <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
-  <input type="text" id="node-input-name" placeholder="name">
-</div>
-<div class="form-row">
-  <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
-  <input type="number" id="node-input-maxBuffer" placeholder="10">
-</div>
+  <!-- Common to all funnel nodes -->
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+    <input type="text" id="node-input-name" placeholder="name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+    <input type="text" id="node-input-description" placeholder="source and flow description">
+  </div>
+  <div class="form-row">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
+  </div>
 </script>
+
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
 
 <script type="text/x-red" data-help-name="switch">
   <h1>Switch inputs</h1>
   <p>Switch between two flows cleanly at a grain boundary.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as source &amp; flow label.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>The button provides the ability to switch between sources cleanly at a grain boundary.</p>
+
+  <h3>Maturity</h3>
+  <p>Currently a naive implementation.</p>
 </script>

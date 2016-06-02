@@ -43,7 +43,34 @@
 </div>
 </script>
 
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
 <script type="text/x-red" data-help-name="mix">
   <h1>Mix inputs</h1>
   <p>Mix the inputs of two flows.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as source &amp; flow label.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+  </table>
+  </div>
+
+  <h3>Maturity</h3>
+  <p>Not implemented.</p>
 </script>
