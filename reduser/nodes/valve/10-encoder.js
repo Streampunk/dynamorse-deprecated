@@ -61,6 +61,13 @@ module.exports = function (RED) {
 
             var dstTags = JSON.parse(JSON.stringify(this.srcFlow.tags));
             dstTags["packing"] = [ `${config.dstFormat}` ];
+            dstTags["encodingName"] = [ `${config.dstFormat}` ];
+            var formattedDstTags = JSON.stringify(dstTags, null, 2);
+            RED.comms.publish('debug', {
+              format: "Encoder output flow tags:",
+              msg: formattedDstTags
+            }, true);
+            
             dstFlow = new ledger.Flow(null, null, localName, localDescription,
               ledger.formats.video, dstTags, source.id, null);
 
@@ -68,7 +75,7 @@ module.exports = function (RED) {
               push(`Unable to register source: ${err}`);
             });
             nodeAPI.putResource(dstFlow).then(function () {
-              dstBufLen = encoder.setInfo(this.srcFlow.tags, dstTags);
+              dstBufLen = encoder.setInfo(this.srcFlow.tags, dstTags, x.duration);
               push(null, new Grain(x.buffers, x.ptpSync, x.ptpOrigin,
                                    x.timecode, dstFlow.id, source.id, x.duration));
               next();
@@ -87,10 +94,6 @@ module.exports = function (RED) {
             }
             next();
           });
-          // allow a number of packets to queue ahead
-          // if (numQueued < +config.maxBuffer) {
-          //   next();
-          // }
         } else {
           push(null, x);
           next();

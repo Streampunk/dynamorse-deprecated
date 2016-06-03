@@ -63,6 +63,16 @@ module.exports = function (RED) {
             dstTags["width"] = [ `${config.dstWidth}` ];
             dstTags["height"] = [ `${config.dstHeight}` ];
             dstTags["packing"] = [ `${config.dstFormat}` ];
+            if ("420P" === config.dstFormat)
+              dstTags["depth"] = [ "8" ];
+            else
+              dstTags["depth"] = [ "10" ];
+            var formattedDstTags = JSON.stringify(dstTags, null, 2);
+            RED.comms.publish('debug', {
+              format: "Converter output flow tags:",
+              msg: formattedDstTags
+            }, true);
+
             dstFlow = new ledger.Flow(null, null, localName, localDescription,
               ledger.formats.video, dstTags, source.id, null);
 

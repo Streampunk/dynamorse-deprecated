@@ -19,18 +19,18 @@ var codecadon = require('codecadon');
 var Grain = require('../../../model/Grain.js');
 
 module.exports = function (RED) {
-  function Decoder (config) {
+  function Packer (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
     this.srcFlow = null;
     var dstFlow = null;
     var dstBufLen = 0;
 
-    var decoder = new codecadon.Decoder(function() {
-      console.log('Decoder exiting');
+    var packer = new codecadon.Packer(function() {
+      console.log('Packer exiting');
     });
-    decoder.on('error', function(err) {
-      console.log('Decoder error: ' + err);
+    packer.on('error', function(err) {
+      console.log('Packer error: ' + err);
     });
 
     var node = this;
@@ -50,7 +50,7 @@ module.exports = function (RED) {
         push(err);
         next();
       } else if (redioactive.isEnd(x)) {
-        decoder.quit(function() {
+        packer.quit(function() {
           push(null, x);
         });
       } else {
@@ -60,18 +60,14 @@ module.exports = function (RED) {
             this.srcFlow = f;
 
             var dstTags = JSON.parse(JSON.stringify(this.srcFlow.tags));
-            var encoding = this.srcFlow.tags.encodingName[0];
-            if (("AVCi50" === encoding) || ("AVCi100" === encoding))
-              dstTags["packing"] = [ "UYVY10" ];
+            dstTags["packing"] = [ `${config.dstFormat}` ];
+            if ("420P" === config.dstFormat)
+              dstTags["depth"] = [ "8" ];
             else
-              dstTags["packing"] = [ "420P" ];
-            if ("AVCi50" === encoding) {
-              var srcWidth = +this.srcFlow.tags["width"];
-              dstTags["width"] = [ `${srcWidth * 3 / 4}` ];
-            }
-            dstTags["encodingName"] = [ "raw" ];
+              dstTags["depth"] = [ "10" ];
+            var formattedDstTags = JSON.stringify(dstTags, null, 2);
             RED.comms.publish('debug', {
-              format: "Decoder output flow tags:",
+              format: "Packer output flow tags:",
               msg: formattedDstTags
             }, true);
 
@@ -79,10 +75,10 @@ module.exports = function (RED) {
               ledger.formats.video, dstTags, source.id, null);
 
             nodeAPI.putResource(source).catch(function(err) {
-              push(`Unable to register source: ${err}`);
+              push(`Unable to register source: ${err}`)
             });
-            nodeAPI.putResource(dstFlow).then(function () {
-              dstBufLen = decoder.setInfo(this.srcFlow.tags, dstTags);
+            nodeAPI.putResource(dstFlow).then(function() {
+              dstBufLen = packer.setInfo(this.srcFlow.tags, dstTags);
               push(null, new Grain(x.buffers, x.ptpSync, x.ptpOrigin,
                                    x.timecode, dstFlow.id, source.id, x.duration));
               next();
@@ -92,7 +88,7 @@ module.exports = function (RED) {
           }.bind(this));
         } else if (Grain.isGrain(x)) {
           var dstBuf = new Buffer(dstBufLen);
-          var numQueued = decoder.decode(x.buffers, dstBuf, function(err, result) {
+          var numQueued = packer.pack(x.buffers, dstBuf, function(err, result) {
             if (err) {
               push(err);
             } else if (result) {
@@ -109,6 +105,6 @@ module.exports = function (RED) {
     }.bind(this));
     this.on('close', this.close);
   }
-  util.inherits(Decoder, redioactive.Valve);
-  RED.nodes.registerType("decoder", Decoder);
+  util.inherits(Packer, redioactive.Valve);
+  RED.nodes.registerType("packer", Packer);
 }
