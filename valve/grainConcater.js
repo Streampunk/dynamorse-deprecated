@@ -31,7 +31,6 @@ module.exports = function(srcTags) {
       push(err);
       next();
     } else if (x === H.nil) {
-      console.log('Concater: Requesting Quit.');
       concater.quit(function() {
         push(null, H.nil);
       });
@@ -46,17 +45,11 @@ module.exports = function(srcTags) {
           if (err) {
             push(err);
           } else if (result) {
-            console.log('Pushing grain', numQueued);
             push(null, new Grain(result, x.ptpSync, x.ptpOrigin,
                                  x.timecode, x.flow_id, x.source_id, x.duration));
           }
           next();
         });
-        // Removing .. was causing back pressure to fail
-        // allow a number of packets to queue ahead
-        // if (numQueued < 2) {
-        //   next();
-        // }
       } else {
         push(null, x);
         next();
