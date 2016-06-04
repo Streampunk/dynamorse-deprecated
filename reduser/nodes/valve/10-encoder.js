@@ -45,6 +45,19 @@ module.exports = function (RED) {
     var source = new ledger.Source(null, null, localName, localDescription,
       ledger.formats.video, null, null, pipelinesID, null);
 
+    function processGrain(x, dstBufLen, push, next) {
+      var dstBuf = new Buffer(dstBufLen);
+      var numQueued = encoder.encode(x.buffers, dstBuf, function(err, result) {
+        if (err) {
+          push(err);
+        } else if (result) {
+          push(null, new Grain(result, x.ptpSync, x.ptpOrigin,
+                               x.timecode, dstFlow.id, source.id, x.duration));
+        }
+        next();
+      });
+    }
+
     this.consume(function (err, x, push, next) {
       if (err) {
         push(err);
@@ -53,7 +66,7 @@ module.exports = function (RED) {
         encoder.quit(function() {
           push(null, x);
         });
-      } else {
+      } else if (Grain.isGrain(x)) {
         if (!this.srcFlow) {
           this.getNMOSFlow(x, function (err, f) {
             if (err) return push("Failed to resolve NMOS flow.");
@@ -62,6 +75,7 @@ module.exports = function (RED) {
             var dstTags = JSON.parse(JSON.stringify(this.srcFlow.tags));
             dstTags["packing"] = [ `${config.dstFormat}` ];
             dstTags["encodingName"] = [ `${config.dstFormat}` ];
+
             var formattedDstTags = JSON.stringify(dstTags, null, 2);
             RED.comms.publish('debug', {
               format: "Encoder output flow tags:",
@@ -76,28 +90,17 @@ module.exports = function (RED) {
             });
             nodeAPI.putResource(dstFlow).then(function () {
               dstBufLen = encoder.setInfo(this.srcFlow.tags, dstTags, x.duration);
-              push(null, new Grain(x.buffers, x.ptpSync, x.ptpOrigin,
-                                   x.timecode, dstFlow.id, source.id, x.duration));
-              next();
+              processGrain(x, dstBufLen, push, next);
             }.bind(this), function (err) {
               push(`Unable to register flow: ${err}`);
             });
           }.bind(this));
-        } else if (Grain.isGrain(x)) {
-          var dstBuf = new Buffer(dstBufLen);
-          var numQueued = encoder.encode(x.buffers, dstBuf, function(err, result) {
-            if (err) {
-              push(err);
-            } else if (result) {
-              push(null, new Grain(result, x.ptpSync, x.ptpOrigin,
-                                   x.timecode, dstFlow.id, source.id, x.duration));
-            }
-            next();
-          });
         } else {
-          push(null, x);
-          next();
-        }
+          processGrain(x, dstBufLen, push, next);
+        } 
+      } else {
+        push(null, x);
+        next();
       }
     }.bind(this));
     this.on('close', this.close);
