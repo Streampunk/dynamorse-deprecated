@@ -31,8 +31,11 @@ udpPort.on('message', (data) => {
   console.log(`server data: ${data.length} of ${totalData}`);
 });
 udpPort.on('listening', () => {
-  var address = udpPort.address;
+  var address = udpPort.address();
   console.log(`server listening ${address.address}:${address.port}`);
+});
+udpPort.on('close', () => {
+  console.log(`server closing`);
 });
 
 var mcastAddress = '224.1.1.1';
