@@ -30,3 +30,4 @@ node_modules
 .config.json
 reduser/flows_*.json
 reduser/.flows_*.json.backup
+reduser/.config.json
