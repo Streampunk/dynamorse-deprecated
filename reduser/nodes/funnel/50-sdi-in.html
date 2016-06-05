@@ -142,9 +142,9 @@
   <p>Receive an SDI stream via <a href="https://www.npmjs.com/package/macadam">macadam</a>,
   a Node.js mmodule providing bindings to the Blackmagic Desktop Video SDK.</p>
 
-  <p>The kind of input video signal must be known, as must the index of the
-  Blackmagic interface card. Currently trial and error, the development of a tool
-  to help with this is
+  <p>Prior to deployment, the kind of input video signal must be known, as must
+  the index of the Blackmagic interface card. Currently found by trial and error,
+  the development of a tool to help with this is
   <a href="https://github.com/Streampunk/macadam/issues/4">under consideration</a>.</p>
 
   <h3>Outputs</h3>
@@ -193,6 +193,11 @@
    </tr>
   </table>
   </div>
+
+  <p>This node produces data from a live data source. Attempts by a consumer to
+  apply back-pressure do not pause the input data and will cause grains to be
+  dropped at once the buffer is full. Through this node interface, dynamorse has
+  no means to control the live-running data rate provided by the Blackmagic SDK.</p>
 
   <h3>Maturity</h3>
   <p>The <a href="https://www.npmjs.com/package/macadam">macadam</a> library is
