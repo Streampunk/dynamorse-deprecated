@@ -13,7 +13,7 @@
   limitations under the License.
 */
 
-var dgram = require('dgram');
+var dgram = require('netadon');
 var H = require('highland');
 var SDP = require('../model/SDP');
 
