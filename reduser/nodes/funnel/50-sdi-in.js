@@ -29,8 +29,8 @@ module.exports = function (RED) {
 
     var capture = new macadam.Capture(config.deviceIndex,
       fixBMDCodes(config.mode), fixBMDCodes(config.format));
-
-    this.tags = { // TOFO make this dynamic based on config code
+    var node = this;
+    this.tags = { // TODO make this dynamic based on config code
       format : [ 'video' ],
       encodingName : [ 'raw' ],
       width : [ '1920' ],
@@ -54,6 +54,8 @@ module.exports = function (RED) {
       "urn:x-nmos:format:video", null, null, pipelinesID, null);
     var flow = new ledger.Flow(null, null, localName, localDescription,
       "urn:x-nmos:format:video", this.tags, source.id, null);
+    nodeAPI.putResource(source).catch(node.warn);
+    nodeAPI.putResource(flow).catch(node.warn);
 
     capture.on('frame', function (payload) {
       var grainTime = new Buffer(10);
@@ -69,7 +71,9 @@ module.exports = function (RED) {
     }.bind(this));
 
     capture.on('error', this.push);
-    this.close(function () {
+
+    this.on('close', function () {
+      this.close();
       capture.stop();
     });
 
