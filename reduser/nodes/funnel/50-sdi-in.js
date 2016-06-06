@@ -15,12 +15,65 @@
 
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
+var macadam = require('macadam');
+
+function fixBMDCodes(code) {
+  if (code === 'ARGB') return 32;
+  return macadam.bmCodeToInt(code);
+}
 
 module.exports = function (RED) {
   function SDIIn (config) {
     RED.nodes.createNode(this,config);
     redioactive.Funnel.call(this, config);
-    // Go figure!
+
+    var capture = new macadam.Capture(config.deviceIndex,
+      fixBMDCodes(config.mode), fixBMDCodes(config.format));
+
+    this.tags = { // TOFO make this dynamic based on config code
+      format : [ 'video' ],
+      encodingName : [ 'raw' ],
+      width : [ '1920' ],
+      height : [ '1080' ],
+      depth : [ '10' ],
+      packing : [ 'V210' ],
+      sampling : [ 'YCbCr-4:2:2' ],
+      clockRate : [ '90000' ],
+      interlace : [ '1' ],
+      format : [ 'video' ]
+    };
+    this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ];
+    var nodeAPI = this.context().global.get('nodeAPI');
+    var ledger = this.context().global.get('ledger');
+    var localName = config.name || `${config.type}-${config.id}`;
+    var localDescription = config.description || `${config.type}-${config.id}`;
+    var pipelinesID = config.device ?
+      RED.nodes.getNode(config.device).nmos_id :
+      this.context().global.get('pipelinesID');
+    var source = new ledger.Source(null, null, localName, localDescription,
+      "urn:x-nmos:format:video", null, null, pipelinesID, null);
+    var flow = new ledger.Flow(null, null, localName, localDescription,
+      "urn:x-nmos:format:video", this.tags, source.id, null);
+
+    capture.on('frame', function (payload) {
+      var grainTime = new Buffer(10);
+      grainTime.writeUIntBE(this.baseTime[0], 0, 6);
+      grainTime.writeUInt32BE(this.baseTime[1], 6);
+      var grainDuration = [ 1000, 25000 ]; // TODO fix this!
+      this.baseTime[1] = ( this.baseTime[1] +
+        grainDuration[0] * 1000000000 / grainDuration[1]|0 );
+      this.baseTime = [ this.baseTime[0] + this.baseTime[1] / 1000000000|0,
+        this.baseTime[1] % 1000000000];
+      this.push(null, new Grain([payload], grainTime, grainTime, null,
+        flow.id, source.id, grainDuration); // TODO Timecode support
+    }.bind(this));
+
+    capture.on('error', this.push);
+    this.close(function () {
+      capture.stop();
+    });
+
+    capture.start();
   }
   util.inherits(SDIIn, redioactive.Funnel);
   RED.nodes.registerType("sdi-in", SDIIn);
