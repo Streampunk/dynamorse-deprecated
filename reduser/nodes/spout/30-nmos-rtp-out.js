@@ -84,10 +84,10 @@ module.exports = function (RED) {
     var node = this;
     // Set up connection
     var sock = dgram.createSocket({type  :'udp4', reuseAddr : true});
-    sock.bind(config.port, function (err) {
-      if (err) return node.warn(err);
+    // sock.bind(config.port, function (err) {
+    //   if (err) return node.warn(err);
       sock.setMulticastTTL(config.ttl);
-    });
+    // });
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     var rtpExtDefID = this.context().global.get('rtp_ext_id');
@@ -135,11 +135,16 @@ module.exports = function (RED) {
           pushGrain(g, next);
         }.bind(this));
       } else {
+      //  for ( var x = 0 ; x < 99 ; x++ ) { pushGrain(g, function () { }); }
         pushGrain(g, next);
+        // console.log(process.memoryUsage());
       }
     }.bind(this));
-    var count = 0, timeoutTune = 0;;
+    var count = 0, timeoutTune = 0;
+    var grainTimer = process.hrtime();
     function pushGrain (g, next) {
+      console.log(':-)', process.hrtime(grainTimer));
+      grainTimer = process.hrtime();
       lineStatus = (is4175) ? {
         width: width, stride: stride, lineNo: 21,
         bytesPerLine: width * byteFactor, byteFactor: byteFactor, linePos: 0,
@@ -242,8 +247,18 @@ module.exports = function (RED) {
       return packet;
     }
 
+    var packetCount = 0;
+    var callbackCount = 0;
+    var packetTime = process.hrtime();
     function sendPacket (p) {
-      sock.send(p.buffer, 0, p.buffer.length, config.port, config.address);
+      packetCount++;
+      sock.send(p.buffer, 0, p.buffer.length, config.port, config.address,
+       function (e) { callbackCount++; if (e) return console.error(e); });
+      if (packetCount % 1000 === 0) {
+        console.log('+++', packetCount, callbackCount, process.hrtime(packetTime)[1]/1000000);
+        packetTime = process.hrtime();
+      }
+
       // console.log(JSON.stringify(p, null, 2));
     }
     this.errors(function (e, next) {

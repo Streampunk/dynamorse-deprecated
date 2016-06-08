@@ -16,6 +16,7 @@
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
 var macadam = require('macadam');
+var Grain = require('../../../model/Grain.js');
 
 function fixBMDCodes(code) {
   if (code === 'ARGB') return 32;
@@ -36,7 +37,7 @@ module.exports = function (RED) {
       width : [ '1920' ],
       height : [ '1080' ],
       depth : [ '10' ],
-      packing : [ 'V210' ],
+      packing : [ 'v210' ],
       sampling : [ 'YCbCr-4:2:2' ],
       clockRate : [ '90000' ],
       interlace : [ '1' ],
@@ -55,9 +56,14 @@ module.exports = function (RED) {
     var flow = new ledger.Flow(null, null, localName, localDescription,
       "urn:x-nmos:format:video", this.tags, source.id, null);
     nodeAPI.putResource(source).catch(node.warn);
-    nodeAPI.putResource(flow).catch(node.warn);
+    nodeAPI.putResource(flow).then(
+      function (x) {
+        node.log('Flow stored. Starting capture.');
+        capture.start();
+      },
+      node.warn);
 
-    capture.on('frame', function (payload) {
+    this.eventMuncher(capture, 'frame', function (payload) {
       var grainTime = new Buffer(10);
       grainTime.writeUIntBE(this.baseTime[0], 0, 6);
       grainTime.writeUInt32BE(this.baseTime[1], 6);
@@ -66,18 +72,20 @@ module.exports = function (RED) {
         grainDuration[0] * 1000000000 / grainDuration[1]|0 );
       this.baseTime = [ this.baseTime[0] + this.baseTime[1] / 1000000000|0,
         this.baseTime[1] % 1000000000];
-      this.push(null, new Grain([payload], grainTime, grainTime, null,
+      return new Grain([payload], grainTime, grainTime, null,
         flow.id, source.id, grainDuration); // TODO Timecode support
     }.bind(this));
 
-    capture.on('error', this.push);
+    capture.on('error', function (e) {
+      this.push(e);
+    }.bind(this));
 
     this.on('close', function () {
       this.close();
       capture.stop();
     });
 
-    capture.start();
+    // capture.start();
   }
   util.inherits(SDIIn, redioactive.Funnel);
   RED.nodes.registerType("sdi-in", SDIIn);
