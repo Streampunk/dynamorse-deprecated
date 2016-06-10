@@ -84,10 +84,12 @@ module.exports = function (RED) {
     var node = this;
     // Set up connection
     var sock = dgram.createSocket({type  :'udp4', reuseAddr : true});
-    // sock.bind(config.port, function (err) {
-    //   if (err) return node.warn(err);
+    var bindCb = function (err) {
+      if (err) return node.warn(err);
       sock.setMulticastTTL(config.ttl);
-    // });
+    };
+    if (config.netif) { sock.bind(config.port, config.netif, bindCb); }
+    else { sock.bind(config.port, bindCb); }
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     var rtpExtDefID = this.context().global.get('rtp_ext_id');
@@ -208,7 +210,7 @@ module.exports = function (RED) {
         }
       }
 
-      sendPacket(packet, true);
+      sendPacket(packet, next);
 
       if (config.timeout === 0) {
         setImmediate(next);
@@ -252,11 +254,15 @@ module.exports = function (RED) {
     var packetTime = process.hrtime();
     var packetBuffers = [];
     function sendPacket (p, done) {
-      packetBuffers.push(p);
+      packetBuffers.push(p.buffer);
       packetCount++;
       if (done) {
         sock.send(packetBuffers, 0, p.length, config.port, config.address,
-          function (e) { callbackCount++; if (e) return console.error(e); });
+          function (e) {
+            callbackCount++;
+            // done();
+            if (e) return console.error(e);
+          });
         packetBuffers = [];
         console.log('+++', packetCount, callbackCount, process.hrtime(packetTime)[1]/1000000);
         packetTime = process.hrtime();

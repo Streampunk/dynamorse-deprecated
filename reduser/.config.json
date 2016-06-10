@@ -11,7 +11,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\analysis\\72-sentiment.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\analysis\\72-sentiment.js"
     },
     "inject": {
      "name": "inject",
@@ -20,7 +20,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\20-inject.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\20-inject.js"
     },
     "catch": {
      "name": "catch",
@@ -29,7 +29,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\25-catch.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\25-catch.js"
     },
     "status": {
      "name": "status",
@@ -38,7 +38,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\25-status.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\25-status.js"
     },
     "debug": {
      "name": "debug",
@@ -47,7 +47,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\58-debug.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\58-debug.js"
     },
     "exec": {
      "name": "exec",
@@ -56,7 +56,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\75-exec.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\75-exec.js"
     },
     "function": {
      "name": "function",
@@ -65,7 +65,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\80-function.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\80-function.js"
     },
     "template": {
      "name": "template",
@@ -74,7 +74,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\80-template.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\80-template.js"
     },
     "delay": {
      "name": "delay",
@@ -83,7 +83,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\89-delay.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\89-delay.js"
     },
     "trigger": {
      "name": "trigger",
@@ -92,7 +92,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\89-trigger.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\89-trigger.js"
     },
     "comment": {
      "name": "comment",
@@ -101,7 +101,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\90-comment.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\90-comment.js"
     },
     "unknown": {
      "name": "unknown",
@@ -110,7 +110,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\98-unknown.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\core\\98-unknown.js"
     },
     "rpi-gpio": {
      "name": "rpi-gpio",
@@ -122,7 +122,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\hardware\\36-rpi-gpio.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\hardware\\36-rpi-gpio.js"
     },
     "mqtt": {
      "name": "mqtt",
@@ -133,7 +133,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\10-mqtt.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\10-mqtt.js"
     },
     "httpin": {
      "name": "httpin",
@@ -143,7 +143,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\21-httpin.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\21-httpin.js"
     },
     "httprequest": {
      "name": "httprequest",
@@ -152,7 +152,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\21-httprequest.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\21-httprequest.js"
     },
     "websocket": {
      "name": "websocket",
@@ -164,7 +164,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\22-websocket.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\22-websocket.js"
     },
     "watch": {
      "name": "watch",
@@ -173,7 +173,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\23-watch.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\23-watch.js"
     },
     "tcpin": {
      "name": "tcpin",
@@ -184,7 +184,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\31-tcpin.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\31-tcpin.js"
     },
     "udp": {
      "name": "udp",
@@ -194,7 +194,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\32-udp.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\io\\32-udp.js"
     },
     "switch": {
      "name": "switch",
@@ -203,7 +203,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\valve\\30-switch.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\valve\\30-switch.js"
     },
     "change": {
      "name": "change",
@@ -212,7 +212,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\logic\\15-change.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\logic\\15-change.js"
     },
     "range": {
      "name": "range",
@@ -221,7 +221,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\logic\\16-range.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\logic\\16-range.js"
     },
     "CSV": {
      "name": "CSV",
@@ -230,7 +230,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\parsers\\70-CSV.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\parsers\\70-CSV.js"
     },
     "HTML": {
      "name": "HTML",
@@ -239,7 +239,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\parsers\\70-HTML.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\parsers\\70-HTML.js"
     },
     "JSON": {
      "name": "JSON",
@@ -248,7 +248,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\parsers\\70-JSON.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\parsers\\70-JSON.js"
     },
     "XML": {
      "name": "XML",
@@ -257,7 +257,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\parsers\\70-XML.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\parsers\\70-XML.js"
     },
     "tail": {
      "name": "tail",
@@ -266,7 +266,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\storage\\28-tail.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\storage\\28-tail.js"
     },
     "file": {
      "name": "file",
@@ -276,7 +276,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\nodes\\core\\storage\\50-file.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\nodes\\core\\storage\\50-file.js"
     },
     "device": {
      "name": "device",
@@ -285,7 +285,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\config\\device.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\config\\device.js"
     },
     "gauges": {
      "name": "gauges",
@@ -294,7 +294,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\config\\gauges.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\config\\gauges.js"
     },
     "rtp-ext": {
      "name": "rtp-ext",
@@ -303,7 +303,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\config\\rtp-ext.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\config\\rtp-ext.js"
     },
     "self": {
      "name": "self",
@@ -312,7 +312,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\config\\self.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\config\\self.js"
     },
     "drop": {
      "name": "drop",
@@ -321,7 +321,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\10-drop.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\10-drop.js"
     },
     "take": {
      "name": "take",
@@ -330,7 +330,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\12-take.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\12-take.js"
     },
     "doto": {
      "name": "doto",
@@ -339,7 +339,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\20-doto.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\20-doto.js"
     },
     "map": {
      "name": "map",
@@ -348,7 +348,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\22-map.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\22-map.js"
     },
     "filter": {
      "name": "filter",
@@ -357,7 +357,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\24-filter.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\24-filter.js"
     },
     "head": {
      "name": "head",
@@ -366,7 +366,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\30-head.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\30-head.js"
     },
     "last": {
      "name": "last",
@@ -375,7 +375,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\32-last.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\32-last.js"
     },
     "throttle": {
      "name": "throttle",
@@ -384,7 +384,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\40-throttle.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\40-throttle.js"
     },
     "rate-limit": {
      "name": "rate-limit",
@@ -393,7 +393,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\42-rate-limit.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\42-rate-limit.js"
     },
     "retime": {
      "name": "retime",
@@ -402,7 +402,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\44-retime.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\44-retime.js"
     },
     "concat": {
      "name": "concat",
@@ -411,7 +411,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\50-concat.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\50-concat.js"
     },
     "merge": {
      "name": "merge",
@@ -420,7 +420,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\52-merge.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\52-merge.js"
     },
     "otherwise": {
      "name": "otherwise",
@@ -429,7 +429,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\fitting\\54-otherwise.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\fitting\\54-otherwise.js"
     },
     "raw-file-in": {
      "name": "raw-file-in",
@@ -438,7 +438,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\10-raw-file-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\10-raw-file-in.js"
     },
     "cloud-store-in": {
      "name": "cloud-store-in",
@@ -447,7 +447,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\12-cloud-store-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\12-cloud-store-in.js"
     },
     "glob-in": {
      "name": "glob-in",
@@ -456,7 +456,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\14-glob-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\14-glob-in.js"
     },
     "mxf-in": {
      "name": "mxf-in",
@@ -465,7 +465,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\20-mxf-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\20-mxf-in.js"
     },
     "mov-in": {
      "name": "mov-in",
@@ -474,7 +474,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\22-mov-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\22-mov-in.js"
     },
     "wav-in": {
      "name": "wav-in",
@@ -483,7 +483,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\24-wav-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\24-wav-in.js"
     },
     "nmos-rtp-in": {
      "name": "nmos-rtp-in",
@@ -492,7 +492,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\30-nmos-rtp-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\30-nmos-rtp-in.js"
     },
     "aspen-ts-in": {
      "name": "aspen-ts-in",
@@ -501,7 +501,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\32-aspen-ts-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\32-aspen-ts-in.js"
     },
     "spm-http-in": {
      "name": "spm-http-in",
@@ -510,7 +510,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\40-spm-http-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\40-spm-http-in.js"
     },
     "webRTC-in": {
      "name": "webRTC-in",
@@ -519,7 +519,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\42-webRTC-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\42-webRTC-in.js"
     },
     "sdi-in": {
      "name": "sdi-in",
@@ -528,7 +528,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\50-sdi-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\50-sdi-in.js"
     },
     "pcap-reader": {
      "name": "pcap-reader",
@@ -537,7 +537,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\90-pcap-reader.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\90-pcap-reader.js"
     },
     "buffer-in": {
      "name": "buffer-in",
@@ -546,7 +546,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\funnel\\92-buffer-in.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\funnel\\92-buffer-in.js"
     },
     "raw-file-out": {
      "name": "raw-file-out",
@@ -555,7 +555,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\10-raw-file-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\10-raw-file-out.js"
     },
     "cloud-store-out": {
      "name": "cloud-store-out",
@@ -564,7 +564,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\12-cloud-store-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\12-cloud-store-out.js"
     },
     "glob-out": {
      "name": "glob-out",
@@ -573,7 +573,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\14-glob-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\14-glob-out.js"
     },
     "mxf-out": {
      "name": "mxf-out",
@@ -582,7 +582,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\20-mxf-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\20-mxf-out.js"
     },
     "mov-out": {
      "name": "mov-out",
@@ -591,7 +591,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\22-mov-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\22-mov-out.js"
     },
     "wav-out": {
      "name": "wav-out",
@@ -600,7 +600,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\24-wav-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\24-wav-out.js"
     },
     "nmos-rtp-out": {
      "name": "nmos-rtp-out",
@@ -609,7 +609,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\30-nmos-rtp-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\30-nmos-rtp-out.js"
     },
     "aspen-ts-out": {
      "name": "aspen-ts-out",
@@ -618,7 +618,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\32-aspen-ts-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\32-aspen-ts-out.js"
     },
     "spm-http-out": {
      "name": "spm-http-out",
@@ -627,7 +627,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\40-spm-http-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\40-spm-http-out.js"
     },
     "webRTC-out": {
      "name": "webRTC-out",
@@ -636,7 +636,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\42-webRTC-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\42-webRTC-out.js"
     },
     "sdi-out": {
      "name": "sdi-out",
@@ -645,7 +645,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\spout\\50-sdi-out.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\spout\\50-sdi-out.js"
     },
     "funnelOne": {
      "name": "funnelOne",
@@ -654,7 +654,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\testing\\10-funnelOne.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\testing\\10-funnelOne.js"
     },
     "funnelTwo": {
      "name": "funnelTwo",
@@ -663,7 +663,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\testing\\12-funnelTwo.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\testing\\12-funnelTwo.js"
     },
     "valveOne": {
      "name": "valveOne",
@@ -672,7 +672,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\testing\\50-valveOne.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\testing\\50-valveOne.js"
     },
     "valveTwo": {
      "name": "valveTwo",
@@ -681,7 +681,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\testing\\52-valveTwo.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\testing\\52-valveTwo.js"
     },
     "spout": {
      "name": "spout",
@@ -690,7 +690,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\testing\\90-spout.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\testing\\90-spout.js"
     },
     "encoder": {
      "name": "encoder",
@@ -699,7 +699,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\valve\\10-encoder.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\valve\\10-encoder.js"
     },
     "decoder": {
      "name": "decoder",
@@ -708,7 +708,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\valve\\12-decoder.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\valve\\12-decoder.js"
     },
     "converter": {
      "name": "converter",
@@ -717,7 +717,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\valve\\20-converter.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\valve\\20-converter.js"
     },
     "packer": {
      "name": "packer",
@@ -726,7 +726,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\valve\\22-packer.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\valve\\22-packer.js"
     },
     "mix": {
      "name": "mix",
@@ -735,7 +735,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\valve\\32-mix.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\valve\\32-mix.js"
     },
     "graphics": {
      "name": "graphics",
@@ -744,7 +744,7 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\valve\\50-graphics.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\valve\\50-graphics.js"
     },
     "grain-xray": {
      "name": "grain-xray",
@@ -753,13 +753,13 @@
      ],
      "enabled": true,
      "module": "node-red",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\reduser\\nodes\\valve\\90-grain-xray.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\reduser\\nodes\\valve\\90-grain-xray.js"
     }
    }
   },
   "node-red-node-email": {
    "name": "node-red-node-email",
-   "version": "0.1.7",
+   "version": "0.1.3",
    "nodes": {
     "email": {
      "name": "email",
@@ -769,7 +769,7 @@
      ],
      "enabled": true,
      "module": "node-red-node-email",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-email\\61-email.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-email\\61-email.js"
     }
    }
   },
@@ -784,7 +784,7 @@
      ],
      "enabled": true,
      "module": "node-red-node-feedparser",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-feedparser\\32-feedparse.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-feedparser\\32-feedparse.js"
     }
    }
   },
@@ -799,7 +799,7 @@
      ],
      "enabled": true,
      "module": "node-red-node-rbe",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-rbe\\rbe.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-rbe\\rbe.js"
     }
    }
   },
@@ -816,7 +816,7 @@
      ],
      "enabled": true,
      "module": "node-red-node-serialport",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-serialport\\25-serial.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-serialport\\25-serial.js"
     }
    }
   },
@@ -833,7 +833,7 @@
      ],
      "enabled": true,
      "module": "node-red-node-twitter",
-     "file": "C:\\Users\\testcinebsair1\\Streampunk\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-twitter\\27-twitter.js"
+     "file": "C:\\Users\\sparkpunk\\Documents\\dynamorse\\node_modules\\node-red\\node_modules\\node-red-node-twitter\\27-twitter.js"
     }
    }
   }
