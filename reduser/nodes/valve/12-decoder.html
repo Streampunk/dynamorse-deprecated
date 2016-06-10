@@ -23,7 +23,6 @@
         maxBuffer : { value : 10, validate : RED.validators.number() },
         description : { value : "" },
         device : { value : "", type : "device", required : true },
-        dstFormat: { value : "420P" }
       },
       inputs:1,
       outputs:1,
@@ -50,14 +49,7 @@
   </div>
   <div class="form-row">
     <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
-    <input type="number" id="node-input-maxBuffer" placeholder="10">
-  </div>
-
-  <div class="form-row">
-    <label for="node-input-dstFormat"><i class="fa fa-paw"></i> dest format</label>
-    <select name="node-input-dstFormat" id="node-input-dstFormat">
-      <option value="420P" selected>420P</option>
-    </select>
+    <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
   </div>
 </script>
 
@@ -93,10 +85,6 @@
    <tr>
     <td><i class="fa fa-suitcase"></i> max buffer</td>
     <td>Maximum number of grains to buffer before overflowing.</td>
-   </tr>
-   <tr>
-    <td><i class="fa fa-paw"></i> dest format</td>
-    <td>Select the desired packing format of the decoder output.</td>
    </tr>
   </table>
   </div>

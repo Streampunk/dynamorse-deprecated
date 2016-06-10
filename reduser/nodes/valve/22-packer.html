@@ -1,0 +1,113 @@
+<!--
+  Copyright 2016 Streampunk Media Ltd.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/javascript">
+    RED.nodes.registerType('packer',{
+      category: 'valve',
+      color: '#AF4830',
+      defaults: {
+        name: { value : "" },
+        maxBuffer : { value : 10, validate : RED.validators.number() },
+        description : { value : "" },
+        device : { value : "", type : "device", required : true },
+        dstFormat: { value : "420P" }
+      },
+      inputs:1,
+      outputs:1,
+      icon: "valve.png",
+      label: function() {
+        return this.name || "packer";
+      }
+    });
+</script>
+
+<script type="text/x-red" data-template-name="packer">
+  <!-- Common to all funnel nodes -->
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+    <input type="text" id="node-input-description" placeholder="source and flow description">
+  </div>
+  <div class="form-row">
+    <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
+    <input type="text" id="node-input-device">
+  </div>
+  <div class="form-row">
+    <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
+    <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
+  </div>
+
+  <div class="form-row">
+    <label for="node-input-dstFormat"><i class="fa fa-paw"></i> dest format</label>
+    <select name="node-input-dstFormat" id="node-input-dstFormat">
+      <option value="420P" selected>420P</option>
+      <option value="YUV422P10">YUV422P10</option>
+      <option value="UYVY10">UYVY10</option>
+      <option value="v210">V210</option>
+      <option value="pgroup">RFC4175</option>
+    </select>
+  </div>
+</script>
+
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
+<script type="text/x-red" data-help-name="packer">
+  <h1>Video Packer</h1>
+  <p>Modifies a grain by repacking the pixels to suit different nodes, creating a new NMOS flow with the correct attributes.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as source &amp; flow label.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tablet"></i> device</td>
+    <td>Select or create an NMOS device for this source and flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-paw"></i> dest format</td>
+    <td>Select the desired packing format of the node output.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>Metadata from the source flow will be passed through to the new flow with relevant modifications concerning the new packing format selected.</p>
+
+  <h3>Maturity</h3>
+  <p>Implemented and partially tested. Awaiting automated testing -
+  <a href="https://github.com/Streampunk/dynamorse/issues/5">status</a>.
+</script>

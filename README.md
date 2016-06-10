@@ -170,7 +170,7 @@ On Windows:
 Using the Node-RED drag-and-drop user interface to define a large scale infrastructure will quickly become tiresome. Fortunately, this UI is not the only way to work deploy and configure virtual infrastructure with Node-RED. Behind the scenes is a REST API -the [Node-RED Admin HTTP API](http://nodered.org/docs/api/admin/) - that can be used to inspect and deploy nodes. For example, to see the currently deployed flows on a local instance on the default port, browse to
 http://localhost:8000/red/flows. As use of the API matures at an installation, infrastructure can be orchestrated through this API using standard IT tools, including business process orchestration, resource managers and rules engines.
 
-As a half way house, it is possible to create and manage _subflows_, accessed via the menu icon in the top-right corner of the screen.#### Configuration nodes
+As a half way house, it is possible to create and manage _subflows_, accessed via the menu icon in the top-right corner of the screen.
 
 #### Configuration nodes
 

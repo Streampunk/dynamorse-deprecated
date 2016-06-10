@@ -19,18 +19,18 @@ var codecadon = require('codecadon');
 var Grain = require('../../../model/Grain.js');
 
 module.exports = function (RED) {
-  function Converter (config) {
+  function Packer (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
     this.srcFlow = null;
     var dstFlow = null;
     var dstBufLen = 0;
 
-    var converter = new codecadon.ScaleConverter(function() {
-      console.log('Converter exiting');
+    var packer = new codecadon.Packer(function() {
+      console.log('Packer exiting');
     });
-    converter.on('error', function(err) {
-      console.log('Converter error: ' + err);
+    packer.on('error', function(err) {
+      console.log('Packer error: ' + err);
     });
 
     var node = this;
@@ -47,7 +47,7 @@ module.exports = function (RED) {
 
     function processGrain(x, dstBufLen, push, next) {
       var dstBuf = new Buffer(dstBufLen);
-      var numQueued = converter.scaleConvert(x.buffers, dstBuf, function(err, result) {
+      var numQueued = packer.pack(x.buffers, dstBuf, function(err, result) {
         if (err) {
           push(err);
         } else if (result) {
@@ -63,7 +63,7 @@ module.exports = function (RED) {
         push(err);
         next();
       } else if (redioactive.isEnd(x)) {
-        converter.quit(function() {
+        packer.quit(function() {
           push(null, x);
         });
       } else if (Grain.isGrain(x)) {
@@ -73,8 +73,6 @@ module.exports = function (RED) {
             this.srcFlow = f;
 
             var dstTags = JSON.parse(JSON.stringify(this.srcFlow.tags));
-            dstTags["width"] = [ `${config.dstWidth}` ];
-            dstTags["height"] = [ `${config.dstHeight}` ];
             dstTags["packing"] = [ `${config.dstFormat}` ];
             if ("420P" === config.dstFormat)
               dstTags["depth"] = [ "8" ];
@@ -83,7 +81,7 @@ module.exports = function (RED) {
 
             var formattedDstTags = JSON.stringify(dstTags, null, 2);
             RED.comms.publish('debug', {
-              format: "Converter output flow tags:",
+              format: "Packer output flow tags:",
               msg: formattedDstTags
             }, true);
 
@@ -94,7 +92,7 @@ module.exports = function (RED) {
               push(`Unable to register source: ${err}`)
             });
             nodeAPI.putResource(dstFlow).then(function() {
-              dstBufLen = converter.setInfo(this.srcFlow.tags, dstTags);
+              dstBufLen = packer.setInfo(this.srcFlow.tags, dstTags);
               processGrain(x, dstBufLen, push, next);
             }.bind(this), function (err) {
               push(`Unable to register flow: ${err}`);
@@ -102,14 +100,15 @@ module.exports = function (RED) {
           }.bind(this));
         } else {
           processGrain(x, dstBufLen, push, next);
-        }
-      } else {
+        } 
+      }
+      else {
         push(null, x);
         next();
       }
     }.bind(this));
     this.on('close', this.close);
   }
-  util.inherits(Converter, redioactive.Valve);
-  RED.nodes.registerType("converter", Converter);
+  util.inherits(Packer, redioactive.Valve);
+  RED.nodes.registerType("packer", Packer);
 }
