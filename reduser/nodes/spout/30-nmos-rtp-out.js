@@ -177,7 +177,7 @@ module.exports = function (RED) {
         if ((b.length - o) >= t) {
           packet.setPayload(b.slice(o, o + t));
           o += t;
-          sendPacket(packet, remaining); // May want to spread packets
+          sendPacket(packet); // May want to spread packets
           // FIXME: probably won't work for compressed video
           if (!is4175) tsAdjust += t / stride;
           remaining = 1410; // Slightly short so last header fits
@@ -208,7 +208,7 @@ module.exports = function (RED) {
         }
       }
 
-      sendPacket(packet, remaining);
+      sendPacket(packet, true);
 
       if (config.timeout === 0) {
         setImmediate(next);
@@ -250,16 +250,17 @@ module.exports = function (RED) {
     var packetCount = 0;
     var callbackCount = 0;
     var packetTime = process.hrtime();
-    function sendPacket (p) {
+    var packetBuffers = [];
+    function sendPacket (p, done) {
+      packetBuffers.push(p);
       packetCount++;
-      sock.send(p.buffer, 0, p.buffer.length, config.port, config.address,
-       function (e) { callbackCount++; if (e) return console.error(e); });
-      if (packetCount % 1000 === 0) {
+      if (done) {
+        sock.send(packetBuffers, 0, p.length, config.port, config.address,
+          function (e) { callbackCount++; if (e) return console.error(e); });
+        packetBuffers = [];
         console.log('+++', packetCount, callbackCount, process.hrtime(packetTime)[1]/1000000);
         packetTime = process.hrtime();
       }
-
-      // console.log(JSON.stringify(p, null, 2));
     }
     this.errors(function (e, next) {
       this.warn(`Received unhandled error: ${e.message}.`);
