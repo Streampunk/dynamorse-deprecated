@@ -19,8 +19,35 @@
     category: 'funnel',
     color: '#D79748',
     defaults: {
-      name: { value : ""},
-      maxBuffer : { value : 10, validate : RED.validators.number() }
+      name : { value : ''},
+      file : { value : '', required : true },
+      loop : { value : false },
+      regenerate : { value : false },
+      description : { value : '' },
+      device : { value : '', type : "device" },
+      maxBuffer : { value : 10, validate : RED.validators.number() },
+      pictureTrack0 : { value : true },
+      pictureTrack1 : {value : false },
+      soundTrack0 : { value : true },
+      soundTrack1 : { value : false },
+      soundTrack2 : { value : false },
+      soundTrack3 : { value : false },
+      soundTrack4 : { value : false },
+      soundTrack5 : { value : false },
+      soundTrack6 : { value : false },
+      soundTrack7 : { value : false },
+      soundTrack8 : { value : false },
+      soundTrack9 : { value : false },
+      soundTrack10 : { value : false },
+      soundTrack11 : { value : false },
+      soundTrack12 : { value : false },
+      soundTrack13 : { value : false },
+      soundTrack14 : { value : false },
+      soundTrack15 : { value : false },
+      dataTrack0 : { value : false },
+      dataTrack1 : { value : false },
+      dataTrack2 : { value : false },
+      dataTrack3 : { value : false }
     },
     inputs:0,
     outputs:3,
@@ -38,18 +65,139 @@
     <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
+    <label for="node-input-file"><i class="fa fa-file"></i> MXF file</label>
+    <input type="text" id="node-input-file" placeholder="dynamorse.mxf">
+  </div>
+  <div class="form-row">
+    <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+    <input type="text" id="node-input-description" placeholder="source and flow description">
+  </div>
+  <div class="form-row">
+    <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
+    <input type="text" id="node-input-device">
+  </div>
+  <div class="form-row">
     <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
     <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
   </div>
+  <div class="form-row">
+    <label><i class="fa fa-video-camera"></i> picture tracks</label>
+    <label style="width: 2em; text-align: right">0&nbsp;</label><input type="checkbox" id="node-input-pictureTrack0" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">1&nbsp;</label><input type="checkbox" id="node-input-pcitureTrack1" style="width: 1em"/>
+  </div>
+  <div class="form-row">
+    <label><i class="fa fa-music"></i> sound tracks</label>
+    <label style="width: 2em; text-align: right">0&nbsp;</label><input type="checkbox" id="node-input-soundTrack0" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">1&nbsp;</label><input type="checkbox" id="node-input-soundTrack1" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">2&nbsp;</label><input type="checkbox" id="node-input-soundTrack2" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">3&nbsp;</label><input type="checkbox" id="node-input-soundTrack3" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">4&nbsp;</label><input type="checkbox" id="node-input-soundTrack4" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">5&nbsp;</label><input type="checkbox" id="node-input-soundTrack5" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">6&nbsp;</label><input type="checkbox" id="node-input-soundTrack6" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">7&nbsp;</label><input type="checkbox" id="node-input-soundTrack7" style="width: 1em"/>
+    <br/><label> </label>
+    <label style="width: 2em; text-align: right">8&nbsp;</label><input type="checkbox" id="node-input-soundTrack8" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">9&nbsp;</label><input type="checkbox" id="node-input-soundTrack9" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">10&nbsp;</label><input type="checkbox" id="node-input-soundTrack10" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">11&nbsp;</label><input type="checkbox" id="node-input-soundTrack11" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">12&nbsp;</label><input type="checkbox" id="node-input-soundTrack12" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">13&nbsp;</label><input type="checkbox" id="node-input-soundTrack13" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">14&nbsp;</label><input type="checkbox" id="node-input-soundTrack14" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">15&nbsp;</label><input type="checkbox" id="node-input-soundTrack15" style="width: 1em"/>
+  </div>
+  <div class="form-row">
+    <label><i class="fa fa-table" aria-hidden="true"></i> data tracks</label>
+    <label style="width: 2em; text-align: right">0&nbsp;</label><input type="checkbox" id="node-input-dataTrack0" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">1&nbsp;</label><input type="checkbox" id="node-input-dataTrack1" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">2&nbsp;</label><input type="checkbox" id="node-input-dataTrack2" style="width: 1em"/>
+    <label style="width: 2em; text-align: right">3&nbsp;</label><input type="checkbox" id="node-input-dataTrack3" style="width: 1em"/>
+  </div>
 </script>
+
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
 
 <script type="text/x-red" data-help-name="mxf-in">
   <h1>MXF file input</h1>
   <p>Read grains from a MXF file, creating one or more NMOS flow(s) per
-  interleaved track.</p>
+  track. The MXF file may be located on a web-server, in which case specify
+  its location with an HTTP URL. If no protocol is specified, the file is
+  assumed to be stored locally.</p>
+
+  <p>Select the tracks from the that you would like to appear as NMOS flows.
+  Interleaved MXF files (MXF OP1a) may contain an interleaved mix of picture, sound
+  and data tracks. Mono-essence files (AS-02, IMF) contain only a single type of
+  essence. Selecting an essence track that does not exist will create a flow
+  record but no grains will flow. To find out what tracks an MXF file contains,
+  use an MXF dumping tool, such as <a href="https://github.com/Streampunk/kelvinadon">
+  kelvinadump</a>.</p>
+
+  <p>MXF nodes have three outputs. From top to bottom, these are:</p>
+
+  <ol>
+   <li>Picture/video flows.</li>
+   <li>Sound/audio flows.</li>
+   <li>Data/event flows.</li>
+  </ol>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as a base for source &amp; flow labels.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-file"></i> WAV file</td>
+    <td>Path location for the WAVE format input file.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of the this NMOS source and output flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tablet"></i> device</td>
+    <td>Select or create an NMOS device for the sources and flows.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-repeat"></i> loop?</td>
+    <td>Should the WAV file be repeated indefinitely?</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-video-camera"></i> picture tracks</td>
+    <td>Select the picture tracks to be used to create video flows.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-music"></i> sound tracks</td>
+    <td>Select the sound tracks to be used to create audio flows.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-table" aria-hidden="true"></i> data tracks</td>
+    <td>Select the data tracks to be used to create data flows.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>File path locations are relative to the folder where the dynamorse server was
+  started.</p>
+
+  <p>Source and flow labels and descriptions are created to included the MXF track
+  name, e.g. for a name <em>rise and shine</em>, the flow and source are labelled
+  and described as <code>rise and shine picture0</code>.</p>
 
   <h3>Maturity</h3>
-  <p>Not implemented -
+  <p>Work in progress -
   <a href="https://github.com/Streampunk/dynamorse/issues/9">status</a>.
 
 </script>
