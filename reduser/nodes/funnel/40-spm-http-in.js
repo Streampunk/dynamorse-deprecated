@@ -59,7 +59,7 @@ module.exports = function (RED) {
         var position = 0;
         var grainData = new Buffer(+res.headers['content-length']);
         if (res.statusCode === 200) {
-          nextRequest[x] = res.headers['x-arachnid-ptp-origin'];
+          nextRequest[x] = res.headers['x-arachnid-origintimestamp'];
           res.on('data', function (data) {
             data.copy(grainData, position);
             position += data.length;
@@ -67,7 +67,7 @@ module.exports = function (RED) {
           });
           res.on('end', function () {
             grainData = grainData.slice(0, position);
-            nextRequest[x] = res.headers['x-arachnid-next-by-thread'];
+            nextRequest[x] = res.headers['x-arachnid-nextbythread'];
             if (config.regenerate) {
               pushGrains(g, push);
             } else {
@@ -99,7 +99,7 @@ module.exports = function (RED) {
       var nextMin = nextRequest.reduce(function (a, b) {
         return compareVersions(a, b) <= 0 ? a : b;
       });
-      Object.keys(grainQueue).filter(function (gts) { 
+      Object.keys(grainQueue).filter(function (gts) {
         return compareVersions(gts, nextMin) <= 0;
       })
       .sort(compareVersions)
