@@ -26,17 +26,19 @@
   "homepage": "https://github.com/Streampunk/dynamorse#readme",
   "dependencies": {
     "body-parser": "^1.15.0",
+    "codecadon": "^0.0.5",
     "express": "^4.13.4",
     "fastqueue": "^0.1.0",
     "highland": "^2.5.1",
+    "kelvinadon": "^0.1.1",
+    "mp4-stream": "^2.0.1",
     "nmos-ledger": "^1.0.8",
     "node-red": "^0.13.1",
     "seamless-immutable": "^4.1.1",
     "tape": "^4.2.2",
     "uuid": "^2.0.1",
-    "xml2js": "^0.4.16",
-    "codecadon": "^0.0.5",
-    "kelvinadon": "^0.1.0" },
+    "xml2js": "^0.4.16"
+  },
   "bin": {
     "dynamorse": "./server.js"
   }
