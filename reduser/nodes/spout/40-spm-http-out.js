@@ -15,12 +15,44 @@
 
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
+var express = require('express');
+var bodyParser = require('body-parser');
+var http = require('http');
+var https = require('https');
+var fs = require('fs');
+var Grain = require('../../../model/Grain.js');
 
 module.exports = function (RED) {
   function SpmHTTPOut (config) {
     RED.nodes.createNode(this, config);
     redioactive.Spout.call(this, config);
-    // Go figure!
+    var node = this;
+    var srcFlow = null;
+    this.on('error', function (err) {
+      node.warn(`Error transporting flow over HTTP '${config.path}': ${err}`)
+    });
+    var grainCache = [];
+    config.path = (config.path.endsWith('/')) ? config.path.slice(-1) : config.path;
+    this.each(function (x, next) {
+      if (Grain.isGrain(x)) {
+        grainCache.push(x);
+        if (grainCache.length > config.cacheSize) grainCache = grainCache.slice(1);
+        next();
+      } else {
+        node.warn(`HTTP out received something that is not a grain.`);
+        next();
+      }
+    });
+    if (config.mode === 'pull') {
+      var app = express();
+      app.use(bodyParser.raw({ limit : config.payloadLimit || 6000000 }));
+      app.get(config.path + "/:ts", function (req, res) {
+
+      });
+    } else {
+      // TODO implement push mode
+    }
+
   }
   util.inherits(SpmHTTPOut, redioactive.Spout);
   RED.nodes.registerType("spm-http-out", SpmHTTPOut);

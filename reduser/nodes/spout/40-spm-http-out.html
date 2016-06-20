@@ -28,7 +28,8 @@
       path : { value : '' },
       port : { value : 8712, validate : RED.validators.number() },
       regenerate : { value : false },
-      parallel : { value : 1, validate : RED.validators.number() }
+      parallel : { value : 1, validate : RED.validators.number() },
+      cacheSize : { value : 10, validate : RED.validators.number() }
     },
     inputs:1,
     outputs:0,
@@ -82,6 +83,10 @@
     <input type="number" id="node-input-port" min="1024" placeholder="8712" style="width: 100px">
     <label for="node-input-parallel" style="width: 80px">&nbsp;<i class="fa fa-fighter-jet" aria-hidden="true"></i> parallel</label>
     <input type="number" id="node-input-parallel" min="1" max="6" placeholder="1" style="width: 100px">
+  </div>
+  <div class="form-row">
+    <label for="node-input-cacheSize"><i class="fa fa-archive" aria-hidden="true"></i> cache size</label>
+    <input type="number" id="node-input-cacheSize" min="5" placeholder="10" style="width: 100px">
   </div>
 </script>
 
@@ -150,6 +155,10 @@
    <tr>
     <td><i class="fa fa-fighter-jet" aria-hidden="true"></i> parallel</td>
     <td>Number of parallel pipelines of HTTP to make or receive.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-archive" aria-hidden="true"></i> cache size</td>
+    <td>Maximum number of grains to cache in RAM.</td>
    </tr>
   </table>
   </div>
