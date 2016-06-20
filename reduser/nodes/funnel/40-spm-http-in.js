@@ -50,16 +50,52 @@ module.exports = function (RED) {
     config.path = (config.path.endsWith('/')) ?
       config.path.slice(-1) : config.path;
     var clientID = Date.now();
+    this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ];
+    var nodeAPI = this.context().global.get('nodeAPI');
+    var ledger = this.context().global.get('ledger');
+    var nodeAPI = this.context().global.get('nodeAPI');
+    var ledger = this.context().global.get('ledger');
+    var localName = config.name || `${config.type}-${config.id}`;
+    var localDescription = config.description || `${config.type}-${config.id}`;
+    var pipelinesID = config.device ?
+      RED.nodes.getNode(config.device).nmos_id :
+      this.context().global.get('pipelinesID');
+    var sourceID = uuid.v4();
+    var flowID = uuid.v4();
+    var flow = null; var source = null;
+    var mimeMatch = /(\S+)\/([^\s;]+)(\s*;?\s*)(.*)/;
+
+    function makeFlowAndSource (headers) {
+      var m = headers['content-type'].match(mimeMap);
+      var tags = { format : m[1], encodingName : m[2] };
+      m[4].split(/\s*;\s*/).forEach(function (param) {
+        var nameValue = param.split(/=/);
+        tags[nameValue[0]] = [ nameValue[1] ];
+      });
+      if (headers['x-arachnid-fourcc']) {
+        tags.packing = [ headers['x-arachnid-fourcc'] ]; }
+      var source = new ledger.Source(null, null, localName, localDescription,
+        "urn:x-nmos:format:" + this.tags.format[0], null, null, pipelinesID, null);
+      var flow = new ledger.Flow(null, null, localName, localDescription,
+        "urn:x-nmos:format:" + this.tags.format[0], this.tags, source.id, null);
+      nodeAPI.putResource(source).catch(function(err) {
+        node.log(`Unable to register source: ${err}`);
+      });
+      nodeAPI.putResource(flow).catch(function (err) {
+        node.log(`Unable to register flow: ${err}`);
+      });
+    };
 
     var runNext = function (x, push, next) {
-      protocol.get(
-          `${config.pullUrl}/${config.path}/${clientID}/${config.parallel}/${nextRequest[x]}`,
+      var req = protocol.get(
+          `${config.pullUrl}/${config.path}/${nextRequest[x]}`,
           function (res) {
         var count = 0;
         var position = 0;
         var grainData = new Buffer(+res.headers['content-length']);
         if (res.statusCode === 200) {
           nextRequest[x] = res.headers['x-arachnid-origintimestamp'];
+          if (!flow) makeFlowAndSource(headers);
           res.on('data', function (data) {
             data.copy(grainData, position);
             position += data.length;
@@ -68,12 +104,15 @@ module.exports = function (RED) {
           res.on('end', function () {
             grainData = grainData.slice(0, position);
             nextRequest[x] = res.headers['x-arachnid-nextbythread'];
-            if (config.regenerate) {
-              pushGrains(g, push);
-            } else {
-              var g = new Grain([ grainData ]));
-              pushGrains(g, push);
-            };
+            var ptpOrigin = res.headers['x-arachnid-origintimestamp'];
+            var ptpSync = res.headers['x-arachnid-synctimestamp'];
+            var duration = res.headers['x-arachnid-grainduration'];
+            var gFlowID = (config.regenerate) ? flowID : res.headers['x-arachnid-flowid'];
+            var gSourceID = (config.regenerate) ? sourceID : res.headers['x-arachnid-sourceid'];
+            var tc = res.headers['x-arachnid-timecode'];
+            var g = new Grain([ grainData ], ptpSync, ptpOrigin, tc, gFlowID,
+              gSourceID, duration); // regenerate time as emitted
+            pushGrains(g, push);
             next();
           });
         };
@@ -83,12 +122,16 @@ module.exports = function (RED) {
           activeThreads[x] = false;
           next();
         });
-      }).on('error', function (e) {
+      });
+      req.on('error', function (e) {
         node.warn(`Received error when requesting frame from server on thread ${x}: ${e}`);
         push(`Received error when requesting frame from server on thread ${x}: ${e}`);
         activeThreads[x] = false;
         next();
       });
+      req.setHeader('X-Arachnid-ThreadNumber', x);
+      req.setHeader('X-Arachnid-TotalConcurrent', config.parallel);
+      req.setHeader('X-Arachnid-ClientID', clientID);
     };
 
     var grainQueue = { };
@@ -105,6 +148,7 @@ module.exports = function (RED) {
       .sort(compareVersions)
       .forEach(function (gts) {
         delete grainQueue[gts];
+        // TODO regenerate time here
         push(null, grainQueue[gts]);
         highWaterMark = gts;
       });
@@ -115,23 +159,23 @@ module.exports = function (RED) {
     var nextRequest =
       [ '-5', '-4', '-3', '-2', '-1', '0' ].slice(-config.parallel);
 
-    if (config.mode === 'push') {
-      var app = express();
-      app.use(bodyParser.raw({ limit : config.payloadLimit || 6000000 }));
-
-      app.post(config.path, function (req, res) {
-        console.log(pushCount++, process.hrtime(star
-          tTime), req.body.length);
-        res.json({ length : req.body.length }); // Need to add back pressure concept
-      });
-
-      var server = protocol.createServer((config.protocol === 'HTTP') ? {} : {
-        key : fs.readFileSync('./certs/dynamorse-key.pem'),
-        cert : fs.readFileSync('./certs/dynamorse-cert.pem')
-      }, app).listen(config.port);
-      server.on('listening', function () {
-        this.log(`Dynamorse ${config.protocol} server listening on port ${config.port}.`);
-      });
+    if (config.mode === 'push') { // TODO push mode
+      // var app = express();
+      // app.use(bodyParser.raw({ limit : config.payloadLimit || 6000000 }));
+      //
+      // app.post(config.path, function (req, res) {
+      //   console.log(pushCount++, process.hrtime(star
+      //     tTime), req.body.length);
+      //   res.json({ length : req.body.length }); // Need to add back pressure concept
+      // });
+      //
+      // var server = protocol.createServer((config.protocol === 'HTTP') ? {} : {
+      //   key : fs.readFileSync('./certs/dynamorse-key.pem'),
+      //   cert : fs.readFileSync('./certs/dynamorse-cert.pem')
+      // }, app).listen(config.port);
+      // server.on('listening', function () {
+      //   this.log(`Dynamorse ${config.protocol} server listening on port ${config.port}.`);
+      // });
     } else { // config.mode is set to pull
       this.generator(function (push, next) {
         for ( var i = 0 ; i < activeThreads.length ; i++ ) {
