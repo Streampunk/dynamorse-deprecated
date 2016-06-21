@@ -72,10 +72,27 @@
   * Flow and Source identifiers
   * Duration
 * Let's see one!
-  * Download a grain from https://github.com/AMWA-TV/nmos-in-stream-id-timing/blob/master/examples/pcap/rtp-audio-l24-2chan.pcap?raw=true
-  * Download an SDP file that describes the nature of the grain https://raw.githubusercontent.com/AMWA-TV/nmos-in-stream-id-timing/master/examples/sdp/sdp_L24_2chan.sdp
+  * Save the following files to the same folder where dynamorse is running 
+    * Download a grain from https://github.com/AMWA-TV/nmos-in-stream-id-timing/blob/master/examples/pcap/rtp-audio-l24-2chan.pcap?raw=true
+    * Download an SDP file that describes the nature of the grain https://raw.githubusercontent.com/AMWA-TV/nmos-in-stream-id-timing/master/examples/sdp/sdp_L24_2chan.sdp
   * Look at the grain in [Wireshark](https://www.wireshark.org/download.html) with [NMOS plugin](https://github.com/AMWA-TV/nmos-in-stream-id-timing/tree/master/software/wireshark_plugins)
-  * 
+
+* Build a pipeline in dynamors
+![grain101](../images/grain-analyzer.png)
+  * Configure pcap reader with:
+   * pcap file `rtp-audio-l24-2chan.pcap`
+   * description `EBU NTS 2016`
+   * device `pipelines...`
+   * sdp file `file:sdp_L24_2chan.sdp`
+  * Select the debug tab
+  * __Deploy__
+ * Look at the grain that flowed down the pipe in the debbug tab ... wow!
+ * Check out the flows and sources:
+  * http://localhost:3101/x-nmos/node/v1.0/flows http://localhost:3002/x-nmos/query/v1.0/flows
+  * http://localhost:3101/x-nmos/node/v1.0/sources http://localhost:3002/x-nmos/query/v1.0/sources
+ * Set the timeout parameter in spout to 500ms
+ * Set the loop parameter in pcap reader and redeploy - notice how the timestampe are constant
+ * Set the regenerate paramter in pcap reader and redeploy - timestamps are now incrementing
 
 
 
