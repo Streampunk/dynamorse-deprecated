@@ -33,7 +33,7 @@
 * Describe node.js and its package manager, culture etc.
 * Discuss the need for a compiler at this time
 
-### Regisrtration and discovery - ledger
+### Registration and discovery - ledger
 
 * Install nmos-ledger - how you install a node module.
   * Show instructions at https://www.npmjs.com/package/nmos-ledger
