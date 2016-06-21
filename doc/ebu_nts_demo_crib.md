@@ -166,6 +166,17 @@ curl -X POST http://localhost:8000/red/flow -H "Content-Type: application/json" 
 * File available at https://raw.githubusercontent.com/Streampunk/dynamorse/master/doc/switch_flow.json
 * Deploys ... make a switch.
 
+![switch](../images/switch.png)
+
+## Summary
+
+* Demonstrated software-only infrastructure
+* With registration and discovery
+* Wiring like the IoT
+* Load managed like big data - reactive streams
+* Monitored and measured
+* API-driven dynamic infrastructure
+
 ### Nice to have
 
 * Receive an NMOS stream - requires an SDP file to be created
