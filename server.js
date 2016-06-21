@@ -28,7 +28,7 @@ var pid = process.pid;
 
 var properties = {
   redPort : '8000',
-  ledgerPort : '3001',
+  ledgerPort : '3101',
   userDir : 'reduser'
 };
 

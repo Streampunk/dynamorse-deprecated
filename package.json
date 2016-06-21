@@ -1,6 +1,6 @@
 {
   "name": "dynamorse",
-  "version": "0.1.8",
+  "version": "0.1.9",
   "description": "IT swiss army knife for professional media infrastructure and production.",
   "main": "server.js",
   "scripts": {
