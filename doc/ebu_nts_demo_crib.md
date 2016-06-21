@@ -4,7 +4,6 @@
 
 ## Introduction
 
-
 * What we are trying to achieve as a new company.
  * Ground up implementation of JT-NM, applying big data technologies and IoT concepts to media infrastructure on commodity IT.
  * Everything is browser-based, RESTful, cloud-ready, measured and monitored.
@@ -77,7 +76,7 @@
     * Download an SDP file that describes the nature of the grain https://raw.githubusercontent.com/AMWA-TV/nmos-in-stream-id-timing/master/examples/sdp/sdp_L24_2chan.sdp
   * Look at the grain in [Wireshark](https://www.wireshark.org/download.html) with [NMOS plugin](https://github.com/AMWA-TV/nmos-in-stream-id-timing/tree/master/software/wireshark_plugins)
 
-* Build a pipeline in dynamors
+* Build a pipeline in dynamorse
 ![grain101](../images/grain-analyzer.png)
   * Configure pcap reader with:
    * pcap file `rtp-audio-l24-2chan.pcap`
@@ -88,11 +87,19 @@
   * __Deploy__
  * Look at the grain that flowed down the pipe in the debbug tab ... wow!
  * Check out the flows and sources:
-  * http://localhost:3101/x-nmos/node/v1.0/flows http://localhost:3002/x-nmos/query/v1.0/flows
-  * http://localhost:3101/x-nmos/node/v1.0/sources http://localhost:3002/x-nmos/query/v1.0/sources
- * Set the timeout parameter in spout to 500ms
- * Set the loop parameter in pcap reader and redeploy - notice how the timestampe are constant
- * Set the regenerate paramter in pcap reader and redeploy - timestamps are now incrementing
+   * http://localhost:3101/x-nmos/node/v1.0/flows http://localhost:3002/x-nmos/query/v1.0/flows
+   * http://localhost:3101/x-nmos/node/v1.0/sources http://localhost:3002/x-nmos/query/v1.0/sources
+ * Other things to try:
+  * Set the timeout parameter in spout to 500ms
+  * Set the loop parameter in pcap reader and redeploy - notice how the timestampe are constant
+  * Set the regenerate paramter in pcap reader and redeploy - timestamps are now incrementing
+
+* Introduce the concept of back pressure
+
+## Playing grains
+
+
+
 
 
 
