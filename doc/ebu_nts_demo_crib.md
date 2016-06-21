@@ -5,25 +5,25 @@
 ## Introduction
 
 * What we are trying to achieve as a new company.
- * Ground up implementation of JT-NM, applying big data technologies and IoT concepts to media infrastructure on commodity IT.
- * Everything is browser-based, RESTful, cloud-ready, measured and monitored.
- * Education, design, implementation, support - based around a set of open source tools.
+  * Ground up implementation of JT-NM, applying big data technologies and IoT concepts to media infrastructure on commodity IT.
+  * Everything is browser-based, RESTful, cloud-ready, measured and monitored.
+  * Education, design, implementation, support - based around a set of open source tools.
 * Tour of Streampunk Media software. http://www.streampunk.media/ and http://www.npmjs.com/~streampunk
- * dynamorse
- * ledger
- * codecadon
- * netadon
- * kelvinadon
+  * dynamorse
+  * ledger
+  * codecadon
+  * netadon
+  * kelvinadon
 * Take an interactive tour
- * Prototype software, things will go wrong, restarts will be required please ask questions as we go ... or even follow along.
- * Install from scratch
- * Set up registration & discovery service
- * Set up Node-RED IoT tool for wiring virtual infrastructure
- * Design and deploy some simple infrastructure with a GUI
- * Meaure what we built
- * Build it again via an API
+  * Prototype software, things will go wrong, restarts will be required please ask questions as we go ... or even follow along.
+  * Install from scratch
+  * Set up registration & discovery service
+  * Set up Node-RED IoT tool for wiring virtual infrastructure
+  * Design and deploy some simple infrastructure with a GUI
+  * Meaure what we built
+  * Build it again via an API
 * Link back to what Peter has already talked about.
-* Everything here can be downloaded and used for free
+  * Everything here can be downloaded and used for free
 
 ## Installation
 
@@ -107,9 +107,24 @@
 
 ## Sending grains
 
+![send RTP](../images/nmos-flow.png)
 * Take a WAV file and send it over NMOS RTP
-* 
+  * Configure nmos-rtp-out
+   * address `225.6.7.8` port `5001` interface _find local IP address_ ttl `127` (default) timeout `40`ms
+  * Set input to a 48KHz audio WAV, e.g. https://freesound.org/people/MidEngine4Life/sounds/127966/# 
+   * Locally `../steam_48000.wav`
+  * Join the multicast group. Run `node`:
 
+```javascript
+ var dgram = require('dgram');
+ var sock = dgram.createSocket({type: 'udp4', reuseAddr : true});
+ sock.bind(5001, console.error);
+ sock.addMembership('225.6.7.8', '<local ip>');
+ ```
+ 
+  * View packets in Wireshark - set `udp.port eq 5001`
+
+## Encoding a video stream
 
 
 
