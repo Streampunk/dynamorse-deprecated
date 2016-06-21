@@ -8,12 +8,13 @@
   * Ground up implementation of JT-NM, applying big data technologies and IoT concepts to media infrastructure on commodity IT.
   * Everything is browser-based, RESTful, cloud-ready, measured and monitored.
   * Education, design, implementation, support - based around a set of open source tools.
-* Tour of Streampunk Media software. http://www.streampunk.media/ and http://www.npmjs.com/~streampunk
+* Tour of Streampunk Media software. https://github.com/Streampunk and http://www.npmjs.com/~streampunk
   * dynamorse
   * ledger
   * codecadon
   * netadon
   * kelvinadon
+  * macadam
 * Take an interactive tour
   * Prototype software, things will go wrong, restarts will be required please ask questions as we go ... or even follow along.
   * Install from scratch
