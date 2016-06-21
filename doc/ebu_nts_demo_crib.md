@@ -140,7 +140,7 @@
 ![monitoring](../images/grafana.png)
 * Monitoring
   * What's going on on the system? - Measure and monitor
-  * Run up docker 
+  * Run up docker
    * Command `docker run -it -p 8083:8083 -p 8086:8086 -p 80:3000 -p 8765:8765/udp scriptorian/grafin`
    * If environment problems `docker-machine env`
   * Take a look at the two components
@@ -148,9 +148,26 @@
    * Grafana: http://192.168.99.100/login
    * Set pcap-reader to loop - watch the graphs
 
+* Check back to registration and discovery
+
+## Automated configuration
+
+* [Node-RED](http://nodered.org/) has its own [programmatic and REST APIs](http://nodered.org/docs/api/)
+* Take a look at the [HTTP admin API methods](http://nodered.org/docs/api/admin/methods/)
+* Look at the flows behind the scenes http://localhost:8000/red/flows
+* Look at the specific flow http://localhost:8000/red/flow/<flow-id>
+* Use curl to delete the flow `curl -X DELETE http://localhost:8000/red/flow/<flow-id>`
+* Use curl to create a new flow:
+
+```
+curl -X POST http://localhost:8000/red/flow -H "Content-Type: application/json" -d @switch_flow.json
+```
+
+* File available at https://raw.githubusercontent.com/Streampunk/dynamorse/master/doc/switch_flow.json
+* Deploys ... make a switch.
+
 ### Nice to have
 
 * Receive an NMOS stream - requires an SDP file to be created
-
 
 
