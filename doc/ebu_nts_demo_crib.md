@@ -55,8 +55,8 @@
   * Create and enter a new folder for this demonstration
   * `npm install -g dynamorse`
   * `dynamorse`
-* Run GUI http://localhost:8000/red/ and explore funnels, spouts, valves etc..
-* Check the NMOS Reg&D NodeAPI at http://localhost:3101/x-nmos/node/v1.0/
+* Run GUI [http://localhost:8000/red/] and explore funnels, spouts, valves etc..
+* Check the NMOS Reg&D NodeAPI at [http://localhost:3101/x-nmos/node/v1.0/]
   * Browser to node API description of self http://localhost:3101/x-nmos/node/v1.0/self
   * Show that the node has registered itself via query API http://localhost:3002/x-nmos/query/v1.0/nodes
   * Show the devices http://localhost:3101/x-nmos/node/v1.0/devices
