@@ -107,6 +107,8 @@ The design of redioactive was inspired by [highland.js](http://highlandjs.org/).
 
 Each dynamorse instance can send statistics to [influxdb](https://influxdata.com/time-series-platform/influxdb/), a time-series database that is optimized for storing and searching metrics information. The running instance sends metrics about the overall performance of the application, along with each Node-RED node sending details about how many grains it processed per second and how long it took to process each grain. This data can be mined and turned into reports or graphed in real time with tools such as  [Grafana](http://grafana.org/).
 
+![grafana example](../images/grafana.png)
+
 Dynamorse uses standard IT tools so that it fits alongside other metrics systems and applications in an enterprise IT environment. Combined with system monitoring tools that also work with the same toolsets, such as [collectd](https://collectd.org/), it is possible to monitor and respond to issues such as real-time streams about to dropping below real-time performance. Also, developers and testers can analyze performance by watching for memory leaks, buffer overflows, the impact of garbage collection etc..
 
 ## Getting started
