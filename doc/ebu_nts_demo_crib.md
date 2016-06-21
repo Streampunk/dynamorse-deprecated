@@ -126,5 +126,31 @@
 
 ## Encoding a video stream
 
+![video chain](../images/encode.png)
+* Take a 2gig example file provided to NMOS incubator members, encode as H.264
+* Measure the process using standard IT monitoring tools
+* pcap reader setup:
+  * Input file `/Users/sparkpunk/Documents/Streampunk/nmi-examples/rtp-video-rfc4175-1080i50-sync.pcap`
+  * SDP file `file:../sdp_rfc4175_10bit_1080i50.sdp`
+  * Set device in converter and encoder to `pipeline...`
+  * Set output file to `out.h264` and headers `out.json`.
+  * Play output in [VLC](http://www.videolan.org/vlc/) - File -> Open and select other file extensions
+  * Try again and set timeout to `40`ms - watch back pressure
+
+![monitoring](../images/grafana.png)
+* Monitoring
+  * What's going on on the system? - Measure and monitor
+  * Run up docker 
+   * Command `docker run -it -p 8083:8083 -p 8086:8086 -p 80:3000 -p 8765:8765/udp scriptorian/grafin`
+   * If environment problems `docker-machine env`
+  * Take a look at the two components
+   * Influxdb: http://192.168.99.100:8083/
+   * Grafana: http://192.168.99.100/login
+   * Set pcap-reader to loop - watch the graphs
+
+### Nice to have
+
+* Receive an NMOS stream - requires an SDP file to be created
+
 
 
