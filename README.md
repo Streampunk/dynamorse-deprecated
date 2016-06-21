@@ -1,5 +1,7 @@
 # Dynamorse
 
+[Click her for EBU NTS 2016 demo crib sheet.](doc/ebu_nts_demo_crib.md)
+
 ![overview graphic](images/overview.png)
 
 IT swiss army knife for professional media infrastructure and production. This is a *prototype* [Node.js](http://nodejs.org/) application that demonstrates:
