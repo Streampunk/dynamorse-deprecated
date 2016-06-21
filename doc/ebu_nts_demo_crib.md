@@ -98,7 +98,17 @@
 
 ## Playing grains
 
+* Create a WAV file
+![make a WAV](../images/wav-file.png)
+  * Change the pipeline as shown - type in a file name and __deploy__
+  * Look at the file in audacity http://www.audacityteam.org/download/
+  * Change the input to `../rtp-audio-l24-2chan-wav.pcap` (avaiable to AMWA incubator members via box) and timeout to 0
+  * Add a take node to the pipeline - take 100 grains - creates approx 3sec file
 
+## Sending grains
+
+* Take a WAV file and send it over NMOS RTP
+* 
 
 
 
