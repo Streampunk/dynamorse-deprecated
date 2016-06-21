@@ -168,10 +168,12 @@ curl -X POST http://localhost:8000/red/flow -H "Content-Type: application/json" 
 
 ![switch](../images/switch.png)
 
+* This is nonsense ... so we're working on adding some rules that prevent mixing single essnece type flows.
+
 ## Summary
 
-* Demonstrated software-only infrastructure
-* With registration and discovery
+* Demonstrated software-only infrastructure - not software defined
+* With registration and discovery - mDNS supported
 * Wiring like the IoT
 * Load managed like big data - reactive streams
 * Monitored and measured
