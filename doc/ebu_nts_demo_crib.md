@@ -2,6 +2,8 @@
 ## NMOS Described and Demonstrated
 ### Demo crib sheet
 
+Dr Richard Cartwright - Founder & CTO - Streampunk Media Ltd
+
 ## Introduction
 
 * What we are trying to achieve as a new company.
