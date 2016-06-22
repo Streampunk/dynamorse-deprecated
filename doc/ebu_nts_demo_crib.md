@@ -127,6 +127,7 @@
  ```
  
   * View packets in Wireshark - set `udp.port eq 5001`
+  * Alternative tool from Cinegy https://github.com/Cinegy/NmosAnalyser
 
 ## Encoding a video stream
 
@@ -144,12 +145,10 @@
 ![monitoring](../images/grafana.png)
 * Monitoring
   * What's going on on the system? - Measure and monitor
-  * Run up docker
-   * Command `docker run -it -p 8083:8083 -p 8086:8086 -p 80:3000 -p 8765:8765/udp scriptorian/grafin`
-   * If environment problems `docker-machine env`
+  * Show docker
   * Take a look at the two components
-   * Influxdb: http://192.168.99.100:8083/
-   * Grafana: http://192.168.99.100/login
+    * [Influxdb](https://influxdata.com/time-series-platform/influxdb/): http://192.168.99.100:8083/
+    * [Grafana](http://grafana.org/): http://192.168.99.100/login
    * Set pcap-reader to loop - watch the graphs
 
 * Check back to registration and discovery
@@ -193,6 +192,8 @@ curl -X POST http://localhost:8000/red/flow -H "Content-Type: application/json" 
 * Uninstall dynamorse `npm uninstall -g dynamorse`
 * Uninstall nmos-ledger `npm uninstall -g ledger`
 * Check docker is running, load EBU NTS dashboard into grafana using [this file](ebu_nts_2016_graphs.json).
+  * Command `docker run -it -p 8083:8083 -p 8086:8086 -p 80:3000 -p 8765:8765/udp scriptorian/grafin`
+  * If environment problems `docker-machine env`
 * cd to Documents folder in terminal.
 * Clear down all browser tabs to just [this page](https://github.com/Streampunk/dynamorse/edit/master/doc/ebu_nts_demo_crib.md).
 
