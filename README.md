@@ -123,7 +123,9 @@ Install Node.js for your plarform. This software has been developed against the 
 
 Mac and linux users may have to prepend `sudo` to the above.
 
-Dynamorse depends on modules that use native C++ bindings that compile with node-gyp. To use these modules, you many need to install a C++ compiler and python on your system. On Windows, compilation has been tested using the community edition of Microsoft Visual Studio 2015.
+Dynamorse depends on modules that use native C++ bindings that compile with node-gyp. To use these modules, you many need to install a C++ compiler and python on your system. On Windows, compilation has been tested using the community edition of Microsoft Visual Studio 2015. On Windows, node may need to be configured with:
+
+    npm config set msvs_version 2015 --global
 
 At this time, dynamorse is not intended for use as dependency in other projects. However, you may wish to install dynamorse locally in a `node_modules` sub-folder. In which case:
 
