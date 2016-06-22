@@ -157,8 +157,8 @@
 
 * [Node-RED](http://nodered.org/) has its own [programmatic and REST APIs](http://nodered.org/docs/api/)
 * Take a look at the [HTTP admin API methods](http://nodered.org/docs/api/admin/methods/)
-* Look at the flows behind the scenes http://localhost:8000/red/flows
-* Look at the specific flow http://localhost:8000/red/flow/<flow-id>
+* Look at the flows behind the scenes [http://localhost:8000/red/flows](http://localhost:8000/red/flows)
+* Look at the specific flow [http://localhost:8000/red/flow/](http://localhost:8000/red/flow/)<flow-id>
 * Use curl to delete the flow `curl -X DELETE http://localhost:8000/red/flow/<flow-id>`
 * Use curl to create a new flow:
 
