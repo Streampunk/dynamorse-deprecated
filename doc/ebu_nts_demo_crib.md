@@ -91,8 +91,8 @@
   * __Deploy__
  * Look at the grain that flowed down the pipe in the debbug tab ... wow!
  * Check out the flows and sources:
-   * http://localhost:3101/x-nmos/node/v1.0/flows http://localhost:3002/x-nmos/query/v1.0/flows
-   * http://localhost:3101/x-nmos/node/v1.0/sources http://localhost:3002/x-nmos/query/v1.0/sources
+   * [http://localhost:3101/x-nmos/node/v1.0/flows](http://localhost:3101/x-nmos/node/v1.0/flows) [http://localhost:3002/x-nmos/query/v1.0/flows](http://localhost:3002/x-nmos/query/v1.0/flows)
+   * [http://localhost:3101/x-nmos/node/v1.0/sources](http://localhost:3101/x-nmos/node/v1.0/sources) [http://localhost:3002/x-nmos/query/v1.0/sources](http://localhost:3002/x-nmos/query/v1.0/sources)
  * Other things to try:
   * Set the timeout parameter in spout to 500ms
   * Set the loop parameter in pcap reader and redeploy - notice how the timestampe are constant
