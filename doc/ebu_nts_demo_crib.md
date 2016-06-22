@@ -17,14 +17,14 @@ Dr Richard Cartwright - Founder & CTO - Streampunk Media Ltd
   * netadon
   * kelvinadon
   * macadam
-* Interactive demonstration
+* Interactive demonstration - no Powerpoint - questions welcome during and after
   * Prototype software, things will go wrong, restarts will be required please ask questions as we go ... or even follow along.
-  * Install from scratch
+  * Install from scratch - on a £600 windows laptop
   * Set up registration & discovery service
-  * Set up Node-RED IoT tool for wiring virtual infrastructure
+  * Set up [Node-RED](http://nodered.org/) IoT tool for wiring virtual infrastructure
   * Design and deploy some simple infrastructure with a GUI
   * Meaure what we built
-  * Build it again via an API
+  * Build something via an API
 * Link back to what Peter has already talked about.
   * Everything here can be downloaded and used for free
 
@@ -93,7 +93,7 @@ Dr Richard Cartwright - Founder & CTO - Streampunk Media Ltd
   * __Deploy__
  * Look at the grain that flowed down the pipe in the debbug tab ... wow!
  * Check out the flows and sources:
-   * [http://localhost:3101/x-nmos/node/v1.0/flows](http://localhost:3101/x-nmos/node/v1.0/flows) [http://localhost:3002/x-nmos/query/v1.0/flows](http://localhost:3002/x-nmos/query/v1.0/flows)
+   * [http://localhost:3101/x-nmos/node/v1.0/flows](http://localhost:3101/x-nmos/node/v1.0/flows)     [http://localhost:3002/x-nmos/query/v1.0/flows](http://localhost:3002/x-nmos/query/v1.0/flows)
    * [http://localhost:3101/x-nmos/node/v1.0/sources](http://localhost:3101/x-nmos/node/v1.0/sources) [http://localhost:3002/x-nmos/query/v1.0/sources](http://localhost:3002/x-nmos/query/v1.0/sources)
  * Other things to try:
   * Set the timeout parameter in spout to 500ms
@@ -161,7 +161,7 @@ Dr Richard Cartwright - Founder & CTO - Streampunk Media Ltd
 * Take a look at the [HTTP admin API methods](http://nodered.org/docs/api/admin/methods/)
 * Look at the flows behind the scenes [http://localhost:8000/red/flows](http://localhost:8000/red/flows)
 * Look at the specific flow [http://localhost:8000/red/flow/](http://localhost:8000/red/flow/)<flow-id>
-* Use curl to delete the flow `curl -X DELETE http://localhost:8000/red/flow/<flow-id>`
+* Use [curl](https://curl.haxx.se/) to delete the flow `curl -X DELETE http://localhost:8000/red/flow/<flow-id>`
 * Use curl to create a new flow:
 
 ```
@@ -173,7 +173,9 @@ curl -X POST http://localhost:8000/red/flow -H "Content-Type: application/json" 
 
 ![switch](../images/switch.png)
 
-* This is nonsense ... so we're working on adding some rules that prevent mixing single essnece type flows.
+* This is nonsense ... 
+  * We're working on adding some rules that prevent errors pre-flight and auto-configure nodes.
+  * You can walk the Node-RED flows on deployment and check they do something sensible
 
 ## Summary
 
