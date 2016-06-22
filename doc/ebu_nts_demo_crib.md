@@ -5,8 +5,8 @@
 ## Introduction
 
 * What we are trying to achieve as a new company.
-  * Ground up implementation of JT-NM, applying big data technologies and IoT concepts to media infrastructure on commodity IT.
-  * Everything is browser-based, RESTful, cloud-ready, measured and monitored.
+  * Ground up implementation of JT-NM reference architecture, applying big data technologies and IoT concepts to media infrastructure on commodity IT.
+  * Software-only infrastructure - Everything is browser-based, RESTful, cloud-ready, measured and monitored.
   * Education, design, implementation, support - based around a set of open source tools.
 * Tour of Streampunk Media software. https://github.com/Streampunk and http://www.npmjs.com/~streampunk
   * dynamorse
@@ -15,7 +15,7 @@
   * netadon
   * kelvinadon
   * macadam
-* Take an interactive tour
+* Interactive demonstration
   * Prototype software, things will go wrong, restarts will be required please ask questions as we go ... or even follow along.
   * Install from scratch
   * Set up registration & discovery service
@@ -55,14 +55,16 @@
   * Create and enter a new folder for this demonstration
   * `npm install -g dynamorse`
   * `dynamorse`
-* Run GUI [http://localhost:8000/red/] and explore funnels, spouts, valves etc..
-* Check the NMOS Reg&D NodeAPI at [http://localhost:3101/x-nmos/node/v1.0/]
-  * Browser to node API description of self http://localhost:3101/x-nmos/node/v1.0/self
-  * Show that the node has registered itself via query API http://localhost:3002/x-nmos/query/v1.0/nodes
-  * Show the devices http://localhost:3101/x-nmos/node/v1.0/devices
-  * Show the devices as registered http://localhost:3002/x-nmos/query/v1.0/devices
-  * Explore the API by dereferncing a node, e.g. http://localhost:3002/x-nmos/query/v1.0/nodes/<uuid-of-a-node>
+* Run GUI [http://localhost:8000/red/]() and explore funnels, spouts, valves etc..
+* Check the NMOS Reg&D NodeAPI at [http://localhost:3101/x-nmos/node/v1.0/]()
+  * Browser to node API description of self [http://localhost:3101/x-nmos/node/v1.0/self]()
+  * Show that the node has registered itself via query API [http://localhost:3002/x-nmos/query/v1.0/nodes]()
+  * Show the devices [http://localhost:3101/x-nmos/node/v1.0/devices]()
+  * Show the devices as registered [http://localhost:3002/x-nmos/query/v1.0/devices]()
+  * Explore the API by dereferncing a node, e.g. [http://localhost:3002/x-nmos/query/v1.0/nodes/]()<uuid-of-a-node>
 * Recap - run NMOS registration service, run NMOS node with 2 devices, node discovers and registers, made a query
+
+## Grains and flows
 
 ### My first flow - grains 101
 
@@ -183,5 +185,11 @@ curl -X POST http://localhost:8000/red/flow -H "Content-Type: application/json" 
 ### Nice to have
 
 * Receive an NMOS stream - requires an SDP file to be created
+
+### Pre-demo
+
+* Uninstall dynamorse `npm uninstall -g dynamorse`
+* Uninstall nmos-ledger `npm uninstall -g ledger`
+* Check docker is running, load EBU NTS dashboard into grafana using [this file]().
 
 
