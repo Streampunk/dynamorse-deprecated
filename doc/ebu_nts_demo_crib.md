@@ -29,6 +29,7 @@
 ## Installation
 
 ### Platform
+
 * Show installation of Node.js LTS from https://nodejs.org/en/
 * Describe node.js and its package manager, culture etc.
 * Discuss the need for a compiler at this time
@@ -40,13 +41,13 @@
   * `npm install -g nmos-ledger`
   * `nmos-ledger`
   * Connect to:
-   * http://localhost:3002/x-nmos/query/v1.0/ - leave open in a tab
-   * http://localhost:3001/x-nmos/registration/v1.0/
+    * [http://localhost:3002/x-nmos/query/v1.0/](http://localhost:3002/x-nmos/query/v1.0/) - leave open in a tab
+    * [http://localhost:3001/x-nmos/registration/v1.0/](http://localhost:3001/x-nmos/registration/v1.0/)
   * Show MDNS adveristisement:
-   * `dns-sd -B _nmos-query._tcp`
-   * `dns-sd -L ledger_query  _nmos-query._tcp`
-   * `ping ledger_query.local`
-   * `ping ledger_registration.local`
+    * `dns-sd -B _nmos-query._tcp`
+    * `dns-sd -L ledger_query  _nmos-query._tcp`
+    * `ping ledger_query.local`
+    * `ping ledger_registration.local`
 
 ### Designing infrastructure - dynamorse
 
@@ -55,13 +56,13 @@
   * Create and enter a new folder for this demonstration
   * `npm install -g dynamorse`
   * `dynamorse`
-* Run GUI [http://localhost:8000/red/]() and explore funnels, spouts, valves etc..
-* Check the NMOS Reg&D NodeAPI at [http://localhost:3101/x-nmos/node/v1.0/]()
-  * Browser to node API description of self [http://localhost:3101/x-nmos/node/v1.0/self]()
-  * Show that the node has registered itself via query API [http://localhost:3002/x-nmos/query/v1.0/nodes]()
-  * Show the devices [http://localhost:3101/x-nmos/node/v1.0/devices]()
-  * Show the devices as registered [http://localhost:3002/x-nmos/query/v1.0/devices]()
-  * Explore the API by dereferncing a node, e.g. [http://localhost:3002/x-nmos/query/v1.0/nodes/]()<uuid-of-a-node>
+* Run GUI [http://localhost:8000/red/](http://localhost:8000/red/) and explore funnels, spouts, valves etc..
+* Check the NMOS Reg&D NodeAPI at [http://localhost:3101/x-nmos/node/v1.0/](http://localhost:3101/x-nmos/node/v1.0/)
+  * Browser to node API description of self [http://localhost:3101/x-nmos/node/v1.0/self](http://localhost:3101/x-nmos/node/v1.0/self)
+  * Show that the node has registered itself via query API [http://localhost:3002/x-nmos/query/v1.0/nodes](http://localhost:3002/x-nmos/query/v1.0/nodes)
+  * Show the devices [http://localhost:3101/x-nmos/node/v1.0/devices](http://localhost:3101/x-nmos/node/v1.0/devices)
+  * Show the devices as registered [http://localhost:3002/x-nmos/query/v1.0/devices](http://localhost:3002/x-nmos/query/v1.0/devices)
+  * Explore the API by dereferncing a node, e.g. [http://localhost:3002/x-nmos/query/v1.0/nodes/](http://localhost:3002/x-nmos/query/v1.0/nodes/)<uuid-of-a-node>
 * Recap - run NMOS registration service, run NMOS node with 2 devices, node discovers and registers, made a query
 
 ## Grains and flows
@@ -188,8 +189,11 @@ curl -X POST http://localhost:8000/red/flow -H "Content-Type: application/json" 
 
 ### Pre-demo
 
+* Remove Node.js - use the installer in downloads. Clear download.
 * Uninstall dynamorse `npm uninstall -g dynamorse`
 * Uninstall nmos-ledger `npm uninstall -g ledger`
-* Check docker is running, load EBU NTS dashboard into grafana using [this file]().
+* Check docker is running, load EBU NTS dashboard into grafana using [this file](ebu_nts_2016_graphs.json).
+* cd to Documents folder in terminal.
+* Clear down all browser tabs to just [this page](https://github.com/Streampunk/dynamorse/edit/master/doc/ebu_nts_demo_crib.md).
 
 
