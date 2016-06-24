@@ -1,6 +1,8 @@
 # Dynamorse
 
-[Click her for EBU NTS 2016 demo crib sheet.](doc/ebu_nts_demo_crib.md)
+[Click here for EBU NTS 2016 demo crib sheet.](doc/ebu_nts_demo_crib.md)
+
+[Click here for AMWA Tech Together London 2016 crib sheet.](doc/amwa_techtogether_crib.md)
 
 ![overview graphic](images/overview.png)
 
