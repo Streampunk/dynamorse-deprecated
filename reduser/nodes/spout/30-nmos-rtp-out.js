@@ -102,6 +102,7 @@ module.exports = function (RED) {
     var sender = null;
     var sdp = null;
     var lastSend = null;
+    var Packet = null;
     this.each(function (g, next) {
       this.log(`Received grain ${Grain.prototype.formatTimestamp(g.ptpSync)}.`);
       if (!Grain.isGrain(g)) return node.warn('Received a non-grain on the input.');
@@ -117,6 +118,9 @@ module.exports = function (RED) {
             height = +f.tags.height[0];
             byteFactor = getByteFactor(f.tags);
             interlace = f.tags.interlace && f.tags.interlace[0] === '1';
+            Packet = RFC4175Packet;
+          } else {
+            Packet = RTPPacket;
           }
           stride = getStride(f.tags);
           source = new ledger.Source(null, null, localName, localDescription,
@@ -176,6 +180,7 @@ module.exports = function (RED) {
           packet.getLineData()[0].length;
         // console.log('HAT', packet.getLineData()[0].lineNo, (b.length - o) % 4800, 4800 - lineStatus.linePos,
         //   ((b.length - o) % 4800) - (4800 - lineStatus.linePos));
+        // console.log(b.length, o, t, remaining, (b.length - o) >= t);
         if ((b.length - o) >= t) {
           packet.setPayload(b.slice(o, o + t));
           o += t;
@@ -183,13 +188,16 @@ module.exports = function (RED) {
           // FIXME: probably won't work for compressed video
           if (!is4175) tsAdjust += t / stride;
           remaining = 1410; // Slightly short so last header fits
-          packet = makePacket(g, remaining);
+          // packet = makePacket(g, remaining);
         } else if (++i < g.buffers.length) {
+          console.log("Getting next buffer."); // Not called when one buffer per grain - now the default
           b = Buffer.concat([b.slice(o), g.buffers[i]],
             b.length + g.buffers[i].length - o);
           o = 0;
         } else {
-          b = b.slice(o);
+          // console.log("Shrinking buffer.", o, t, b.length);
+          // TODO: This seems pointless - removing for now.
+          // b = b.slice(o);
         }
       }
       var endExt = { profile : 0xbede };
@@ -211,6 +219,7 @@ module.exports = function (RED) {
       }
 
       sendPacket(packet, next);
+      console.log(':-(', process.hrtime(grainTimer));
 
       if (config.timeout === 0) {
         setImmediate(next);
@@ -223,10 +232,14 @@ module.exports = function (RED) {
         // timeoutTune = 0;
         setTimeout(waitNext, config.timeout - 5);
       }
+      console.log(':-((', process.hrtime(grainTimer));
     }
     function makePacket (g, remaining) {
-      var packet = (is4175) ? new RFC4175Packet(new Buffer(1452)) :
-        new RTPPacket(new Buffer(1452));
+      // var packetMaker = process.hrtime();
+      var buf = new Buffer(1452);
+      // var bufAlloc = process.hrtime(packetMaker);
+      var packet = new Packet(buf);
+      // console.log('Made buffer in', bufAlloc, 'packet in', process.hrtime(packetMaker));
       packet.setVersion(2);
       packet.setPadding(false);
       packet.setExtension(false);
@@ -246,6 +259,7 @@ module.exports = function (RED) {
           tsAdjust = 1800; // TODO Find a frame rate adjust
         }
       }
+      // console.log('Packet maker', process.hrtime(packetMaker));
       return packet;
     }
 
@@ -254,9 +268,10 @@ module.exports = function (RED) {
     var packetTime = process.hrtime();
     var packetBuffers = [];
     function sendPacket (p, done) {
+      return;
       packetBuffers.push(p.buffer);
-      packetCount++;
       if (done) {
+        packetCount++;
         sock.send(packetBuffers, 0, p.length, config.port, config.address,
           function (e) {
             callbackCount++;
