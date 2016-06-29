@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/Streampunk/dynamorse.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/Streampunk/dynamorse)
 # Dynamorse
 
 [Click here for EBU NTS 2016 demo crib sheet.](doc/ebu_nts_demo_crib.md)
