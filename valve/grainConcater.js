@@ -23,7 +23,8 @@ module.exports = function(srcTags) {
     console.log('Concater exiting');
   });
 
-  var dstSampleSize = calculateSampleSize(srcTags);
+  var dstSampleSize = concater.setInfo(srcTags);
+  //var dstSampleSize = calculateSampleSize(srcTags);
   var isVideo = srcTags.format[0] === 'video';
 
   var grainMuncher = function (err, x, push, next) {
