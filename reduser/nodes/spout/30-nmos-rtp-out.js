@@ -88,8 +88,8 @@ module.exports = function (RED) {
       if (err) return node.warn(err);
       sock.setMulticastTTL(config.ttl);
     };
-    if (config.netif) { sock.bind(config.port, config.netif, bindCb); }
-    else { sock.bind(config.port, bindCb); }
+//    if (config.netif) { sock.bind(config.port, config.netif, bindCb); }
+//    else { sock.bind(config.port, bindCb); }
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     var rtpExtDefID = this.context().global.get('rtp_ext_id');
@@ -268,7 +268,7 @@ module.exports = function (RED) {
     var packetTime = process.hrtime();
     var packetBuffers = [];
     function sendPacket (p, done) {
-      return;
+      // return;
       packetBuffers.push(p.buffer);
       if (done) {
         packetCount++;
