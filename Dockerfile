@@ -8,4 +8,5 @@ RUN cd /src; npm install --production
 COPY . /src
 
 EXPOSE  8000 
+VOLUME ["/data"]
 CMD ["node", "/src/server.js"]
