@@ -188,7 +188,7 @@ module.exports = function (RED) {
           // FIXME: probably won't work for compressed video
           if (!is4175) tsAdjust += t / stride;
           remaining = 1410; // Slightly short so last header fits
-          // packet = makePacket(g, remaining);
+          packet = makePacket(g, remaining);
         } else if (++i < g.buffers.length) {
           console.log("Getting next buffer."); // Not called when one buffer per grain - now the default
           b = Buffer.concat([b.slice(o), g.buffers[i]],
