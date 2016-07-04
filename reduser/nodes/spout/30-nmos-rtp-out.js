@@ -88,8 +88,8 @@ module.exports = function (RED) {
       if (err) return node.warn(err);
       sock.setMulticastTTL(config.ttl);
     };
-//    if (config.netif) { sock.bind(config.port, config.netif, bindCb); }
-//    else { sock.bind(config.port, bindCb); }
+    if (config.netif) { sock.bind(config.port, config.netif, bindCb); }
+    else { sock.bind(config.port, bindCb); }
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     var rtpExtDefID = this.context().global.get('rtp_ext_id');
@@ -150,6 +150,8 @@ module.exports = function (RED) {
     var grainTimer = process.hrtime();
     function pushGrain (g, next) {
       console.log(':-)', process.hrtime(grainTimer));
+      var masterBuffer = new Buffer(4400*1452);
+      var pc = 0;
       grainTimer = process.hrtime();
       lineStatus = (is4175) ? {
         width: width, stride: stride, lineNo: 21,
@@ -158,7 +160,7 @@ module.exports = function (RED) {
         field : 1
       } : undefined;
       var remaining = 1200; // Allow for extension
-      var packet = makePacket(g, remaining);
+      var packet = makePacket(g, remaining, masterBuffer, pc++);
 
       // Make grain start RTP header extension
       var startExt = { profile : 0xbede };
@@ -188,7 +190,7 @@ module.exports = function (RED) {
           // FIXME: probably won't work for compressed video
           if (!is4175) tsAdjust += t / stride;
           remaining = 1410; // Slightly short so last header fits
-          packet = makePacket(g, remaining);
+          packet = makePacket(g, remaining, masterBuffer, pc++);
         } else if (++i < g.buffers.length) {
           console.log("Getting next buffer."); // Not called when one buffer per grain - now the default
           b = Buffer.concat([b.slice(o), g.buffers[i]],
@@ -220,6 +222,7 @@ module.exports = function (RED) {
 
       sendPacket(packet, next);
       console.log(':-(', process.hrtime(grainTimer));
+      masterBuffer = null;
 
       if (config.timeout === 0) {
         setImmediate(next);
@@ -234,11 +237,12 @@ module.exports = function (RED) {
       }
       console.log(':-((', process.hrtime(grainTimer));
     }
-    function makePacket (g, remaining) {
+    function makePacket (g, remaining, buf, pc) {
       // var packetMaker = process.hrtime();
-      var buf = new Buffer(1452);
+      // var buf = new Buffer(1452);
+      // var packet = new Packet(buf);
       // var bufAlloc = process.hrtime(packetMaker);
-      var packet = new Packet(buf);
+      var packet = new Packet(buf.slice(pc*1452, pc*1452+1452));
       // console.log('Made buffer in', bufAlloc, 'packet in', process.hrtime(packetMaker));
       packet.setVersion(2);
       packet.setPadding(false);
@@ -268,7 +272,7 @@ module.exports = function (RED) {
     var packetTime = process.hrtime();
     var packetBuffers = [];
     function sendPacket (p, done) {
-      // return;
+      // console.log('\_/', p.getExtension(), p.getExtendedSequenceNumber(), p.getSequenceNumber());
       packetBuffers.push(p.buffer);
       if (done) {
         packetCount++;
@@ -279,7 +283,7 @@ module.exports = function (RED) {
             if (e) return console.error(e);
           });
         packetBuffers = [];
-        console.log('+++', packetCount, callbackCount, process.hrtime(packetTime)[1]/1000000);
+        // console.log('+++', packetCount, callbackCount, process.hrtime(packetTime)[1]/1000000);
         packetTime = process.hrtime();
       }
     }
