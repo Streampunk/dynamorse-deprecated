@@ -36,7 +36,7 @@
     "uuid": "^2.0.1",
     "xml2js": "^0.4.16",
     "codecadon": "^0.0.5",
-    "macadam": "^0.1.2" ,
+    "macadam": "^0.1.3" ,
     "netadon" : "^0.0.2"
   },
   "bin": {
