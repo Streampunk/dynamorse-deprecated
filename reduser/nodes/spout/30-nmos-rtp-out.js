@@ -103,6 +103,7 @@ module.exports = function (RED) {
     var sdp = null;
     var lastSend = null;
     var Packet = null;
+    var packetsPerGrain = 100;
     this.each(function (g, next) {
       this.log(`Received grain ${Grain.prototype.formatTimestamp(g.ptpSync)}.`);
       if (!Grain.isGrain(g)) return node.warn('Received a non-grain on the input.');
@@ -119,6 +120,7 @@ module.exports = function (RED) {
             byteFactor = getByteFactor(f.tags);
             interlace = f.tags.interlace && f.tags.interlace[0] === '1';
             Packet = RFC4175Packet;
+            packetsPerGrain = width * height * byteFactor * 1.1 / 1452|0;
           } else {
             Packet = RTPPacket;
           }
@@ -150,7 +152,7 @@ module.exports = function (RED) {
     var grainTimer = process.hrtime();
     function pushGrain (g, next) {
       console.log(':-)', process.hrtime(grainTimer));
-      var masterBuffer = new Buffer(4400*1452);
+      var masterBuffer = new Buffer(packetsPerGrain*1452);
       var pc = 0;
       grainTimer = process.hrtime();
       lineStatus = (is4175) ? {
@@ -276,7 +278,7 @@ module.exports = function (RED) {
       packetBuffers.push(p.buffer);
       if (done) {
         packetCount++;
-        sock.send(packetBuffers, 0, p.length, config.port, config.address,
+          sock.send(packetBuffers, 0, p.length, config.port, config.address,
           function (e) {
             callbackCount++;
             // done();

@@ -116,7 +116,7 @@ var settings = {
       updated : false
     },    // enables global context
     paletteCategories: ['subflows', 'funnel', 'valve', 'fitting', 'spout', 'testing', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
-    logging: { console : { level : "error", audit : false } }
+    logging: { console : { level : "trace", audit : false } }
 };
 
 // Initialise the runtime with a server and settings
