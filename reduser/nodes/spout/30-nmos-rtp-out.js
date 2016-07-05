@@ -199,9 +199,9 @@ module.exports = function (RED) {
             b.length + g.buffers[i].length - o);
           o = 0;
         } else {
-          // console.log("Shrinking buffer.", o, t, b.length);
-          // TODO: This seems pointless - removing for now.
-          // b = b.slice(o);
+          console.log("Shrinking buffer.", o, t, b.length);
+          // Required to shrink last packet of the set.
+          b = b.slice(o);
         }
       }
       var endExt = { profile : 0xbede };
