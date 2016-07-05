@@ -24,9 +24,10 @@ module.exports = function (client, sdpOrAddress, port, netif) {
     var sdp = sdpOrAddress;
     address = sdp.getConnectionAddress(0);
     port = sdp.getPort(0);
-    netif = sdp.getOriginUnicastAddress();
+    // netif = sdp.getOriginUnicastAddress();
     ttl = sdp.getConnectionTTL(0);
   }
+  if (!netif) netif = '0.0.0.0';
   var errorStream = H('error', client).map(function (e) { throw e; });
   var messageStream = H('message', client, ['msg', 'rinfo']).map(function (o) { return o.msg; });
   var listenStream = H('listening', client).map(function () { return { state: 'listening' }; });
