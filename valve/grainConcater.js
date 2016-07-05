@@ -26,6 +26,7 @@ module.exports = function(srcTags) {
   var dstSampleSize = concater.setInfo(srcTags);
   //var dstSampleSize = calculateSampleSize(srcTags);
   var isVideo = srcTags.format[0] === 'video';
+  if (!isVideo) dstSampleSize = calculateSampleSize(srcTags);
 
   var grainMuncher = function (err, x, push, next) {
     if (err) {
