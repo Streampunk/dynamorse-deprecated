@@ -23,7 +23,6 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
 
-    console.log(`Tickly ${count++}.`);
     // Go figure
   }
   util.inherits(MOVIn, redioactive.Funnel);
