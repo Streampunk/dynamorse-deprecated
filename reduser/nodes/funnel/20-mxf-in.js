@@ -15,21 +15,15 @@
 
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
-var klv = require('kelvinadon');
-var grainConcater = require('../../../valve/grainConcater.js');
 
 module.exports = function (RED) {
   function MXFIn (config) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
 
-    // var base = H(res)
-    // .through(klv.kelviniser())
-    // .through(klv.metatiser())
-    // .through(klv.stripTheFiller)
-    // .through(klv.detailing())
-    // .through(klv.puppeteer())
-    // .through(klv.trackCacher());
+    if (!this.context().global.get('updated'))
+      return this.log("Waiting for global context update.");
+    // Go figure
   }
   util.inherits(MXFIn, redioactive.Funnel);
   RED.nodes.registerType("mxf-in", MXFIn);

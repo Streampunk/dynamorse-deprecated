@@ -26,6 +26,8 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
 
+    if (!this.context().global.get('updated'))
+      return this.log('Waiting for global context updated.');
     // var protocol = (config.protocol === 'HTTP') ? http : https;
     //
     // var runNext = function (x) {

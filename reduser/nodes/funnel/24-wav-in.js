@@ -137,10 +137,8 @@ module.exports = function (RED) {
   function WAVIn (config) {
     RED.nodes.createNode(this,config);
     redioactive.Funnel.call(this, config);
-    if (!this.context().global.get('updated')) {
-      this.log('False start for WAV funnel.');
-      return;
-    }
+    if (!this.context().global.get('updated'))
+      return this.log('Waiting for global context updated.');
     fs.access(config.file, fs.R_OK, function (e) {
       if (e) {
         return this.preFlightError(e);

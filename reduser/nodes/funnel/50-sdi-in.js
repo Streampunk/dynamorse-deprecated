@@ -21,6 +21,8 @@ module.exports = function (RED) {
     RED.nodes.createNode(this,config);
     redioactive.Funnel.call(this, config);
     // Go figure!
+    if (!this.context().global.get('updated'))
+      return this.log('Waiting for global context updated.');
   }
   util.inherits(SDIIn, redioactive.Funnel);
   RED.nodes.registerType("sdi-in", SDIIn);

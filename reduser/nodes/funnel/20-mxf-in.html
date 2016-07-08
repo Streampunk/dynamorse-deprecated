@@ -20,7 +20,7 @@
     color: '#D79748',
     defaults: {
       name : { value : ''},
-      file : { value : '', required : true },
+      mxfUrl : { value : '', required : true },
       loop : { value : false },
       regenerate : { value : false },
       description : { value : '' },
@@ -65,8 +65,8 @@
     <input type="text" id="node-input-name" placeholder="name">
   </div>
   <div class="form-row">
-    <label for="node-input-file"><i class="fa fa-file"></i> MXF file</label>
-    <input type="text" id="node-input-file" placeholder="dynamorse.mxf">
+    <label for="node-input-mxfUrl"><i class="fa fa-file"></i> MXF URL</label>
+    <input type="text" id="node-input-mxfUrl" placeholder="dynamorse.mxf">
   </div>
   <div class="form-row">
     <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
@@ -123,9 +123,10 @@
 
 <script type="text/x-red" data-help-name="mxf-in">
   <h1>MXF file input</h1>
-  <p>Read grains from a MXF file, creating one or more NMOS flow(s) per
-  track. The MXF file may be located on a web-server, in which case specify
-  its location with an HTTP URL. If no protocol is specified, the file is
+  <p>Read grains from a MXF stream, creating one or more NMOS flow(s) per
+  essence element. The MXF file may be located as a local file, on am HTTP
+  web-server or a FRP server, in which case specify
+  its location with a URL. If no protocol is specified, a file is
   assumed to be stored locally.</p>
 
   <p>Select the tracks from the that you would like to appear as NMOS flows.
@@ -139,9 +140,9 @@
   <p>MXF nodes have three outputs. From top to bottom, these are:</p>
 
   <ol>
-   <li>Picture/video flows.</li>
-   <li>Sound/audio flows.</li>
-   <li>Data/event flows.</li>
+   <li>Picture (video) flows.</li>
+   <li>Sound (audio) flows.</li>
+   <li>Data (event) flows.</li>
   </ol>
 
   <h3>Parameters</h3>
@@ -155,8 +156,8 @@
     <td>Name of the node. Also used as a base for source &amp; flow labels.</td>
    </tr>
    <tr>
-    <td><i class="fa fa-file"></i> WAV file</td>
-    <td>Path location for the WAVE format input file.</td>
+    <td><i class="fa fa-file"></i> MXF URL</td>
+    <td>Location of the MXF stream.</td>
    </tr>
    <tr>
     <td><i class="fa fa-info-circle"></i> description</td>
@@ -171,20 +172,16 @@
     <td>Maximum number of grains to buffer before overflowing.</td>
    </tr>
    <tr>
-    <td><i class="fa fa-repeat"></i> loop?</td>
-    <td>Should the WAV file be repeated indefinitely?</td>
-   </tr>
-   <tr>
     <td><i class="fa fa-video-camera"></i> picture tracks</td>
-    <td>Select the picture tracks to be used to create video flows.</td>
+    <td>Select the picture essence tracks to be used to create video flows.</td>
    </tr>
    <tr>
     <td><i class="fa fa-music"></i> sound tracks</td>
-    <td>Select the sound tracks to be used to create audio flows.</td>
+    <td>Select the sound essence tracks to be used to create audio flows.</td>
    </tr>
    <tr>
     <td><i class="fa fa-table" aria-hidden="true"></i> data tracks</td>
-    <td>Select the data tracks to be used to create data flows.</td>
+    <td>Select the data essence tracks to be used to create data flows.</td>
    </tr>
   </table>
   </div>
@@ -195,6 +192,11 @@
   <p>Source and flow labels and descriptions are created to included the MXF track
   name, e.g. for a name <em>rise and shine</em>, the flow and source are labelled
   and described as <code>rise and shine picture0</code>.</p>
+
+  <p>The phrase <em>essence track</em> refers to the pacakaging of essence elements
+  into groups of tracks. A sound essence track may have more than one channel and
+  each channel may be exposed as a seperate timeline track for the purpose of
+  presentation and editing.</p>
 
   <h3>Maturity</h3>
   <p>Work in progress -
