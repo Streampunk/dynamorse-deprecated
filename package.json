@@ -1,6 +1,6 @@
 {
   "name": "dynamorse",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "IT swiss army knife for professional media infrastructure and production.",
   "main": "server.js",
   "scripts": {
@@ -30,7 +30,6 @@
     "express": "^4.13.4",
     "fastqueue": "^0.1.0",
     "highland": "^2.5.1",
-    "kelvinadon": "^0.1.1",
     "mp4-stream": "^2.0.1",
     "nmos-ledger": "^1.0.8",
     "node-red": "^0.13.1",
