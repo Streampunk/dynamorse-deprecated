@@ -16,10 +16,13 @@
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
 
+var count = 0;
+
 module.exports = function (RED) {
   function MOVIn (config) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
+
     // Go figure
   }
   util.inherits(MOVIn, redioactive.Funnel);
