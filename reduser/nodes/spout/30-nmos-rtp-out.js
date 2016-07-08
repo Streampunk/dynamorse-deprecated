@@ -115,10 +115,11 @@ module.exports = function (RED) {
           clockRate = +f.tags.clockRate[0];
           is4175 = f.tags.encodingName[0] === 'raw'; // TODO add pgroup/V210 check
           if (is4175) {
+            console.log(f.tags);
             width = +f.tags.width[0];
             height = +f.tags.height[0];
             byteFactor = getByteFactor(f.tags);
-            interlace = f.tags.interlace && f.tags.interlace[0] === '1';
+            interlace = f.tags.interlace && (f.tags.interlace[0] === '1' || f.tags.interlace[0] === 'true');
             Packet = RFC4175Packet;
             packetsPerGrain = width * height * byteFactor * 1.1 / 1452|0;
           } else {
@@ -177,7 +178,7 @@ module.exports = function (RED) {
       if (actualExts.prototype && actualExts.prototype.name === 'Error')
         node.warn(`Failed to set header extensions: ${actualExts}`);
 
-      var i = 0, o = 0;
+      var i = 0, o = 0; y = 0;
       var b = g.buffers[i];
       while (i < g.buffers.length) {
         var t = (!is4175 || !packet.getMarker()) ? remaining - remaining % stride :
@@ -186,8 +187,21 @@ module.exports = function (RED) {
         //   ((b.length - o) % 4800) - (4800 - lineStatus.linePos));
         // console.log(b.length, o, t, remaining, (b.length - o) >= t);
         if ((b.length - o) >= t) {
-          packet.setPayload(b.slice(o, o + t));
-          o += t;
+          if (is4175 && interlace && (lineStatus.lineNo > packet.getLineData()[0].lineNo)) {
+            // !!! doesn't currently handle > 2 line parts in a packet
+            if (lineStatus.lineNo === lineStatus.fieldBreaks.field2Start) {
+              packet.setPayload(b.slice(o, o + t));
+              o = lineStatus.bytesPerLine;
+            } else {
+              var newLineOff = o + (t - lineStatus.linePos) + lineStatus.bytesPerLine;
+              packet.setPayload(Buffer.concat([b.slice(o, o + (t - lineStatus.linePos)), 
+                                               b.slice(newLineOff, newLineOff + lineStatus.linePos)], t));
+              o = newLineOff + lineStatus.linePos;
+            }
+          } else {
+            packet.setPayload(b.slice(o, o + t));
+            o += t;
+          }
           sendPacket(packet); // May want to spread packets
           // FIXME: probably won't work for compressed video
           if (!is4175) tsAdjust += t / stride;
@@ -199,7 +213,7 @@ module.exports = function (RED) {
             b.length + g.buffers[i].length - o);
           o = 0;
         } else {
-          console.log("Shrinking buffer.", o, t, b.length);
+          // console.log("Shrinking buffer.", o, t, b.length);
           // Required to shrink last packet of the set.
           b = b.slice(o);
         }
