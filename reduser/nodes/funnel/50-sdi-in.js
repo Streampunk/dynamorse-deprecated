@@ -34,6 +34,7 @@ module.exports = function (RED) {
     var capture = new macadam.Capture(config.deviceIndex,
       fixBMDCodes(config.mode), fixBMDCodes(config.format));
     var node = this;
+    var grainDuration = macadam.modeGrainDuration(fixBMDCodes(config.mode));
     this.tags = {
       format : [ 'video' ],
       encodingName : [ 'raw' ],
@@ -44,9 +45,9 @@ module.exports = function (RED) {
       sampling : [ macadam.formatSampling(fixBMDCodes(config.format)) ],
       clockRate : [ '90000' ],
       interlace : [ (macadam.modeInterlace(fixBMDCodes(config.mode))) ? '1' : '0' ],
-      colorimetry : [ macadam.formatColorimetry(fixBMDCodes(config.format)) ]
+      colorimetry : [ macadam.formatColorimetry(fixBMDCodes(config.format)) ],
+      grainDuration : [ `${grainDuration[0]}/${grainDuration[1]}`]
     };
-    console.log(this.tags);
     this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ];
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
@@ -71,7 +72,6 @@ module.exports = function (RED) {
       var grainTime = new Buffer(10);
       grainTime.writeUIntBE(this.baseTime[0], 0, 6);
       grainTime.writeUInt32BE(this.baseTime[1], 6);
-      var grainDuration = [ 1000, 25000 ]; // TODO fix this!
       this.baseTime[1] = ( this.baseTime[1] +
         grainDuration[0] * 1000000000 / grainDuration[1]|0 );
       this.baseTime = [ this.baseTime[0] + this.baseTime[1] / 1000000000|0,
