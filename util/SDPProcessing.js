@@ -31,7 +31,7 @@ var sdpToTags = function(sdp, config) {
     this.setTag('sampling', sdp, sdp.getSampling, config);
     this.setTag('depth', sdp, sdp.getDepth, config);
     this.setTag('colorimetry', sdp, sdp.getColorimetry, config);
-    this.setTag('interlace', sdp, sdp.getInterlace, config);
+    this.setTag('interlace', sdp, sdp.getInterlace, config, false);
     this.tags.packing = [ 'pgroup' ];
   } else if (this.tags.format[0].endsWith('audio')) {
     this.setTag('channels', sdp, sdp.getEncodingParameters, config);
@@ -41,9 +41,9 @@ var sdpToTags = function(sdp, config) {
   return this.tags;
 }
 
-var setTag = function (name, sdp, valueFn, config) {
+var setTag = function (name, sdp, valueFn, config, deflt) {
   if (!name) return;
-  var value = (valueFn) ? valueFn.call(sdp, 0) : undefined;
+  var value = (valueFn) ? valueFn.call(sdp, 0) : deflt;
   if (!value) {
     value = config[name];
     if (!value) {
@@ -56,7 +56,7 @@ var setTag = function (name, sdp, valueFn, config) {
   } else if (typeof value === 'string') {
     this.tags[name] = [ value ];
   } else if (typeof value === 'boolean') {
-    this.tags[name] = [ `${value}` ];
+    this.tags[name] = value ? [ '1' ] : [ '0' ];
   } else {
     this.warn(`Cannot set property ${name} because value is of unsupported type ${typeof value}.`);
   }

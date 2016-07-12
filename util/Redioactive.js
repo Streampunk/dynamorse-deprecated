@@ -132,7 +132,6 @@ function Funnel (config) {
           pull : pull
         });
       };
-
       if (queue.length >= maxBuffer) {
         node.setStatus('red', 'dot', 'overflow');
       } else if (queue.length >= 0.75 * maxBuffer) {
@@ -141,6 +140,13 @@ function Funnel (config) {
         node.setStatus('green', 'dot', 'generating');
       }
     } // });
+  };
+  this.eventMuncher = function (emitter, event, map) {
+    emitter.on(event, function (value) {
+      if (map) value = map(value);
+      push(null, value);
+      next();
+    });
   };
   var workStart = null;
   var next = function () {

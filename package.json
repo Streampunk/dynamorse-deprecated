@@ -1,6 +1,6 @@
 {
   "name": "dynamorse",
-  "version": "0.1.11",
+  "version": "0.1.13",
   "description": "IT swiss army knife for professional media infrastructure and production.",
   "main": "server.js",
   "scripts": {
@@ -36,7 +36,10 @@
     "seamless-immutable": "^4.1.1",
     "tape": "^4.2.2",
     "uuid": "^2.0.1",
-    "xml2js": "^0.4.16"
+    "xml2js": "^0.4.16",
+    "codecadon": "^0.0.6",
+    "macadam": "^0.1.6",
+    "netadon" : "^0.0.3"
   },
   "bin": {
     "dynamorse": "./server.js"
