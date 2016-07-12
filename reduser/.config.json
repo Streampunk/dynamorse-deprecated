@@ -719,6 +719,15 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/20-converter.js"
     },
+    "packer": {
+     "name": "packer",
+     "types": [
+      "packer"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/22-packer.js"
+    },
     "mix": {
      "name": "mix",
      "types": [

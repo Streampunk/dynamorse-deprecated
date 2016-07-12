@@ -28,7 +28,7 @@ var pid = process.pid;
 
 var properties = {
   redPort : '8000',
-  ledgerPort : '3001',
+  ledgerPort : '3101',
   userDir : 'reduser'
 };
 
@@ -116,7 +116,7 @@ var settings = {
       updated : false
     },    // enables global context
     paletteCategories: ['subflows', 'funnel', 'valve', 'fitting', 'spout', 'testing', 'input', 'output', 'function', 'social', 'mobile', 'storage', 'analysis', 'advanced'],
-    logging: { console : { level : "trace", audit : true } }
+    logging: { console : { level : "trace", audit : false } }
 };
 
 // Initialise the runtime with a server and settings
@@ -140,11 +140,12 @@ var EE = require('events').EventEmitter;
 var logger = new EE();
 RED.log.addHandler(logger);
 logger.on('log', function (x) { if (x.msg === 'Starting flows') {
+  RED.settings.functionGlobalContext.updated = false;
   // logger.removeAllListeners();
   nodeAPI.putResource(device).catch(RED.log.error);
   nodeAPI.putResource(pipelines).then(function () {
     RED.log.info('Devices and self registred with ledger.');
-    RED.settings.functionGlobalContext.updated = true;
+
     RED.nodes.updateFlow('global', {
       configs: [ {
         id: deviceNodeID,
@@ -194,7 +195,8 @@ logger.on('log', function (x) { if (x.msg === 'Starting flows') {
     if (!RED.nodes.getFlows().some(function (x) {
       return x.label === 'Dynamorse'
     })) {
-      RED.nodes.addFlow({
+      RED.log.info("Creating dynamorse tab.")
+      return RED.nodes.addFlow({
         label : 'Dynamorse',
         configs: [ ],
         nodes: [ {
@@ -208,10 +210,15 @@ logger.on('log', function (x) { if (x.msg === 'Starting flows') {
           y: 45,
           wires: []
         } ]
-      });
+      }).then(RED.nodes.loadFlows);
+    } else {
+      RED.log.info("Dynamorse tab already in place.");
     }
   }).then(
-    function () { RED.log.info('Dynamorse tab checked and created if required.')},
+    function () {
+      RED.settings.functionGlobalContext.updated = true;
+      RED.log.info('Dynamorse tab checked and created if required.')
+    },
     RED.log.error
   );
 }} );

@@ -1,4 +1,9 @@
+[![CircleCI](https://circleci.com/gh/Streampunk/dynamorse.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/Streampunk/dynamorse)
 # Dynamorse
+
+[Click here for EBU NTS 2016 demo crib sheet.](doc/ebu_nts_demo_crib.md)
+
+[Click here for AMWA Tech Together London 2016 crib sheet.](doc/amwa_techtogether_crib.md)
 
 ![overview graphic](images/overview.png)
 
@@ -107,6 +112,8 @@ The design of redioactive was inspired by [highland.js](http://highlandjs.org/).
 
 Each dynamorse instance can send statistics to [influxdb](https://influxdata.com/time-series-platform/influxdb/), a time-series database that is optimized for storing and searching metrics information. The running instance sends metrics about the overall performance of the application, along with each Node-RED node sending details about how many grains it processed per second and how long it took to process each grain. This data can be mined and turned into reports or graphed in real time with tools such as  [Grafana](http://grafana.org/).
 
+![grafana example](images/grafana.png)
+
 Dynamorse uses standard IT tools so that it fits alongside other metrics systems and applications in an enterprise IT environment. Combined with system monitoring tools that also work with the same toolsets, such as [collectd](https://collectd.org/), it is possible to monitor and respond to issues such as real-time streams about to dropping below real-time performance. Also, developers and testers can analyze performance by watching for memory leaks, buffer overflows, the impact of garbage collection etc..
 
 ## Getting started
@@ -119,7 +126,9 @@ Install Node.js for your plarform. This software has been developed against the 
 
 Mac and linux users may have to prepend `sudo` to the above.
 
-Dynamorse depends on modules that use native C++ bindings that compile with node-gyp. To use these modules, you many need to install a C++ compiler and python on your system. On Windows, compilation has been tested using the community edition of Microsoft Visual Studio 2015.
+Dynamorse depends on modules that use native C++ bindings that compile with node-gyp. To use these modules, you many need to install a C++ compiler and python on your system. On Windows, compilation has been tested using the community edition of Microsoft Visual Studio 2015. On Windows, node may need to be configured with:
+
+    npm config set msvs_version 2015 --global
 
 At this time, dynamorse is not intended for use as dependency in other projects. However, you may wish to install dynamorse locally in a `node_modules` sub-folder. In which case:
 
@@ -139,7 +148,7 @@ The Windows flavor is a bit more involved:
 
     for /a %a in ('"npm bin"') do %a\dynamorse
 
-Connect to the user interface via a web browser. By default, the UI runs on port `8000`, so use http://localhost:8000/red. The NMOS Node API runs on port `3001` be default, so connect in another tab with http://localhost:3001/x-nmos/node/v1.0/. Alternatively, connect over HTTP from a another browser on a different computer.
+Connect to the user interface via a web browser. By default, the UI runs on port `8000`, so use [http://localhost:8000/red](http://localhost:8000/red). The NMOS Node API runs on port `3101` be default, so connect in another tab with [http://localhost:3101/x-nmos/node/v1.0/]([http://localhost:3101/x-nmos/node/v1.0/). Alternatively, connect over HTTP from a another browser on a different computer.
 
 The choice of available nodes is provided down the left-hand-side. Each node is self-describing - click on it and it describes what it is and how to configure it in the info panel on the right-hand-side. Drag nodes out into the central flow designer panel and link them together by joining output ports to input ports.
 
@@ -167,8 +176,7 @@ On Windows:
 
 #### Maturing - behind the scenes
 
-Using the Node-RED drag-and-drop user interface to define a large scale infrastructure will quickly become tiresome. Fortunately, this UI is not the only way to work deploy and configure virtual infrastructure with Node-RED. Behind the scenes is a REST API -the [Node-RED Admin HTTP API](http://nodered.org/docs/api/admin/) - that can be used to inspect and deploy nodes. For example, to see the currently deployed flows on a local instance on the default port, browse to
-http://localhost:8000/red/flows. As use of the API matures at an installation, infrastructure can be orchestrated through this API using standard IT tools, including business process orchestration, resource managers and rules engines.
+Using the Node-RED drag-and-drop user interface to define a large scale infrastructure will quickly become tiresome. Fortunately, this UI is not the only way to work deploy and configure virtual infrastructure with Node-RED. Behind the scenes is a REST API -the [Node-RED Admin HTTP API](http://nodered.org/docs/api/admin/) - that can be used to inspect and deploy nodes. For example, to see the currently deployed flows on a local instance on the default port, browse to [http://localhost:8000/red/flows](http://localhost:8000/red/flows). As use of the API matures at an installation, infrastructure can be orchestrated through this API using standard IT tools, including business process orchestration, resource managers and rules engines.
 
 As a half way house, it is possible to create and manage _subflows_, accessed via the menu icon in the top-right corner of the screen.
 
@@ -209,7 +217,7 @@ Other things to try ...
 
 * The longer example files provided to members of the AMWA Networked Media Incubator may also be used as an input source, or change to the _wav-in_ funnel and use your favourite 2 channel WAV file.
 * Try looping the PCAP file and seeing the result. Then try regenerating the grain metadata to see the effect. In each case, change the parameters and redeploy.
-* Examine the NMOS registration and discovery information for the flows available via the NMOS node API, by default at http://localhost:3001/x-nmos/node/v1.0/ .
+* Examine the NMOS registration and discovery information for the flows available via the NMOS node API, by default at [http://localhost:3101/x-nmos/node/v1.0/](http://localhost:3101/x-nmos/node/v1.0/).
 * Watch back-pressure in action by adjusting the speed of the pipeline by setting the timeout parameter on the spout, which is measure in milliseconds. For realtime (assuming 25 frames per second), set the timeout to 40ms. For a more dramatic effect, set even higher.
 
 #### Example 2: Create a WAV file
@@ -254,7 +262,7 @@ Create an RTP multicast stream and advertise it as an NMOS flow, source and send
 3. Configure the _nmos-rtp-out_ spout with a multicast address and port number. Multicast addresses are in the range `224.0.0.0` to `239.255.255.255`. It is best to choose something randomly within this range and avoiding using `0`, `1`, `254` or `255`. You may need to bind a multicast address to a specific network interface according to instructions specific to your platform.
 4. _Deploy_ the graph. An appropriate SDP file will be created and served from the local web server. An NMOS flow, source and a sender will be created and advertised via the Node API and pushed to a Registration API if available.
 
-Analyse or record the RTP stream produced using [Wireshark](https://www.wireshark.org/) or set up another dynamorse instance and use the output of this example as the input to another. A filtered PCAP recording containing only the RTP packets can be used as an input to the _pcap-reader_ Node-RED node.
+Analyse or record the RTP stream produced using [Wireshark](https://www.wireshark.org/) or set up another dynamorse instance and use the output of this example as the input to another. A filtered PCAP recording containing only the RTP packets can be used as an input to the _pcap-reader_ Node-RED node. Consider using a filter such as `udp.port eq 5001`.un
 
 ## Support, status and further development
 

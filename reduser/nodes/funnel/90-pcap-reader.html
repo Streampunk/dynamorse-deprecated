@@ -53,7 +53,7 @@
       sampling : { value : "YCbCr-4:2:2" },
       width : { value : 1920, validate : RED.validators.number() },
       height : { value : 1080, validate : RED.validators.number() },
-      depth : { value : 8, validate : RED.validators.number() },
+      depth : { value : 10, validate : RED.validators.number() },
       colorimetry : { value : "BT709-2" },
       interlace : { value : false },
       packing : { value : "pgroup" },
@@ -177,7 +177,7 @@
   </div>
   <div class="form-row">
     <label for="node-input-depth"><i class="fa fa-picture-o"></i> depth</label>
-    <input type="number" min="8" placeholder="8" id="node-input-depth" style="width: 80px">
+    <input type="number" min="8" placeholder="10" id="node-input-depth" style="width: 80px">
     <label for="node-input-colorimetry" style="text-align: left">
       &nbsp;<i class="fa fa-pencil-square-o"></i> colorimetry</label>
     <select id="node-input-colorimetry" style="width: 120px">

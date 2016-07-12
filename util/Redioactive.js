@@ -96,8 +96,8 @@ function Funnel (config) {
     };
   };
   var push = function (err, val) {
-    node.log(`Push received with value ${val}, queue length ${queue.length}, pending ${JSON.stringify(pending)}`);
     if (err) {
+      node.log(`Push received with error '${err}', queue length ${queue.length}, pending ${JSON.stringify(pending)}`);
       node.setStatus('red', 'dot', 'error');
       node.send({
         payload : null,
@@ -105,6 +105,7 @@ function Funnel (config) {
         pull : pull
       });
     } else {
+      node.log(`Push received with value ${val}, queue length ${queue.length}, pending ${JSON.stringify(pending)}`);
       if (queue.length <= maxBuffer) {
         // node.log(queue);
         queue.push(val);
@@ -131,7 +132,6 @@ function Funnel (config) {
           pull : pull
         });
       };
-
       if (queue.length >= maxBuffer) {
         node.setStatus('red', 'dot', 'overflow');
       } else if (queue.length >= 0.75 * maxBuffer) {
@@ -140,6 +140,13 @@ function Funnel (config) {
         node.setStatus('green', 'dot', 'generating');
       }
     } // });
+  };
+  this.eventMuncher = function (emitter, event, map) {
+    emitter.on(event, function (value) {
+      if (map) value = map(value);
+      push(null, value);
+      next();
+    });
   };
   var workStart = null;
   var next = function () {
@@ -169,7 +176,7 @@ function Funnel (config) {
       } else if (x === H.nil) {
         hpush (null, H.nil);
       } else {
-        if (workStart) { workTimes.push(process.hrtime(workStart)); }
+          if (workStart) { workTimes.push(process.hrtime(workStart)); }
         push(null, x);
         workStart = process.hrtime();
         if (queue.length > 0.8 * maxBuffer) {
@@ -180,9 +187,10 @@ function Funnel (config) {
           hnext();
         }
       }
-    }).done(function () {
-        push(null, theEnd);
-      });
+    })
+    .done(function () {
+      push(null, theEnd);
+    });
     node.setStatus('green', 'dot', 'generating');
   }
   this.preFlightError = function (e) {
@@ -367,7 +375,7 @@ function Valve (config) {
 function Spout (config) {
   var eachFn = null;
   var doneFn = function () { };
-  var errorFn = function (err, n) { // Defauly error handler shuts the pipeline
+  var errorFn = function (err, n) { // Default error handler shuts the pipeline
     node.error(`Unhandled error ${err.toString()}.`);
     doneFn = function () { }
     eachFn = null;

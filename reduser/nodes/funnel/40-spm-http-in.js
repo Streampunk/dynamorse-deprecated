@@ -42,6 +42,9 @@ module.exports = function (RED) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
 
+    if (!this.context().global.get('updated'))
+      return this.log('Waiting for global context updated.');
+
     var protocol = (config.protocol === 'HTTP') ? http : https;
     var node = this;
     var total = 0;
@@ -186,6 +189,7 @@ module.exports = function (RED) {
         };
       });
     }
+
   }
   util.inherits(SpmHTTPIn, redioactive.Funnel);
   RED.nodes.registerType("spm-http-in", SpmHTTPIn);

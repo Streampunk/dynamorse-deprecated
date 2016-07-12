@@ -23,7 +23,7 @@ module.exports = function(srcTags) {
     console.log('Concater exiting');
   });
 
-  var dstSampleSize = calculateSampleSize(srcTags);
+  var dstSampleSize = concater.setInfo(srcTags);
   var isVideo = srcTags.format[0] === 'video';
 
   var grainMuncher = function (err, x, push, next) {
@@ -56,17 +56,6 @@ module.exports = function(srcTags) {
       }
     }
   };
-
-  function calculateSampleSize(tags) {
-    if (tags.format[0] === 'video') {
-      return ((tags.packing[0] === 'pgroup') ?
-        +tags.width[0] * 5 / 2|0 :
-        (+tags.width[0] + (47 - (+tags.width[0] - 1) % 48)) * 8 / 3|0
-      ) * +tags.height[0];
-    } else { // TODO work with ancillary data packets
-      return +tags.channels[0] * +tags.encodingName[0].substring(1) / 8|0;
-    }
-  }
 
   return H.pipeline(H.consume(grainMuncher));
 }

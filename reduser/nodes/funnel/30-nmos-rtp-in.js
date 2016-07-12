@@ -27,10 +27,8 @@ module.exports = function (RED) {
     RED.nodes.createNode(this,config);
     redioactive.Funnel.call(this, config);
 
-    if (!this.context().global.get('updated')) {
-      this.log('False start for NMOS RTP input funnel.');
-      return;
-    }
+    if (!this.context().global.get('updated'))
+      return this.log('Waiting for global context updated.');
     var node = this;
     this.tags = {};
     this.exts = {};
@@ -62,7 +60,7 @@ module.exports = function (RED) {
       nodeAPI.putResource(flow).then(function () {
         console.log('Starting highland pipeline.');
         this.highland(
-          udpInlet(client, sdp)
+          udpInlet(client, sdp, config.netif)
           .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
           .map(function (g) {
             if (!config.regenerate) {

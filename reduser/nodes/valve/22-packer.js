@@ -26,6 +26,9 @@ module.exports = function (RED) {
     var dstFlow = null;
     var dstBufLen = 0;
 
+    if (!this.context().global.get('updated'))
+      return this.log('Waiting for global context updated.');
+
     var packer = new codecadon.Packer(function() {
       console.log('Packer exiting');
     });
@@ -100,7 +103,7 @@ module.exports = function (RED) {
           }.bind(this));
         } else {
           processGrain(x, dstBufLen, push, next);
-        } 
+        }
       }
       else {
         push(null, x);

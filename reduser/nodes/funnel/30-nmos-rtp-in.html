@@ -25,6 +25,7 @@
       device : { value : '', type : 'device' },
       sender : { value : '', validate : function (v) { return v.length > 0 || this.sdpURL.length > 0; } },
       sdpURL : { value : '', validate : function (v) { return v.length > 0 || this.sender.length > 0; } },
+      netif : { value : '0.0.0.0', validate : RED.validators.regex(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/) },
       regenerate : { value : false }
     },
     inputs:0,
@@ -62,6 +63,10 @@
   <div class="form-row">
     <label for="node-input-sdpURL"><i class="fa fa-external-link-square"></i> SDP URL</label>
     <input type="text" id="node-input-sdpURL" placeholder="file:video.sdp">
+  </div>
+  <div class="form-row">
+    <label for="node-input-netif"><i class="fa fa-external-link-square" aria-hidden="true"></i> interface</label>
+    <input type="text" id="node-input-netif" placeholder="0.0.0.0" style="width: 120px">
   </div>
   <div class="form-row">
     <label for="node-input-regenerate"><i class="fa fa-clock-o"></i> regenerate?</label>
@@ -112,6 +117,11 @@
     <td><i class="fa fa-external-link-square"></i> SDP URL</td>
     <td>URL (<code>file:</code> or <code>http:</code>) to be used to locate the
     SDP file that describes the stream.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-external-link-square" aria-hidden="true"></i> interface</td>
+    <td>Local network interface card for joining a multicast group.
+    <code>0.0.0.0</code> is treated as all interfaces.</td>
    </tr>
    <tr>
     <td><i class="fa fa-clock-o"></i> regenerate?</td>
