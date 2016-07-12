@@ -19,7 +19,9 @@
     category: 'spout',
     color: '#B26D45',
     defaults: {
-      name : { value : "" }
+      name : { value : '' },
+      frameCache : { value : 3, validate : RED.validators.number() },
+      deviceIndex : { value : 0, vaidate : RED.validators.number() }
     },
     inputs:1,
     outputs:0,
@@ -36,6 +38,12 @@
     <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
     <input type="text" id="node-input-name" placeholder="name">
   </div>
+  <div class="form-row">
+    <label for="node-input-frameCache"><i class="fa fa-signal" aria-hidden="true"></i> cache</label>
+    <input type="number" id="node-input-frameCache" min="1" placeholder="3" style="width: 100px">
+    <label for="node-input-deviceIndex" style="text-align: right; width: 80px"><i class="fa fa-list" aria-hidden="true"></i> index</label>
+    <input type="number" id="node-input-deviceIndex" min="0" max="30" placeholder="0" style="width: 100px">
+  </div>
 </script>
 
 <script type="text/x-red" data-help-name="sdi-out">
@@ -44,11 +52,47 @@
   <p>Send an SDI stream via <a href="https://www.npmjs.com/package/macadam">macadam</a>,
   a Node.js mmodule providing bindings to the Blackmagic Desktop Video SDK.</p>
 
+  <h3>Inputs</h3>
+  <p>This node can accept separate input flows of up to one each of video, audio
+  and event data. To synchronize playback, the sync timestamp values of the
+  grains should match (within a reasonable margin of error). The first flows
+  received of each type will be considered <em>the</em> input flow of that
+  type and other flows of that type will cause an error.</p>
+
+  <p>Back pressure is provided via listening to events from the Blackmagic device
+  that indicate that a video frame has been successfully played. The card is
+  configured with mode and format from the parameters of the flow.</p>
+
+  <p>Before deployment, the index of the Blackmagic interface card. Currently
+  found by trial and error, the development of a tool to help with this is
+  <a href="https://github.com/Streampunk/macadam/issues/4">under consideration</a>.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-signal" aria-hidden="true"></i> cache</td>
+    <td>Noumber of video grains to buffer before starting playback.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-list" aria-hidden="true"></i> index</td>
+    <td>Index of the Blackmagic card according to the SDK.</td>
+   </tr>
+  </table>
+  </div>
+
   <h3>Maturity</h3>
   <p>The <a href="https://www.npmjs.com/package/macadam">macadam</a> library is
   implemented with support for streaming frames of video from Node.js buffers to
-  Backmagic hardware. The work to integrate this library into dynamorse has
-  not yet started -
+  Backmagic hardware. The work to integrate this library into dynamorse is
+  underway -
   <a href="https://github.com/Streampunk/dynamorse/issues/12">status</a>.</p>
 
 </script>

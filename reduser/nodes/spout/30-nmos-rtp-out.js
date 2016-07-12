@@ -19,7 +19,7 @@ var RFC4175Packet = require('../../../model/RFC4175Packet.js');
 var RTPPacket = require('../../../model/RTPPacket.js');
 var Grain = require('../../../model/Grain.js');
 var SDP = require('../../../model/SDP.js');
-var dgram = require('dgram');
+var dgram = require('netadon');
 var uuid = require('uuid');
 var Net = require('../../../util/Net.js');
 var util = require('util');
@@ -84,10 +84,12 @@ module.exports = function (RED) {
     var node = this;
     // Set up connection
     var sock = dgram.createSocket({type  :'udp4', reuseAddr : true});
-    sock.bind(config.port, function (err) {
+    var bindCb = function (err) {
       if (err) return node.warn(err);
       sock.setMulticastTTL(config.ttl);
-    });
+    };
+    if (config.netif) { sock.bind(config.port, config.netif, bindCb); }
+    else { sock.bind(config.port, bindCb); }
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     var rtpExtDefID = this.context().global.get('rtp_ext_id');
@@ -100,6 +102,8 @@ module.exports = function (RED) {
     var sender = null;
     var sdp = null;
     var lastSend = null;
+    var Packet = null;
+    var packetsPerGrain = 100;
     this.each(function (g, next) {
       this.log(`Received grain ${Grain.prototype.formatTimestamp(g.ptpSync)}.`);
       if (!Grain.isGrain(g)) return node.warn('Received a non-grain on the input.');
@@ -111,10 +115,15 @@ module.exports = function (RED) {
           clockRate = +f.tags.clockRate[0];
           is4175 = f.tags.encodingName[0] === 'raw'; // TODO add pgroup/V210 check
           if (is4175) {
+            console.log(f.tags);
             width = +f.tags.width[0];
             height = +f.tags.height[0];
             byteFactor = getByteFactor(f.tags);
-            interlace = f.tags.interlace && f.tags.interlace[0] === '1';
+            interlace = f.tags.interlace && (f.tags.interlace[0] === '1' || f.tags.interlace[0] === 'true');
+            Packet = RFC4175Packet;
+            packetsPerGrain = width * height * byteFactor * 1.1 / 1452|0;
+          } else {
+            Packet = RTPPacket;
           }
           stride = getStride(f.tags);
           source = new ledger.Source(null, null, localName, localDescription,
@@ -135,11 +144,18 @@ module.exports = function (RED) {
           pushGrain(g, next);
         }.bind(this));
       } else {
+      //  for ( var x = 0 ; x < 99 ; x++ ) { pushGrain(g, function () { }); }
         pushGrain(g, next);
+        // console.log(process.memoryUsage());
       }
     }.bind(this));
-    var count = 0, timeoutTune = 0;;
+    var count = 0, timeoutTune = 0;
+    var grainTimer = process.hrtime();
     function pushGrain (g, next) {
+      console.log(':-)', process.hrtime(grainTimer));
+      var masterBuffer = new Buffer(packetsPerGrain*1452);
+      var pc = 0;
+      grainTimer = process.hrtime();
       lineStatus = (is4175) ? {
         width: width, stride: stride, lineNo: 21,
         bytesPerLine: width * byteFactor, byteFactor: byteFactor, linePos: 0,
@@ -147,7 +163,7 @@ module.exports = function (RED) {
         field : 1
       } : undefined;
       var remaining = 1200; // Allow for extension
-      var packet = makePacket(g, remaining);
+      var packet = makePacket(g, remaining, masterBuffer, pc++);
 
       // Make grain start RTP header extension
       var startExt = { profile : 0xbede };
@@ -162,26 +178,43 @@ module.exports = function (RED) {
       if (actualExts.prototype && actualExts.prototype.name === 'Error')
         node.warn(`Failed to set header extensions: ${actualExts}`);
 
-      var i = 0, o = 0;
+      var i = 0, o = 0; y = 0;
       var b = g.buffers[i];
       while (i < g.buffers.length) {
         var t = (!is4175 || !packet.getMarker()) ? remaining - remaining % stride :
           packet.getLineData()[0].length;
         // console.log('HAT', packet.getLineData()[0].lineNo, (b.length - o) % 4800, 4800 - lineStatus.linePos,
         //   ((b.length - o) % 4800) - (4800 - lineStatus.linePos));
+        // console.log(b.length, o, t, remaining, (b.length - o) >= t);
         if ((b.length - o) >= t) {
-          packet.setPayload(b.slice(o, o + t));
-          o += t;
-          sendPacket(packet, remaining); // May want to spread packets
+          if (is4175 && interlace && (lineStatus.lineNo > packet.getLineData()[0].lineNo)) {
+            // !!! doesn't currently handle > 2 line parts in a packet
+            if (lineStatus.lineNo === lineStatus.fieldBreaks.field2Start) {
+              packet.setPayload(b.slice(o, o + t));
+              o = lineStatus.bytesPerLine;
+            } else {
+              var newLineOff = o + (t - lineStatus.linePos) + lineStatus.bytesPerLine;
+              packet.setPayload(Buffer.concat([b.slice(o, o + (t - lineStatus.linePos)), 
+                                               b.slice(newLineOff, newLineOff + lineStatus.linePos)], t));
+              o = newLineOff + lineStatus.linePos;
+            }
+          } else {
+            packet.setPayload(b.slice(o, o + t));
+            o += t;
+          }
+          sendPacket(packet); // May want to spread packets
           // FIXME: probably won't work for compressed video
           if (!is4175) tsAdjust += t / stride;
           remaining = 1410; // Slightly short so last header fits
-          packet = makePacket(g, remaining);
+          packet = makePacket(g, remaining, masterBuffer, pc++);
         } else if (++i < g.buffers.length) {
+          console.log("Getting next buffer."); // Not called when one buffer per grain - now the default
           b = Buffer.concat([b.slice(o), g.buffers[i]],
             b.length + g.buffers[i].length - o);
           o = 0;
         } else {
+          // console.log("Shrinking buffer.", o, t, b.length);
+          // Required to shrink last packet of the set.
           b = b.slice(o);
         }
       }
@@ -203,7 +236,9 @@ module.exports = function (RED) {
         }
       }
 
-      sendPacket(packet, remaining);
+      sendPacket(packet, next);
+      console.log(':-(', process.hrtime(grainTimer));
+      masterBuffer = null;
 
       if (config.timeout === 0) {
         setImmediate(next);
@@ -216,10 +251,15 @@ module.exports = function (RED) {
         // timeoutTune = 0;
         setTimeout(waitNext, config.timeout - 5);
       }
+      console.log(':-((', process.hrtime(grainTimer));
     }
-    function makePacket (g, remaining) {
-      var packet = (is4175) ? new RFC4175Packet(new Buffer(1452)) :
-        new RTPPacket(new Buffer(1452));
+    function makePacket (g, remaining, buf, pc) {
+      // var packetMaker = process.hrtime();
+      // var buf = new Buffer(1452);
+      // var packet = new Packet(buf);
+      // var bufAlloc = process.hrtime(packetMaker);
+      var packet = new Packet(buf.slice(pc*1452, pc*1452+1452));
+      // console.log('Made buffer in', bufAlloc, 'packet in', process.hrtime(packetMaker));
       packet.setVersion(2);
       packet.setPadding(false);
       packet.setExtension(false);
@@ -239,12 +279,29 @@ module.exports = function (RED) {
           tsAdjust = 1800; // TODO Find a frame rate adjust
         }
       }
+      // console.log('Packet maker', process.hrtime(packetMaker));
       return packet;
     }
 
-    function sendPacket (p) {
-      sock.send(p.buffer, 0, p.buffer.length, config.port, config.address);
-      // console.log(JSON.stringify(p, null, 2));
+    var packetCount = 0;
+    var callbackCount = 0;
+    var packetTime = process.hrtime();
+    var packetBuffers = [];
+    function sendPacket (p, done) {
+      // console.log('\_/', p.getExtension(), p.getExtendedSequenceNumber(), p.getSequenceNumber());
+      packetBuffers.push(p.buffer);
+      if (done) {
+        packetCount++;
+          sock.send(packetBuffers, 0, p.length, config.port, config.address,
+          function (e) {
+            callbackCount++;
+            // done();
+            if (e) return console.error(e);
+          });
+        packetBuffers = [];
+        // console.log('+++', packetCount, callbackCount, process.hrtime(packetTime)[1]/1000000);
+        packetTime = process.hrtime();
+      }
     }
     this.errors(function (e, next) {
       this.warn(`Received unhandled error: ${e.message}.`);

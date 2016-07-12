@@ -19,8 +19,17 @@
     category: 'funnel',
     color: '#B26D45',
     defaults: {
-      name : { value : "" },
-      maxBuffer : { value : 10, validate : RED.validators.number() }
+      name : { value : '' },
+      maxBuffer : { value : 10, validate : RED.validators.number() },
+      description : { value : '' },
+      device : { value : '', type : 'device' },
+      deviceIndex : { value : 0, validate : RED.validators.number() },
+      mode : { value : 'Hi50', validate : function (x) {
+        return typeof x === 'string' && x.length === 4;
+      } },
+      format : { value : 'v210', validate : function (x) {
+        return typeof x === 'string' && x.length === 4;
+      } }
     },
     inputs:0,
     outputs:3,
@@ -39,9 +48,93 @@
 </div>
 <div class="form-row">
   <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
-  <input type="number" id="node-input-maxBuffer" placeholder="10">
+  <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
+  <label for="node-input-deviceIndex" style="text-align: right; width: 80px"><i class="fa fa-list" aria-hidden="true"></i> index</label>
+  <input type="number" id="node-input-deviceIndex" min="0" max="30" placeholder="0" style="width: 100px">
+</div>
+<div class="form-row">
+  <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
+  <input type="text" id="node-input-description" placeholder="source and flow description">
+</div>
+<div class="form-row">
+  <label for="node-input-device"><i class="fa fa-tablet"></i> device</label>
+  <input type="text" id="node-input-device">
+</div>
+<div class="form-row">
+  <label for="node-input-mode"><i class="fa fa-video-camera"></i> mode</label>
+  <select id="node-input-mode">
+    <optgroup label="SD">
+      <option value="ntsc">NTSC</option>
+      <option value="nt23">NTSC2398 (3:2 pulldown)</option>
+      <option value="pal ">PAL</option>
+      <option value="ntsp">NTSCp</option>
+      <option value="palp">PALp</option>
+    </optgroup>
+    <optgroup label="HD 1080 lines">
+      <option value="23ps">HD1080p2398</option>
+      <option value="24ps">HD1080p24</option>
+      <option value="Hp25">HD1080p25</option>
+      <option value="Hp29">HD1080p2997</option>
+      <option value="Hp30">HD1080p30</option>
+      <option value="Hi50" selected>HD1080i50</option>
+      <option value="Hi59">HD1080i5994</option>
+      <option value="Hi60">HD1080i6000 (really 60fps!)</option>
+      <option value="Hp50">HD1080p50</option>
+      <option value="Hp59">HD1080p5994</option>
+      <option value="Hp60">HD1080p6000 (really 60fps!)</option>
+    </optgroup>
+    <optgroup label="HD 720 lines">
+      <option value="hp50">HD720p50</option>
+      <option value="hp59">HD720p5994</option>
+      <option value="hp60">HD720p60</option>
+    </optgroup>
+    <optgroup label="2K">
+      <option value="2k23">2k2398</option>
+      <option value="2k24">2k24</option>
+      <option value="2k25">2k25</option>
+    </optgroup>
+    <optgroup label="4K">
+      <option value="4k23">4K2160p2398</option>
+      <option value="4k24">4K2160p24</option>
+      <option value="4k25">4K2160p25</option>
+      <option value="4k29">4K2160p2997</option>
+      <option value="4k30">4K2160p30</option>
+      <option value="4k50">4K2160p50</option>
+      <option value="4k59">4K2160p5994</option>
+      <option value="4k60">4K2160p60</option>
+    </optgroup>
+    <optgroup label="Unknown">
+      <option value="iunk">Unknown</option>
+    </optgroup>
+  </select>
+</div>
+<div class="form-row">
+  <label for="node-input-format"><i class="fa fa-eye"></i> sampling</label>
+  <select id="node-input-format">
+    <option value="2vuy">8BitYUV</option>
+    <option value="v210" selected>10BitYUV</option>
+    <option value="ARGB">8BitARGB</option>
+    <option value="BGRA">8BitBGRA</option>
+    <!-- Big-endian RGB 10-bit per component with SMPTE video levels (64-960). Packed as 2:10:10:10 -->
+    <option value="r210">10BitRGB</option>
+    <!-- Big-endian RGB 12-bit per component with full range (0-4095). Packed as 12-bit per component -->
+    <option value="R12B">12BitRGB</option>
+    <!-- Little-endian RGB 12-bit per component with full range (0-4095). Packed as 12-bit per component -->
+    <option value="R12L">12BitRGBLE</option>
+    <!-- Little-endian 10-bit RGB with SMPTE video levels (64-940) -->
+    <option value="R10l">10BitRGBXLE</option>
+    <!-- Big-endian 10-bit RGB with SMPTE video levels (64-940) -->
+    <option value="R10b">10BitRGBX</option>
+  </select>
 </div>
 </script>
+
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
 
 <script type="text/x-red" data-help-name="sdi-in">
   <h1>SDI input</h1>
@@ -49,10 +142,67 @@
   <p>Receive an SDI stream via <a href="https://www.npmjs.com/package/macadam">macadam</a>,
   a Node.js mmodule providing bindings to the Blackmagic Desktop Video SDK.</p>
 
+  <p>Prior to deployment, the kind of input video signal must be known, as must
+  the index of the Blackmagic interface card. Currently found by trial and error,
+  the development of a tool to help with this is
+  <a href="https://github.com/Streampunk/macadam/issues/4">under consideration</a>.</p>
+
+  <h3>Outputs</h3>
+  <ol>
+   <li>Video.</li>
+   <li>Audio - see
+   <a href="https://github.com/Streampunk/macadam/issues/5">this issue</a>.</li>
+   <li>Events including ancillary data - see
+   <a href="https://github.com/Streampunk/macadam/issues/6">this issue</a>.</li>
+  </ol>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node. Also used as source &amp; flow label.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-suitcase"></i> max buffer</td>
+    <td>Maximum number of grains to buffer before overflowing.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-list" aria-hidden="true"></i> index</td>
+    <td>Index of the Blackmagic card according to the SDK.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-info-circle"></i> description</td>
+    <td>Optional description of the output NMOS source and flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tablet"></i> device</td>
+    <td>Select or create an NMOS device for the output source and flow.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-video-camera"></i> mode</td>
+    <td>Picture dimensions, timing and interlace modes supported by the
+    Blackmagic SDK.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-eye"></i> sampling</td>
+    <td>Bit depth and sampling combinations supported by the Blackmagic SDK.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>This node produces data from a live data source. Attempts by a consumer to
+  apply back-pressure do not pause the input data and will cause grains to be
+  dropped at once the buffer is full. Through this node interface, dynamorse has
+  no means to control the live-running data rate provided by the Blackmagic SDK.</p>
+
   <h3>Maturity</h3>
   <p>The <a href="https://www.npmjs.com/package/macadam">macadam</a> library is
   implemented with support for streaming frames of video from Backmagic hardware
   into Node.js buffers. The work to integrate this library into dynamorse has
-  not yet started -
+  underway -
   <a href="https://github.com/Streampunk/dynamorse/issues/12">status</a>.</p>
 </script>

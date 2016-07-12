@@ -72,6 +72,7 @@ RFC4175Packet.prototype.getLineData = function () {
 RFC4175Packet.prototype.setLineDataHeaders = function (lineStatus, remaining) {
   var lineDataStart = this.getPayloadStart() + 2;
   var packetPos = 0;
+  this.lineCount = 0;
   while (packetPos < remaining) {
     var bytesLeftOnLine = lineStatus.bytesPerLine - lineStatus.linePos;
     if (bytesLeftOnLine <= remaining) {
