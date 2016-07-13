@@ -97,7 +97,7 @@ module.exports = function (RED) {
         var position = 0;
         var grainData = new Buffer(+res.headers['content-length']);
         if (res.statusCode === 200) {
-          nextRequest[x] = res.headers['x-arachnid-origintimestamp'];
+          nextRequest[x] = res.headers['arachnid-origintimestamp'];
           if (!flow) makeFlowAndSource(headers);
           res.on('data', function (data) {
             data.copy(grainData, position);
@@ -106,13 +106,13 @@ module.exports = function (RED) {
           });
           res.on('end', function () {
             grainData = grainData.slice(0, position);
-            nextRequest[x] = res.headers['x-arachnid-nextbythread'];
-            var ptpOrigin = res.headers['x-arachnid-origintimestamp'];
-            var ptpSync = res.headers['x-arachnid-synctimestamp'];
-            var duration = res.headers['x-arachnid-grainduration'];
-            var gFlowID = (config.regenerate) ? flowID : res.headers['x-arachnid-flowid'];
-            var gSourceID = (config.regenerate) ? sourceID : res.headers['x-arachnid-sourceid'];
-            var tc = res.headers['x-arachnid-timecode'];
+            nextRequest[x] = res.headers['arachnid-nextbythread'];
+            var ptpOrigin = res.headers['arachnid-origintimestamp'];
+            var ptpSync = res.headers['arachnid-synctimestamp'];
+            var duration = res.headers['arachnid-grainduration'];
+            var gFlowID = (config.regenerate) ? flowID : res.headers['arachnid-flowid'];
+            var gSourceID = (config.regenerate) ? sourceID : res.headers['arachnid-sourceid'];
+            var tc = res.headers['arachnid-timecode'];
             var g = new Grain([ grainData ], ptpSync, ptpOrigin, tc, gFlowID,
               gSourceID, duration); // regenerate time as emitted
             pushGrains(g, push);
@@ -132,9 +132,9 @@ module.exports = function (RED) {
         activeThreads[x] = false;
         next();
       });
-      req.setHeader('X-Arachnid-ThreadNumber', x);
-      req.setHeader('X-Arachnid-TotalConcurrent', config.parallel);
-      req.setHeader('X-Arachnid-ClientID', clientID);
+      req.setHeader('Arachnid-ThreadNumber', x);
+      req.setHeader('Arachnid-TotalConcurrent', config.parallel);
+      req.setHeader('Arachnid-ClientID', clientID);
     };
 
     var grainQueue = { };
