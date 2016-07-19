@@ -75,6 +75,7 @@ module.exports = function (RED) {
             var dstTags = JSON.parse(JSON.stringify(this.srcFlow.tags));
             dstTags["packing"] = [ `${config.dstFormat}` ];
             dstTags["encodingName"] = [ `${config.dstFormat}` ];
+            dstTags["sampling"] = [ "YCbCr-4:2:0" ];
 
             var formattedDstTags = JSON.stringify(dstTags, null, 2);
             RED.comms.publish('debug', {
@@ -89,7 +90,7 @@ module.exports = function (RED) {
               push(`Unable to register source: ${err}`);
             });
             nodeAPI.putResource(dstFlow).then(function () {
-              dstBufLen = encoder.setInfo(this.srcFlow.tags, dstTags, x.duration);
+              dstBufLen = encoder.setInfo(this.srcFlow.tags, dstTags, x.duration, +config.bitrate, +config.gopFrames);
               processGrain(x, dstBufLen, push, next);
             }.bind(this), function (err) {
               push(`Unable to register flow: ${err}`);

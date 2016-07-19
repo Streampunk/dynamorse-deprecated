@@ -74,10 +74,14 @@ module.exports = function (RED) {
 
             var dstTags = JSON.parse(JSON.stringify(this.srcFlow.tags));
             dstTags["packing"] = [ `${config.dstFormat}` ];
-            if ("420P" === config.dstFormat)
+            if ("420P" === config.dstFormat) {
               dstTags["depth"] = [ "8" ];
-            else
+              dstTags["sampling"] = [ "YCbCr-4:2:0" ];
+            }
+            else {
               dstTags["depth"] = [ "10" ];
+              dstTags["sampling"] = [ "YCbCr-4:2:2" ];
+            }
 
             var formattedDstTags = JSON.stringify(dstTags, null, 2);
             RED.comms.publish('debug', {
