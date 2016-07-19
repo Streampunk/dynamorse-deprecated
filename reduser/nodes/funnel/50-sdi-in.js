@@ -88,8 +88,6 @@ module.exports = function (RED) {
       this.close();
       capture.stop();
     });
-
-    // capture.start();
   }
   util.inherits(SDIIn, redioactive.Funnel);
   RED.nodes.registerType("sdi-in", SDIIn);

@@ -1,0 +1,402 @@
+{
+  "id": "a8560944.57a9f8",
+  "label": "Tata Demo",
+  "nodes": [
+    {
+      "id": "335d9a86.cca266",
+      "type": "comment",
+      "z": "a8560944.57a9f8",
+      "name": "Streampunk Media",
+      "info": "Design and deploy professional media workflows with [_Dynamorse_](https://github.com/Streampunk/dynamorse/blob/master/README.md).\n\nFor support, development or further information, please e-mail [Streampunk Media Ltd](http://www.streampunk.media) on [furnace@streampunk.media](mailto: furnace@streampunk.media).\n\nDynamorse depends on [codecadon](https://github.com/Streampunk/codecadon) that incorprates binaries compiled from unmodified [LGPL v3 licensed code](https://github.com/Streampunk/codecadon/tree/master/licenses) from the FFMPEG project.",
+      "x": 122,
+      "y": 45,
+      "wires": []
+    },
+    {
+      "id": "a567def6.95afb",
+      "type": "converter",
+      "z": "a8560944.57a9f8",
+      "name": "scale 420",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "dstWidth": 1280,
+      "dstHeight": 720,
+      "dstFormat": "420P",
+      "x": 225,
+      "y": 261,
+      "wires": [
+        [
+          "6baf264c.3f15f8",
+          "339168db.ac8f48",
+          "328f48cd.406ca8",
+          "8219eaf8.9906e8"
+        ]
+      ]
+    },
+    {
+      "id": "6baf264c.3f15f8",
+      "type": "encoder",
+      "z": "a8560944.57a9f8",
+      "name": "level 1920x1080",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "dstFormat": "h264",
+      "x": 445,
+      "y": 157,
+      "wires": [
+        [
+          "2eb0cf75.e6049"
+        ]
+      ]
+    },
+    {
+      "id": "339168db.ac8f48",
+      "type": "encoder",
+      "z": "a8560944.57a9f8",
+      "name": "level 1280x720",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "dstFormat": "h264",
+      "x": 444,
+      "y": 220,
+      "wires": [
+        [
+          "f1754fd.efc18b"
+        ]
+      ]
+    },
+    {
+      "id": "328f48cd.406ca8",
+      "type": "encoder",
+      "z": "a8560944.57a9f8",
+      "name": "level 848x480",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "dstFormat": "h264",
+      "x": 442,
+      "y": 292,
+      "wires": [
+        [
+          "415ea6bf.9e4f68"
+        ]
+      ]
+    },
+    {
+      "id": "8219eaf8.9906e8",
+      "type": "encoder",
+      "z": "a8560944.57a9f8",
+      "name": "level 640x360",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "dstFormat": "h264",
+      "x": 444,
+      "y": 363,
+      "wires": [
+        [
+          "378229ef.fc77b6"
+        ]
+      ]
+    },
+    {
+      "id": "35ec2c34.dd8b84",
+      "type": "sdi-in",
+      "z": "a8560944.57a9f8",
+      "name": "sdi 7",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "deviceIndex": 0,
+      "mode": "Hi50",
+      "format": "v210",
+      "x": 59,
+      "y": 345.5,
+      "wires": [
+        [
+          "a567def6.95afb"
+        ],
+        [
+          "9dcd47d0.7a1878"
+        ],
+        []
+      ]
+    },
+    {
+      "id": "9dcd47d0.7a1878",
+      "type": "encoder",
+      "z": "a8560944.57a9f8",
+      "name": "encode AAC",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "dstFormat": "h264",
+      "x": 306,
+      "y": 437,
+      "wires": [
+        [
+          "b6ec237c.d9475"
+        ]
+      ]
+    },
+    {
+      "id": "2eb0cf75.e6049",
+      "type": "spm-http-out",
+      "z": "a8560944.57a9f8",
+      "name": "video HTTP 1",
+      "description": "",
+      "device": "f089bf72.0f764",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pushURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 656,
+      "y": 158,
+      "wires": []
+    },
+    {
+      "id": "f1754fd.efc18b",
+      "type": "spm-http-out",
+      "z": "a8560944.57a9f8",
+      "name": "video HTTP 2",
+      "description": "",
+      "device": "f089bf72.0f764",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pushURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 654,
+      "y": 221,
+      "wires": []
+    },
+    {
+      "id": "415ea6bf.9e4f68",
+      "type": "spm-http-out",
+      "z": "a8560944.57a9f8",
+      "name": "video HTTP 3",
+      "description": "",
+      "device": "f089bf72.0f764",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pushURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 648,
+      "y": 292,
+      "wires": []
+    },
+    {
+      "id": "378229ef.fc77b6",
+      "type": "spm-http-out",
+      "z": "a8560944.57a9f8",
+      "name": "video HTTP 4",
+      "description": "",
+      "device": "f089bf72.0f764",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pushURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 648,
+      "y": 363,
+      "wires": []
+    },
+    {
+      "id": "b6ec237c.d9475",
+      "type": "spm-http-out",
+      "z": "a8560944.57a9f8",
+      "name": "audio HTTP",
+      "description": "",
+      "device": "f089bf72.0f764",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pushURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 645,
+      "y": 439,
+      "wires": []
+    },
+    {
+      "id": "16bdd529.577feb",
+      "type": "spm-http-in",
+      "z": "a8560944.57a9f8",
+      "name": "video 1 in",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pullURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 103,
+      "y": 553,
+      "wires": [
+        [
+          "6e69db19.e34f34"
+        ]
+      ]
+    },
+    {
+      "id": "54e97e70.113c6",
+      "type": "spm-http-in",
+      "z": "a8560944.57a9f8",
+      "name": "video 2 in",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pullURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 101,
+      "y": 615,
+      "wires": [
+        [
+          "ab57034c.9e63a"
+        ]
+      ]
+    },
+    {
+      "id": "aacc5155.eb33e",
+      "type": "spm-http-in",
+      "z": "a8560944.57a9f8",
+      "name": "video 3 in",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pullURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 102,
+      "y": 675,
+      "wires": [
+        [
+          "e12652b1.a4c1a"
+        ]
+      ]
+    },
+    {
+      "id": "d8038712.4d8da8",
+      "type": "spm-http-in",
+      "z": "a8560944.57a9f8",
+      "name": "video 4 in",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pullURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 99,
+      "y": 737,
+      "wires": [
+        [
+          "4b53f42a.b7acec"
+        ]
+      ]
+    },
+    {
+      "id": "f598c294.5f48b",
+      "type": "spm-http-in",
+      "z": "a8560944.57a9f8",
+      "name": "audio in",
+      "maxBuffer": 10,
+      "description": "",
+      "device": "da7405b8.258bf8",
+      "protocol": "HTTP",
+      "mode": "push",
+      "pullURL": "",
+      "path": "",
+      "port": 8712,
+      "regenerate": false,
+      "parallel": 1,
+      "x": 104,
+      "y": 803,
+      "wires": [
+        [
+          "6e69db19.e34f34",
+          "ab57034c.9e63a",
+          "e12652b1.a4c1a",
+          "4b53f42a.b7acec"
+        ]
+      ]
+    },
+    {
+      "id": "6e69db19.e34f34",
+      "type": "raw-file-out",
+      "z": "a8560944.57a9f8",
+      "name": "level 1 HLS",
+      "file": "",
+      "headers": "",
+      "timeout": 0,
+      "x": 451,
+      "y": 578,
+      "wires": []
+    },
+    {
+      "id": "ab57034c.9e63a",
+      "type": "raw-file-out",
+      "z": "a8560944.57a9f8",
+      "name": "level 2 HLS",
+      "file": "",
+      "headers": "",
+      "timeout": 0,
+      "x": 449,
+      "y": 642,
+      "wires": []
+    },
+    {
+      "id": "e12652b1.a4c1a",
+      "type": "raw-file-out",
+      "z": "a8560944.57a9f8",
+      "name": "level 3 HLS",
+      "file": "",
+      "headers": "",
+      "timeout": 0,
+      "x": 449,
+      "y": 707,
+      "wires": []
+    },
+    {
+      "id": "4b53f42a.b7acec",
+      "type": "raw-file-out",
+      "z": "a8560944.57a9f8",
+      "name": "level 4 HLS",
+      "file": "",
+      "headers": "",
+      "timeout": 0,
+      "x": 450,
+      "y": 769,
+      "wires": []
+    }
+  ]
+}

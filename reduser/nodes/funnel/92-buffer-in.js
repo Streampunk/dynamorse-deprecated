@@ -16,11 +16,15 @@
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
 
+var count = 0;
+
 module.exports = function (RED) {
   function BufferIn (config) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
     // Go figure!
+    console.log(`Bollocking bollocks ${count++}`);
+    throw('pants');
   }
   util.inherits(BufferIn, redioactive.Funnel);
   RED.nodes.registerType("buffer-in", BufferIn);

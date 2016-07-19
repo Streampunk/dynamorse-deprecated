@@ -20,6 +20,9 @@ module.exports = function (RED) {
   function MXFIn (config) {
     RED.nodes.createNode(this, config);
     redioactive.Funnel.call(this, config);
+
+    if (!this.context().global.get('updated'))
+      return this.log("Waiting for global context update.");
     // Go figure
   }
   util.inherits(MXFIn, redioactive.Funnel);

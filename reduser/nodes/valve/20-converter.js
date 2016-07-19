@@ -26,6 +26,9 @@ module.exports = function (RED) {
     var dstFlow = null;
     var dstBufLen = 0;
 
+    if (!this.context().global.get('updated'))
+      return this.log('Waiting for global context updated.');
+
     var converter = new codecadon.ScaleConverter(function() {
       console.log('Converter exiting');
     });

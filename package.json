@@ -1,6 +1,6 @@
 {
   "name": "dynamorse",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "IT swiss army knife for professional media infrastructure and production.",
   "main": "server.js",
   "scripts": {
@@ -26,9 +26,11 @@
   "homepage": "https://github.com/Streampunk/dynamorse#readme",
   "dependencies": {
     "body-parser": "^1.15.0",
+    "codecadon": "^0.0.5",
     "express": "^4.13.4",
     "fastqueue": "^0.1.0",
     "highland": "^2.5.1",
+    "mp4-stream": "^2.0.1",
     "nmos-ledger": "^1.0.8",
     "node-red": "^0.13.1",
     "seamless-immutable": "^4.1.1",
@@ -36,7 +38,7 @@
     "uuid": "^2.0.1",
     "xml2js": "^0.4.16",
     "codecadon": "^0.0.6",
-    "macadam": "^0.1.5",
+    "macadam": "^0.1.6",
     "netadon" : "^0.0.3"
   },
   "bin": {

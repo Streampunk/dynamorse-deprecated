@@ -26,6 +26,9 @@ module.exports = function (RED) {
     var dstFlow = null;
     var dstBufLen = 0;
 
+    if (!this.context().global.get('updated'))
+      return this.log('Waiting for global context updated.');
+
     var encoder = new codecadon.Encoder(function() {
       console.log('Encoder exiting');
     });
@@ -82,7 +85,7 @@ module.exports = function (RED) {
               format: "Encoder output flow tags:",
               msg: formattedDstTags
             }, true);
-            
+
             dstFlow = new ledger.Flow(null, null, localName, localDescription,
               ledger.formats.video, dstTags, source.id, null);
 
@@ -98,7 +101,7 @@ module.exports = function (RED) {
           }.bind(this));
         } else {
           processGrain(x, dstBufLen, push, next);
-        } 
+        }
       } else {
         push(null, x);
         next();
