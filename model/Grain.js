@@ -168,7 +168,7 @@ Grain.prototype.getDuration = function () {
 
 Grain.prototype.getPayloadSize = function () {
   if (Array.isArray(this.buffers)) {
-    if (buffers.length === 1) return buffers[0].length;
+    if (this.buffers.length === 1) return this.buffers[0].length;
     return this.buffers.reduce(function (l, r) { return l + r.length; }, 0);
   }
   return Buffer.isBuffer(this.buffers) ? this.buffers.length : 0;

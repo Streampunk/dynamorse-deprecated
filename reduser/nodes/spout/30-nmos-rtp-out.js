@@ -185,8 +185,8 @@ module.exports = function (RED) {
         'NMOS-GrainFlags' : 'start',
         'NMOS-PTPOriginTimestamp' : g.formatTimestamp(g.ptpOrigin),
         'NMOS-PTPSyncTimestamp' : g.formatTimestamp(g.ptpSync),
-        'NMOS-FlowID' : uuid.unparse(g.flowID),
-        'NMOS-SourceID' : uuid.unparse(g.sourceID),
+        'NMOS-FlowID' : uuid.unparse(g.flow_id),
+        'NMOS-SourceID' : uuid.unparse(g.source_id),
         'Content-Type' : contentType,
         'Content-Length' : g.getPayloadSize()
       };
