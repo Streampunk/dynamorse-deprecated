@@ -103,6 +103,7 @@ module.exports = function (RED) {
     var sdp = null;
     var lastSend = null;
     var Packet = null;
+    var contentType = '';
     var packetsPerGrain = 100;
     this.each(function (g, next) {
       this.log(`Received grain ${Grain.prototype.formatTimestamp(g.ptpSync)}.`);
@@ -122,8 +123,14 @@ module.exports = function (RED) {
             interlace = f.tags.interlace && (f.tags.interlace[0] === '1' || f.tags.interlace[0] === 'true');
             Packet = RFC4175Packet;
             packetsPerGrain = width * height * byteFactor * 1.1 / 1452|0;
+            contentType = `video/raw; sampling=${this.tags.sampling}; ` +
+              `width=${width}; height=${height}; depth=${this.tags.depth}; ` +
+              `colorimetry=${this.tags.colorimetry}; interlace=${this.tags.interlace}`;
           } else {
             Packet = RTPPacket;
+            contentType = `${f.tags.format}/${f.tags.encodingName}`;
+            if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate}`;
+            if (f.tags.channels) contentType += `; channels=${f.tags.channels}`;
           }
           stride = getStride(f.tags);
           source = new ledger.Source(null, null, localName, localDescription,
@@ -166,14 +173,25 @@ module.exports = function (RED) {
       var packet = makePacket(g, remaining, masterBuffer, pc++);
 
       // Make grain start RTP header extension
-      var startExt = { profile : 0xbede };
-      startExt['id' + rtpExts.grain_flags_id] = new Buffer([0x80]);
-      startExt['id' + rtpExts.origin_timestamp_id] = g.ptpOrigin;
-      startExt['id' + rtpExts.sync_timestamp_id] = g.ptpSync;
-      startExt['id' + rtpExts.grain_duration_id] = g.duration;
-      startExt['id' + rtpExts.flow_id_id] = g.flow_id;
-      startExt['id' + rtpExts.source_id_id] = g.source_id;
-      startExt['id' + rtpExts.smpte_tc_id] = g.timecode;
+      // var startExt = { profile : 0xbede };
+      // startExt['id' + rtpExts.grain_flags_id] = new Buffer([0x80]);
+      // startExt['id' + rtpExts.origin_timestamp_id] = g.ptpOrigin;
+      // startExt['id' + rtpExts.sync_timestamp_id] = g.ptpSync;
+      // startExt['id' + rtpExts.grain_duration_id] = g.duration;
+      // startExt['id' + rtpExts.flow_id_id] = g.flow_id;
+      // startExt['id' + rtpExts.source_id_id] = g.source_id;
+      // startExt['id' + rtpExts.smpte_tc_id] = g.timecode;
+      var startExt = {
+        'NMOS-GrainFlags' : 'start',
+        'NMOS-PTPOriginTimestamp' : g.formatTimestamp(g.ptpOrigin),
+        'NMOS-PTPSyncTimestamp' : g.formatTimestamp(g.ptpSync),
+        'NMOS-FlowID' : uuid.unparse(g.flowID),
+        'NMOS-SourceID' : uuid.unparse(g.sourceID),
+        'Content-Type' : contentType,
+        'Content-Length' : g.getPayloadSize()
+      };
+      if (g.timecode) startExt['NMOS-Timecode'] = g.formatTimecode(g.timecode);
+      if (g.duration) startExt['NMOS-GrainDuration'] = g.formatDuration(g.duration);
       var actualExts = packet.setExtensions(startExt);
       if (actualExts.prototype && actualExts.prototype.name === 'Error')
         node.warn(`Failed to set header extensions: ${actualExts}`);
@@ -194,7 +212,7 @@ module.exports = function (RED) {
               o = lineStatus.bytesPerLine;
             } else {
               var newLineOff = o + (t - lineStatus.linePos) + lineStatus.bytesPerLine;
-              packet.setPayload(Buffer.concat([b.slice(o, o + (t - lineStatus.linePos)), 
+              packet.setPayload(Buffer.concat([b.slice(o, o + (t - lineStatus.linePos)),
                                                b.slice(newLineOff, newLineOff + lineStatus.linePos)], t));
               o = newLineOff + lineStatus.linePos;
             }
@@ -218,8 +236,7 @@ module.exports = function (RED) {
           b = b.slice(o);
         }
       }
-      var endExt = { profile : 0xbede };
-      endExt['id' + rtpExts.grain_flags_id] = new Buffer([0x40]);
+      var endExt = { 'NMOS-GrainFlags' : 'end' };
       packet.setExtensions(endExt);
       packet.setMarker(true);
       packet.setPayload(b);

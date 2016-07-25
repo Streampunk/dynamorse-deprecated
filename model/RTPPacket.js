@@ -200,78 +200,57 @@ RTPPacket.prototype.setContributionSourceIDs = function (c) {
 RTPPacket.prototype.getExtensions = function () {
   if (this.extensions !== undefined) return this.extensions;
   if (!this.getExtension()) return undefined;
-  var extensionBase = 12 + this.getCSRCCount() * 4;
-  var profile = this.buffer.readUInt16BE(extensionBase);
-  var length  = this.buffer.readUInt16BE(extensionBase + 2);
-  var extensionEnd = extensionBase + 4 + 4 * length;
-  if (!profile === 0xbede)
-    return {
-      profile : profile,
-      length : length,
-      extensionData : this.buffer.slice(extensionBase + 4, extensionEnd) };
-  var position = extensionBase + 4;
-  var e = { profile : profile, length : length };
-  while (position < extensionEnd) {
-    if (this.buffer[position] === 0) { // skip past padding
-      position++;
-    }
-    else {
-      var id = (this.buffer[position] & 0xf0) >> 4;
-      var len = (this.buffer[position] & 0x0f) + 1;
-      e['id' + id] = this.buffer.slice(position + 1, position + 1 + len);
-      position += 1 + len;
-    }
+  var extensionPos = 12 + this.getCSRCCount() * 4;
+  var profile = this.buffer.readUInt16BE(extensionPos);
+  if (profile !== 0x1000) {
+    console.error(`Detected unexpected header extension start code '${profile}'.`);
+    return undefined;
   }
-  this.extensions = e;
-  return e;
+  var extensionLength = this.buffer.readUInt16BE(extensionPos + 2) * 4;
+  extensionPos += 4;
+  var exts = {};
+  while (extensionPos < extensionLength) {
+    while (this.buffer.readUInt8(extensionPos) === 0) extensionPos++; // Padding
+    var localID = this.buffer.readUInt8(extensionPos);
+    var localLength = this.buffer.readUInt8(extensionPos + 1);
+    var localValue = this.buffer.slice(extensionPos + 2,
+      extensionPos + 2 + localLength).toString('utf8');
+    var parts = localValue.match(/(\S*)\s*:\s*(.*)/);
+    if (parts) exts[parts[1]] = parts[2];
+    extensionPos += 2 + localLength;
+  }
+  this.extensions = exts;
+  return exts;
 }
 
 RTPPacket.prototype.setExtensions = function (x) {
   if (!x || typeof x !== 'object' )
     return new Error('Extensions can only be set using an object.');
-  if (!x.profile || typeof x.profile != 'number' || x.profile < 0 ||
-      x.profile > 65535)
-    return new Error('Cannot set extensions unless a profile property exists, ' +
-        'is a number in the range 0 to 65535.');
   var extensionBase = 12 + this.getCSRCCount() * 4;
+  var extensionPos = extensionBase;
+  var encodedExtensions = Object.keys(x).map(function (k) {
+    return new Buffer(`${k}: ${x[k]}`, 'utf8');
+  });
+  var encodedLength = encodedExtensions.reduce(function (l, r) {
+    return 2 + l + r.length; }, 0);
+  var totalLength = ((encodedLength + 3) / 4|0) * 4;
   var preserveLineData = new Buffer(this.buffer.slice(this.getPayloadStart(),
-    this.getPayloadStart() + 30));
-  if (x.profile !== 0xbede) {
-    if (!x.extensionData || !Buffer.isBuffer(x.extensionData))
-      return new Error('Extension data must be provided as property extensionData ' +
-          'of type Buffer.');
-    var length = (x.length && typeof x.length === 'number' &&
-        x.length > 0 && x.length <= x.extensionData.length) ? x.length : x.extensionData.length;
-    length = (length <= 65535) ? length : 65535;
-    length = (length >= 0) ? length : 0;
-    this.buffer.writeUInt16BE(x.profile, extensionBase);
-    this.buffer.writeUInt16BE(length, extensionBase + 2);
-    x.extensionData.copy(this.buffer, extensionBase, 0, length);
-    this.setExtension(true);
-    preserveLineData.copy(this.buffer, this.getPayloadStart());
-    return x;
-  } else {
-    var position = extensionBase + 4;
-    Object.keys(x).forEach(function (k) {
-      var id = k.match(/id([1-9][1-4]?)/);
-      if (id) {
-        id = +id[1];
-        var buf = x[`id${id}`];
-        if (buf && Buffer.isBuffer(buf)) {
-          var len = (buf.length < 17) ? buf.length - 1 : 15; // 15 == 16
-          this.buffer[position] = (id << 4) | len;
-          buf.copy(this.buffer, position + 1, 0, len + 1);
-          position += len + 2;
-        }
-      }
-    }.bind(this));
-    while ((position - extensionBase) % 4 !== 0) { this.buffer[position++] = 0; }
-    this.buffer.writeUInt16BE(x.profile, extensionBase);
-    this.buffer.writeUInt16BE((position - extensionBase - 4) / 4, extensionBase + 2);
-    this.setExtension(true);
-    preserveLineData.copy(this.buffer, this.getPayloadStart());
-    return this.getExtensions();
-  }
+    this.getPayloadStart() + totalLength));
+  this.buffer.writeUInt16BE(0x1000, extensionPos);
+  this.buffer.writeUInt16BE(totalLength / 4, extensionPos + 2);
+  extensionPos += 4;
+  var localID = 1;
+  for ( var ex of encodedExtensions ) {
+    this.buffer.writeUInt8(localID++, extensionPos);
+    this.buffer.writeUInt8(ex.length, extensionPos + 1);
+    extensionPos += 2 + ex.copy(this.buffer, extensionPos + 2);
+  };
+  while (extensionPos < extensionBase + totalLength + 4) {
+    this.buffer.writeUInt8(0, extensionPos++);
+  }; // padding
+  this.setExtension(true);
+  preserveLineData.copy(this.buffer, this.getPayloadStart());
+  return this.getExtensions();
 }
 
 RTPPacket.prototype.isStart = function (grain_flags_id) {

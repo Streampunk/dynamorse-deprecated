@@ -60,13 +60,13 @@ module.exports = function (exts, pgroup) {
           payloads = (pushLines) ? rtp.getLineData().map(function (x) {
             return x.data }) : [ rtp.getPayload() ];
           var rtpex = rtp.getExtensions();
-          origin_timestamp = rtpex['id' + ex.origin_timestamp_id];
-          sync_timestamp = rtpex['id' + ex.sync_timestamp_id];
-          grain_duration = rtpex['id' + ex.grain_duration_id];
-          smpte_tc = rtpex['id' + ex.smpte_tc_id];
-          flow_id = rtpex['id' + ex.flow_id_id];
-          source_id = rtpex['id' + ex.source_id_id];
-        } else if (rtp.isEnd(ex.grain_flags_id)) {
+          origin_timestamp = rtpex['NMOS-PTPOrigin'];
+          sync_timestamp = rtpex['NMOS-PTPSync'];
+          grain_duration = rtpex['NMOS-GrainDuration'];
+          smpte_tc = rtpex['NMOS-Timecode'];
+          flow_id = rtpex['NMOS-FlowID'];
+          source_id = rtpex['NMOS-SourceID'];
+        } else if (rtpex['NMOS-GrainFlags'] === 'end') {
           if (pushLines) {
             rtp.getLineData().forEach(function (x) { payloads.push(x.data); })
           } else {

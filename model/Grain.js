@@ -166,6 +166,14 @@ Grain.prototype.getDuration = function () {
   }
 }
 
+Grain.prototype.getPayloadSize = function () {
+  if (Array.isArray(this.buffers)) {
+    if (buffers.length === 1) return buffers[0].length;
+    return this.buffers.reduce(function (l, r) { return l + r.length; }, 0);
+  }
+  return Buffer.isBuffer(this.buffers) ? this.buffers.length : 0;
+}
+
 Grain.isGrain = function (x) {
   return x !== null &&
     typeof x === 'object' &&
@@ -175,8 +183,7 @@ Grain.isGrain = function (x) {
 Grain.prototype.toJSON = function () {
   return {
     payloadCount : Array.isArray(this.buffers) ? this.buffers.length : 0,
-    payloadSize : Array.isArray(this.buffers) ?
-      this.buffers.reduce(function (l, r) { return l + r.length; }, 0) : 0,
+    payloadSize : g.getPayloadSize(),
     ptpSyncTimestamp : this.formatTimestamp(this.ptpSync),
     ptpOriginTimestamp : this.formatTimestamp(this.ptpOrigin),
     timecode : this.formatTimecode(this.timecode),
