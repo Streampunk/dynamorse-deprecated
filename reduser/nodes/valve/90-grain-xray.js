@@ -28,9 +28,7 @@ module.exports = function (RED) {
         push (null, x);
       } else {
         if (this.count % config.showEvery === 0) {
-          console.log('@@@ Received', x);
           var formattedGrain = JSON.stringify(x, null, 2);
-          console.log('@@@ formatted', formattedGrain);
           RED.comms.publish('debug', {
             format : `Grain ${this.count}`,
             msg: formattedGrain

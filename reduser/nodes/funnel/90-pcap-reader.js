@@ -65,7 +65,6 @@ module.exports = function (RED) {
           pcapInlet(config.file, config.loop)
           .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
           .map(function (g) {
-            console.log(g);
             if (!config.regenerate) {
               return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
                 flow.id, source.id, g.duration);

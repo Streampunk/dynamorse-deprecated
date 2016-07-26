@@ -60,7 +60,6 @@ module.exports = function (exts, pgroup) {
           payloads = (pushLines) ? rtp.getLineData().map(function (x) {
             return x.data }) : [ rtp.getPayload() ];
           var rtpex = rtp.getExtensions();
-          console.log(rtpex);
           origin_timestamp = rtpex['NMOS-PTPOrigin'];
           sync_timestamp = rtpex['NMOS-PTPSync'];
           grain_duration = rtpex['NMOS-GrainDuration'];
