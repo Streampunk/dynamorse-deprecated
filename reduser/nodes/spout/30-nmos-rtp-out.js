@@ -169,7 +169,7 @@ module.exports = function (RED) {
         fieldBreaks: fieldMap[height + ((interlace) ? 'i' : 'p')],
         field : 1
       } : undefined;
-      var remaining = 1200; // Allow for extension
+      var remaining = 800; // Allow for extension
       var packet = makePacket(g, remaining, masterBuffer, pc++);
 
       // Make grain start RTP header extension

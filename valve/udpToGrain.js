@@ -56,7 +56,7 @@ module.exports = function (exts, pgroup) {
           }
         }
         rtpCounter = nextCounter;
-        if (rtp.isStart(ex.grain_flags_id)) {
+        if (rtp.isStart()) {
           payloads = (pushLines) ? rtp.getLineData().map(function (x) {
             return x.data }) : [ rtp.getPayload() ];
           var rtpex = rtp.getExtensions();
@@ -66,7 +66,7 @@ module.exports = function (exts, pgroup) {
           smpte_tc = rtpex['NMOS-Timecode'];
           flow_id = rtpex['NMOS-FlowID'];
           source_id = rtpex['NMOS-SourceID'];
-        } else if (rtpex['NMOS-GrainFlags'] === 'end') {
+        } else if (rtp.isEnd())  {
           if (pushLines) {
             rtp.getLineData().forEach(function (x) { payloads.push(x.data); })
           } else {

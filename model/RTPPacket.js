@@ -253,20 +253,14 @@ RTPPacket.prototype.setExtensions = function (x) {
   return this.getExtensions();
 }
 
-RTPPacket.prototype.isStart = function (grain_flags_id) {
+RTPPacket.prototype.isStart = function () {
   var e = this.getExtensions();
-  if (typeof e === 'object' && Buffer.isBuffer(e['id' + grain_flags_id])) {
-    return (e['id' + grain_flags_id][0] & 0x80) !== 0;
-  }
-  return false;
+  return (e && typeof e === 'object' && e['NMOS-GrainFlags'] === 'start');
 }
 
-RTPPacket.prototype.isEnd = function (grain_flags_id) {
+RTPPacket.prototype.isEnd = function () {
   var e = this.getExtensions();
-  if (typeof e === 'object' && Buffer.isBuffer(e['id' + grain_flags_id])) {
-    return (e['id' + grain_flags_id][0] & 0x40) !== 0;
-  }
-  return false;
+  return (e && typeof e === 'object' && e['NMOS-GrainFlags'] === 'end');
 }
 
 RTPPacket.prototype.getPayloadStart = function() {
