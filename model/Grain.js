@@ -183,7 +183,7 @@ Grain.isGrain = function (x) {
 Grain.prototype.toJSON = function () {
   return {
     payloadCount : Array.isArray(this.buffers) ? this.buffers.length : 0,
-    payloadSize : g.getPayloadSize(),
+    payloadSize : this.getPayloadSize(),
     ptpSyncTimestamp : this.formatTimestamp(this.ptpSync),
     ptpOriginTimestamp : this.formatTimestamp(this.ptpOrigin),
     timecode : this.formatTimecode(this.timecode),
