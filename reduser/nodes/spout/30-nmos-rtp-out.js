@@ -183,8 +183,8 @@ module.exports = function (RED) {
       // startExt['id' + rtpExts.smpte_tc_id] = g.timecode;
       var startExt = {
         'NMOS-GrainFlags' : 'start',
-        'NMOS-PTPOriginTimestamp' : g.formatTimestamp(g.ptpOrigin),
-        'NMOS-PTPSyncTimestamp' : g.formatTimestamp(g.ptpSync),
+        'NMOS-PTPOrigin' : g.formatTimestamp(g.ptpOrigin),
+        'NMOS-PTPSync' : g.formatTimestamp(g.ptpSync),
         'NMOS-FlowID' : uuid.unparse(g.flow_id),
         'NMOS-SourceID' : uuid.unparse(g.source_id),
         'Content-Type' : contentType,
