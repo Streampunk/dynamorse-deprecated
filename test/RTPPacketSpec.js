@@ -77,6 +77,8 @@ test('Roundtrip two-byte extensions', function (t) {
       'depth=10; colorimetry=BT709-2; interlace=1'
   }, 'object is equal to expected.');
   t.ok(p.getExtension() === true, 'RTP packet has extension flag set.');
+  t.equal(p.isStart(), true, 'Grain is marked as start.');
+  t.equal(p.isEnd(), false, 'Grain is not marked as end.');
   t.end();
 });
 

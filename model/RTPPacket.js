@@ -255,12 +255,12 @@ RTPPacket.prototype.setExtensions = function (x) {
 
 RTPPacket.prototype.isStart = function () {
   var e = this.getExtensions();
-  return (e && typeof e === 'object' && e['NMOS-GrainFlags'] === 'start');
+  return (typeof e === 'object' && e['NMOS-GrainFlags'] === 'start');
 }
 
 RTPPacket.prototype.isEnd = function () {
   var e = this.getExtensions();
-  return (e && typeof e === 'object' && e['NMOS-GrainFlags'] === 'end');
+  return (typeof e === 'object' && e['NMOS-GrainFlags'] === 'end');
 }
 
 RTPPacket.prototype.getPayloadStart = function() {
