@@ -113,11 +113,9 @@ module.exports = function (RED) {
           if (err) return push("Failed to resolve NMOS flow.");
           this.srcFlow = f;
           this.tags = f.tags;
-          console.log('***', f);
           clockRate = +f.tags.clockRate[0];
           is4175 = f.tags.encodingName[0] === 'raw'; // TODO add pgroup/V210 check
           if (is4175) {
-            console.log(f.tags);
             width = +f.tags.width[0];
             height = +f.tags.height[0];
             byteFactor = getByteFactor(f.tags);
