@@ -177,7 +177,7 @@ module.exports = function (RED) {
       node.flow = new ledger.Flow(
         (config.regenerate === false && node.headers.length > 0) ? node.headers[0].flow_id : null,
         null, localName, localDescription,
-        "urn:x-nmos:format:" + node.tags.format[0], this.tags, node.source.id,
+        "urn:x-nmos:format:" + node.tags.format[0], node.tags, node.source.id,
         (config.regenerate === true && node.headers.length > 0) ? [ node.headers[0].flow_id ] : []);
       return nodeAPI.putResource(node.source).then(function () {
         return nodeAPI.putResource(node.flow); });
