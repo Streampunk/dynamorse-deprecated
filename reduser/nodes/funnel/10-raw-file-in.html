@@ -22,6 +22,11 @@
       name: { value : '' },
       file : { value : '', required : true },
       grainSize : { value : 0, validate : RED.validators.number() },
+      grainDuration : { value : "0/1", validate : function (v) {
+        var slashed = v.split('/');
+        return slashed.length === 2 && !isNaN(+slashed[0]) && !isNaN(+slashed[1])
+          && slashed[0] >=0 && slashed[1] > 0;
+      } },
       headers : { value : '' },
       loop : { value : false },
       regenerate : { value : false },
@@ -62,7 +67,9 @@
   </div>
   <div class="form-row">
     <label for="node-input-grainSize"><i class="fa fa-futbol-o" aria-hidden="true"></i> grain size</label>
-    <input type="number" id="node-input-grainSize" placeholder="0" min="0" style="width: 120px">
+    <input type="number" id="node-input-grainSize" placeholder="0" min="0" style="width: 100px">
+    <label for="node-input-grainDuration"><i class="fa fa-tint" aria-hidden="true"></i> duration</label>
+    <input type="text" id="node-input-grainDuration" placeholder="0/1" style="width: 120px">
   </div>
   <div class="form-row">
     <label for="node-input-headers"><i class="fa fa-file-text" aria-hidden="true"></i> headers</label>
@@ -227,6 +234,10 @@
     <td><i class="fa fa-futbol-o" aria-hidden="true"></i> grain size</td>
     <td>Size of each element of raw essence. Overriden when headers are present.</td>
    </tr>
+   <tr>
+    <td><i class="fa fa-tint" aria-hidden="true"></i> duration</td>
+    <td>Duration of each grain as a fraction of a second. Required to regenerate
+    timings when no headers.</td>
    <tr>
     <td><i class="fa fa-file-text" aria-hidden="true"></i> headers</td>
     <td>Optional path location for the sidecar file containing the grain headers
