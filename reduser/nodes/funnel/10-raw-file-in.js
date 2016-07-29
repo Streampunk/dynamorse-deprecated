@@ -23,12 +23,13 @@ var Grain = require('../../../model/Grain.js');
 var H = require('highland');
 var uuid = require('uuid');
 
+const emptyBuf = new Buffer(0);
+
 function rawInlet(file, sizes, loop) {
-  console.log('RAW INLET CALLED WITH', typeof sizes);
   var flowID = uuid.v4();
   var sourceID = uuid.v4();
   var bufs = [];
-  var pointer = 0;
+  var desired = (typeof sizes === 'number') ? sizes : 0;
   var remaining = null;
   var grainCount = 0;
   var fixedChomper = function (err, x, push, next) {
@@ -38,23 +39,18 @@ function rawInlet(file, sizes, loop) {
     } else if (x === H.nil) {
       push(null, x);
     } else {
-      if (remaining) {
-        bufs.push(remaining);
-        pointer += remaining.length;
-        remaining = null;
-      }
-      if (pointer + x.length < sizes) {
-        bufs.push(x);
-        pointer += x.length;
-      } else if (sizes - pointer > 0) {
-        bufs.push(x.slice(0, sizes - pointer));
-        remaining = x.slice(pointer);
-        pointer = sizes;
-      }
-      if (pointer === sizes) {
-        push(null, new Grain(bufs, 0, 0, null, flowID, sourceID, null));
-        bufs = [];
-        pointer = 0;
+      while (x.length > 0) {
+        if (x.length >= desired) {
+          bufs.push(x.slice(0, desired));
+          push(null, new Grain(bufs, 0, 0, null, flowID, sourceID, null));
+          x = x.slice(desired);
+          bufs = [];
+          desired = sizes;
+        } else {
+          bufs.push(x);
+          desired -= x.length;
+          x = emptyBuf;
+        }
       }
       next();
     }
@@ -68,32 +64,25 @@ function rawInlet(file, sizes, loop) {
     } else if (x === H.nil || grainCount >= sizes.length) {
       push(null, H.nil);
     } else {
-      if (!nextGrain) {
-        nextGrain = sizes[grainCount];
-        nextLength = nextGrain.payloadSize;
-      }
-      if (remaining) {
-        bufs.push(remaining);
-        pointer += remaining.length;
-        remaining = null;
-      }
-      // console.log(pointer, x.length, nextLength);
-      if (pointer + x.length < nextLength) {
-        bufs.push(x);
-        pointer += x.length;
-      } else if (nextLength - pointer > 0) {
-        bufs.push(x.slice(0, nextLength - pointer));
-        remaining = x.slice(pointer);
-        pointer = nextLength;
-      }
-      if (pointer === nextLength) {
-        push(null, new Grain(bufs, nextGrain.ptpSyncTimestamp,
-          nextGrain.ptpOriginTimestamp, nextGrain.timecode,
-          nextGrain.flow_id, nextGrain.source_id, nextGrain.duration));
-        bufs = [];
-        pointer = 0;
-        nextGrain = null;
-        grainCount++;
+      while (x.length > 0) {
+        if (!nextGrain) {
+          nextGrain = sizes[grainCount];
+          desired = nextGrain.payloadSize;
+        }
+        if (x.length >= desired) {
+          bufs.push(x.slice(0, desired));
+          push(null, new Grain(bufs, nextGrain.ptpSyncTimestamp,
+            nextGrain.ptpOriginTimestamp, nextGrain.timecode,
+            nextGrain.flow_id, nextGrain.source_id, nextGrain.duration));
+          nextGrain = null;
+          grainCount ++;
+          bufs = [];
+          x = x.slice(desired);
+        } else {
+          bufs.push(x);
+          desired -= x.length;
+          x = emptyBuf;
+        }
       }
       next();
     }
@@ -115,7 +104,7 @@ module.exports = function (RED) {
     RED.nodes.createNode(this,config);
     redioactive.Funnel.call(this, config);
     if (!this.context().global.get('updated'))
-      return this.log('Waiting for global context updated.');
+      return this.log(`Waiting for global context updated. ${this.context().global.get('updated')}`);
     var node = this;
 
     this.tags = {};
@@ -128,12 +117,16 @@ module.exports = function (RED) {
     this.headers = [];
     this.source = null;
     this.flow = null;
+    this.configDuration = [ +config.grainDuration.split('/')[0],
+                            +config.grainDuration.split('/')[1] ];
 
     fsaccess(config.file, fs.R_OK)
     .then(function () {
       if (config.headers) {
         return fsaccess(config.headers, fs.R_OK);
       }
+      if (+config.grainSize <= 0)
+        return Promise.reject(new Error('No headers file and grain size is zero.'));
     })
     .then(function () {
       if (config.headers) {
@@ -177,11 +170,15 @@ module.exports = function (RED) {
       var pipelinesID = config.device ?
         RED.nodes.getNode(config.device).nmos_id :
         node.context().global.get('pipelinesID');
-      node.source = new ledger.Source(null, null, localName, localDescription,
+      node.source = new ledger.Source(
+        (config.regenerate === false && node.headers.length > 0) ? node.headers[0].source_id : null,
+        null, localName, localDescription,
         "urn:x-nmos:format:" + node.tags.format[0], null, null, pipelinesID, null);
-      node.flow = new ledger.Flow(null, null, localName, localDescription,
+      node.flow = new ledger.Flow(
+        (config.regenerate === false && node.headers.length > 0) ? node.headers[0].flow_id : null,
+        null, localName, localDescription,
         "urn:x-nmos:format:" + node.tags.format[0], this.tags, node.source.id,
-        (node.headers.length > 0) ? [ node.headers[0].flow_id ] : []);
+        (config.regenerate === true && node.headers.length > 0) ? [ node.headers[0].flow_id ] : []);
       return nodeAPI.putResource(node.source).then(function () {
         return nodeAPI.putResource(node.flow); });
     })
@@ -200,6 +197,7 @@ module.exports = function (RED) {
           grainTime.writeUIntBE(node.baseTime[0], 0, 6);
           grainTime.writeUInt32BE(node.baseTime[1], 6);
           var grainDuration = g.getDuration();
+          if (isNaN(grainDuration[0])) grainDuration = node.configDuration;
           node.baseTime[1] = ( node.baseTime[1] +
             grainDuration[0] * 1000000000 / grainDuration[1]|0 );
           node.baseTime = [ node.baseTime[0] + node.baseTime[1] / 1000000000|0,
