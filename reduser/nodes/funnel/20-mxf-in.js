@@ -91,7 +91,7 @@ module.exports = function (RED) {
         .then(function () {
           node.highland(
             H(function (push, next) {
-              push(null, H(fs.createReadStream(mxfurl.pathname));
+              push(null, H(fs.createReadStream(mxfurl.pathname)));
               next();
             })
             .take(config.loop ? Number.MAX_SAFE_INTEGER : 1)
