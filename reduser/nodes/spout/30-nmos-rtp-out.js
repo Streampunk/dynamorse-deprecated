@@ -47,7 +47,7 @@ function getStride (tags) {
     }
   } else if (tags.format[0] === 'audio') {
     if (tags.blockAlign) return +tags.blockAlign[0];
-    return +tags.channels[0] * +tags.encodingName[0].substring(1);
+    return +tags.channels[0] * +tags.encodingName[0].substring(1) / 8|0;
   } else {
     return 1;
   }
@@ -110,7 +110,7 @@ module.exports = function (RED) {
       if (!Grain.isGrain(g)) return node.warn('Received a non-grain on the input.');
       if (!this.tags) {
         this.getNMOSFlow(g, function (err, f) {
-          if (err) return push("Failed to resolve NMOS flow.");
+          if (err) return node.error(`Failed to resolve NMOS flow ${uuid.unparse(g.flow_id)}: ${err}`);
           this.srcFlow = f;
           this.tags = f.tags;
           clockRate = +f.tags.clockRate[0];
@@ -130,6 +130,7 @@ module.exports = function (RED) {
             contentType = `${f.tags.format}/${f.tags.encodingName}`;
             if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate}`;
             if (f.tags.channels) contentType += `; channels=${f.tags.channels}`;
+            packetsPerGrain = g.getPayloadSize() / 1400|0 + 5;
           }
           stride = getStride(f.tags);
           source = new ledger.Source(null, null, localName, localDescription,
@@ -221,7 +222,7 @@ module.exports = function (RED) {
           }
           sendPacket(packet); // May want to spread packets
           // FIXME: probably won't work for compressed video
-          if (!is4175) tsAdjust += t / stride;
+          if (!is4175 && clockRate === 48000) tsAdjust += t / stride;
           remaining = 1410; // Slightly short so last header fits
           packet = makePacket(g, remaining, masterBuffer, pc++);
         } else if (++i < g.buffers.length) {
@@ -230,7 +231,7 @@ module.exports = function (RED) {
             b.length + g.buffers[i].length - o);
           o = 0;
         } else {
-          // console.log("Shrinking buffer.", o, t, b.length);
+          console.log("Shrinking buffer.", o, t, b.length);
           // Required to shrink last packet of the set.
           b = b.slice(o);
         }
@@ -308,7 +309,8 @@ module.exports = function (RED) {
       packetBuffers.push(p.buffer);
       if (done) {
         packetCount++;
-          sock.send(packetBuffers, 0, p.length, config.port, config.address,
+        console.log('Sending', packetBuffers.length, 'packets', packetCount);
+        sock.send(packetBuffers, 0, p.length, config.port, config.address,
           function (e) {
             callbackCount++;
             // done();
