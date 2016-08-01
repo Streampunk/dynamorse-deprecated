@@ -66,7 +66,13 @@
   </div>
   <div class="form-row">
     <label for="node-input-mxfUrl"><i class="fa fa-file"></i> MXF URL</label>
-    <input type="text" id="node-input-mxfUrl" placeholder="dynamorse.mxf">
+    <input type="text" id="node-input-mxfUrl" placeholder="file:dynamorse.mxf">
+  </div>
+  <div class="form-row">
+    <label for="node-input-loop"><i class="fa fa-repeat"></i> loop?</label>
+    <input type="checkbox" id="node-input-loop" style="width: 100px">
+    <label for="node-input-regenerate"><i class="fa fa-clock-o"></i> regenerate?</label>
+    <input type="checkbox" id="node-input-regenerate" style="width: 100px">
   </div>
   <div class="form-row">
     <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
@@ -125,7 +131,7 @@
   <h1>MXF file input</h1>
   <p>Read grains from a MXF stream, creating one or more NMOS flow(s) per
   essence element. The MXF file may be located as a local file, on am HTTP
-  web-server or a FRP server, in which case specify
+  web-server or a FTP server, in which case specify
   its location with a URL. If no protocol is specified, a file is
   assumed to be stored locally.</p>
 
@@ -158,6 +164,14 @@
    <tr>
     <td><i class="fa fa-file"></i> MXF URL</td>
     <td>Location of the MXF stream.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-repeat"></i> loop?</td>
+    <td>Should the PCAP file be repeated indefinitely?</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-clock-o"></i> regenerate?</td>
+    <td>Should the grain metadata be regenerated locally?</td>
    </tr>
    <tr>
     <td><i class="fa fa-info-circle"></i> description</td>
