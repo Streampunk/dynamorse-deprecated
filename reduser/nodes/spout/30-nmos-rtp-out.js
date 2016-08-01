@@ -47,7 +47,7 @@ function getStride (tags) {
     }
   } else if (tags.format[0] === 'audio') {
     if (tags.blockAlign) return +tags.blockAlign[0];
-    return +tags.channels[0] * +tags.encodingName[0].substring(1);
+    return +tags.channels[0] * +tags.encodingName[0].substring(1) / 8|0;
   } else {
     return 1;
   }
@@ -194,7 +194,7 @@ module.exports = function (RED) {
               o = lineStatus.bytesPerLine;
             } else {
               var newLineOff = o + (t - lineStatus.linePos) + lineStatus.bytesPerLine;
-              packet.setPayload(Buffer.concat([b.slice(o, o + (t - lineStatus.linePos)), 
+              packet.setPayload(Buffer.concat([b.slice(o, o + (t - lineStatus.linePos)),
                                                b.slice(newLineOff, newLineOff + lineStatus.linePos)], t));
               o = newLineOff + lineStatus.linePos;
             }
