@@ -90,7 +90,12 @@ module.exports = function (RED) {
         fsaccess(mxfurl.pathname, fs.R_OK)
         .then(function () {
           node.highland(
-            H(fs.createReadStream(mxfurl.pathname))
+            H(function (push, next) {
+              push(null, H(fs.createReadStream(mxfurl.pathname));
+              next();
+            })
+            .take(config.loop ? Number.MAX_SAFE_INTEGER : 1)
+            .sequence()
             .through(klv.kelviniser())
             .through(klv.metatiser())
             .through(klv.stripTheFiller)
@@ -113,11 +118,10 @@ module.exports = function (RED) {
                 var baseTC = startTC.StartTimecode + node.grainCount;
                 timecode = new Timecode( // FIXME drop frame calculations
                   baseTC / (3600 * startTC.FramesPerSecond)|0,
-                  baseTC / (60 * startTC.FramesPerSecond)|0 % 60,
-                  baseTC / startTC.FramesPerSecond|0 % 60,
+                  (baseTC / (60 * startTC.FramesPerSecond)|0) % 60,
+                  (baseTC / startTC.FramesPerSecond|0) % 60,
                   baseTC % startTC.FramesPerSecond,
                   startTC.DropFrame, true);
-                console.error(timecode.toString());
               }
               node.grainCount++;
               return new Grain(x.value, grainTime, grainTime, timecode,
