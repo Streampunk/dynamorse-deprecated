@@ -15,12 +15,18 @@
 
 var util = require('util');
 var redioactive = require('../../../util/Redioactive.js')
+var Grain = require('../../../model/Grain.js');
+var Promise = require('promise');
+var SDPProcessing = require('../../../util/SDPProcessing.js');
 
 module.exports = function (RED) {
-  function GlobIn (config) {
+  function FunnelOne (config) {
     RED.nodes.createNode(this,config);
     redioactive.Funnel.call(this, config);
-    this.log(JSON.stringify(config, null, 2));
+    if (!this.context().global.get('updated'))
+      return this.log(`Waiting for global context updated. ${this.context().global.get('updated')}`);
+    var node = this;
+
     this.count = +config.start;
     this.log(JSON.stringify(this.context().global.get('node')));
     this.generator(function (push, next) {
@@ -39,6 +45,11 @@ module.exports = function (RED) {
     }.bind(this));
     this.on('close', this.close);
   }
-  util.inherits(GlobIn, redioactive.Funnel);
-  RED.nodes.registerType("funnel one",GlobIn);
+  util.inherits(FunnelOne, redioactive.Funnel);
+  RED.nodes.registerType("funnel one", FunnelOne);
+
+  FunnelOne.prototype.sdpToTags = SDPProcessing.sdpToTags;
+  FunnelOne.prototype.setTag = SDPProcessing.setTag;
+  FunnelOne.prototype.sdpURLReader = Promise.denodeify(SDPProcessing.sdpURLReader);
+  FunnelOne.prototype.sdpToExt = SDPProcessing.sdpToExt;
 };
