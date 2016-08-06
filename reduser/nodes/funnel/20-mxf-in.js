@@ -30,6 +30,7 @@ function makeTags(x) {
   switch (x.description.ObjectClass) {
     case 'MPEGVideoDescriptor':
       var tags = { descriptor : [ 'MPEGVideoDescriptor' ] };
+      tags.clockRate = [ '90000' ];
       tags.width = [ `${x.description.StoredWidth}` ];
       tags.height = [ `${(x.description.FrameLayout === 'SeparateFields') ?
         2 * x.description.StoredHeight : x.description.StoredHeight}` ];
@@ -103,7 +104,7 @@ module.exports = function (RED) {
             .through(klv.puppeteer())
             .through(klv.trackCacher())
             .through(klv.essenceFilter('picture0'))
-            .doto(node.extractFlowAndSource.bind(node))
+            .flatMap(node.extractFlowAndSource.bind(node))
             .map(function (x) {
               var grainTime = new Buffer(10);
               grainTime.writeUIntBE(node.baseTime[0], 0, 6);
@@ -145,7 +146,7 @@ module.exports = function (RED) {
   RED.nodes.registerType("mxf-in", MXFIn);
 
   MXFIn.prototype.extractFlowAndSource = function (x) {
-    if (this.flow) return;
+    if (this.flow) return H([x]);
     this.tags = makeTags(x);
     if (x.description && x.description.SampleRate) {
       this.grainDuration = [ x.description.SampleRate[1], x.description.SampleRate[0] ];
@@ -161,8 +162,14 @@ module.exports = function (RED) {
     this.flow = new this.ledger.Flow(null, null, localName, localDescription,
       "urn:x-nmos:format:" + this.tags.format[0], this.tags, this.source.id, null);
     console.log('---', this.flow);
-    this.nodeAPI.putResource(this.source).then(function () {
-      return this.nodeAPI.putResource(this.flow);
-    }.bind(this)).catch(this.error);
+    return H(
+      this.nodeAPI.putResource(this.source)
+      .then(function () {
+        return this.nodeAPI.putResource(this.flow);
+      }.bind(this))
+      .then(function () { return x; }));
+    // this.nodeAPI.putResource(this.source).then(function () {
+    //   return this.nodeAPI.putResource(this.flow);
+    // }.bind(this)).catch(this.error);
   }
 }

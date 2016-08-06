@@ -111,7 +111,7 @@ module.exports = function (RED) {
       if (!Grain.isGrain(g)) return node.warn('Received a non-grain on the input.');
       if (!this.tags) {
         this.getNMOSFlow(g, function (err, f) {
-          if (err) return push("Failed to resolve NMOS flow.");
+          if (err) return node.warn(`Failed to resolve NMOS flow ${uuid.unparse(g.flow_id)}: ${err}`);
           this.srcFlow = f;
           this.tags = f.tags;
           clockRate = +f.tags.clockRate[0];
@@ -186,10 +186,13 @@ module.exports = function (RED) {
       var b = g.buffers[i];
       while (i < g.buffers.length) {
         if (is6184) {
-          packet.setPayload(b);
-          sendPacket(packet);
-          packet = makePacket(g, remaining, masterBuffer, pc++);
           b = g.buffers[i++];
+          if (i < g.buffers.length) {
+            packet.setPayload(b);
+            sendPacket(packet);
+            remaining = 1410;
+            packet = makePacket(g, remaining, masterBuffer, pc++);
+          }
           continue;
         }
         var t = (!is4175 || !packet.getMarker()) ? remaining - remaining % stride :
