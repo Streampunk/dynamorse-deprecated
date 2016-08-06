@@ -23,6 +23,6 @@ test('A newly created grain from mainly strings', function (t) {
     'CCA06626-AEB1-4014-8287-BBEF45E7DD51',
     '0313B546-1325-4983-B80B-1C3C312FC181',
     '25/1');
-  console.log(JSON.stringify(g, null, 2));
+  // console.log(JSON.stringify(g, null, 2));
   t.end();
 });

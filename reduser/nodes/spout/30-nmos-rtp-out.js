@@ -48,7 +48,7 @@ function getStride (tags) {
     }
   } else if (tags.format[0] === 'audio') {
     if (tags.blockAlign) return +tags.blockAlign[0];
-    return +tags.channels[0] * +tags.encodingName[0].substring(1);
+    return +tags.channels[0] * +tags.encodingName[0].substring(1) / 8|0;
   } else {
     return 1;
   }
