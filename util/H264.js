@@ -28,7 +28,7 @@ function compact6184 (g, payloadSize) {
   var endPointer = 0;
   var nals = { slices : [] , seis : [], max_ref_idc : 0 };
   if (g.buffers.length > 1) {
-    g.buffers = Buffer.concat(g.buffers);
+    g.buffers = [ Buffer.concat(g.buffers) ];
   }
   function testMaxRefIDC(value) {
     if (value & 0x60 > nals.max_ref_idc)
