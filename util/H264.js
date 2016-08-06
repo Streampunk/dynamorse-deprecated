@@ -27,7 +27,7 @@ function compact6184 (g, payloadSize) {
   var rangePointer = 0;
   var endPointer = 0;
   var nals = { slices : [] , seis : [], max_ref_idc : 0 };
-  if (g.buffers.length > 0) {
+  if (g.buffers.length > 1) {
     g.buffers = Buffer.concat(g.buffers);
   }
   function testMaxRefIDC(value) {
@@ -107,29 +107,29 @@ function compact6184 (g, payloadSize) {
   if (state === DATA) endPointer = b.length;
   if (endPointer > rangePointer) nextNAL(b.slice(rangePointer, endPointer));
 
-  var statA = new Buffer(
+  var stapA = new Buffer(
     ((nals.aud) ? nals.aud.length + 2 : 0) +
     ((nals.sps) ? nals.sps.length + 2 : 0) +
     ((nals.pps) ? nals.pps.length + 2 : 0) + 1);
 
   var pos = 1;
-  statA.writeUInt8(nals.max_ref_idc | 24, 0);
+  stapA.writeUInt8(nals.max_ref_idc | 24, 0);
   if (nals.aud) {
-    statA.writeUInt16BE(nals.aud.length, pos);
+    stapA.writeUInt16BE(nals.aud.length, pos);
     pos += 2;
-    pos += nals.aud.copy(statA, pos);
+    pos += nals.aud.copy(stapA, pos);
   }
   if (nals.sps) {
-    statA.writeUInt16BE(nals.sps.length, pos);
+    stapA.writeUInt16BE(nals.sps.length, pos);
     pos += 2;
-    pos += nals.sps.copy(statA, pos);
+    pos += nals.sps.copy(stapA, pos);
   }
   if (nals.pps) {
-    statA.writeUInt16BE(nals.pps.length, pos);
+    stapA.writeUInt16BE(nals.pps.length, pos);
     pos += 2;
-    nals.pps.copy(statA, pos);
+    nals.pps.copy(stapA, pos);
   }
-  g.buffers = [ statA ];
+  g.buffers = [ stapA ];
 
   function splitNal (nal) {
     if (nal.length < payloadSize) return [ nal ];
@@ -141,6 +141,7 @@ function compact6184 (g, payloadSize) {
       p.writeUInt8(nals.max_ref_idc | 28, 0);
       p.writeUInt8(nalType, 1);
       var written = nal.copy(p, 2);
+      payloads.push(p.slice(0, nal.length + 2));
       nal = nal.slice(written);
     }
     payloads[0].writeUInt8(0x80 | nalType, 1);
@@ -148,17 +149,58 @@ function compact6184 (g, payloadSize) {
     return payloads;
   }
 
-  seis.forEach(function (sei) {
+  nals.seis.forEach(function (sei) {
     splitNal(sei).forEach(function (y) { g.buffers.push(y); });
   });
 
-  slices.forEach(function (slice) {
+  nals.slices.forEach(function (slice) {
     splitNal(slice).forEach(function (y) { g.buffers.push(y); });
   });
 
   return g;
 }
 
+const zzzOne = new Buffer([0, 0, 0, 1]);
+
+function backToAVC (g) {
+  g.buffers = g.buffers.map(function (b) {
+    if (b.readUInt8(0) & 0x80 !== 0) {
+      console.error('Forbidden zero bit in an H.264 stream is one!');
+      return b;
+    }
+    switch (b.readUInt8(0) & 0x1f) {
+      case 24:
+        var pos = 1;
+        var bufs = [];
+        var total = 0;
+        while(pos < b.length - 2 &&
+            (pos + b.readUInt16BE(pos) + 2) <= b.length) {
+          var length = b.readUInt16BE(pos);
+          bufs.push(zzzOne);
+          bufs.push(b.slice(pos + 2, pos + 2 + length));
+          pos += 2 + length;
+          total += 4 + length;
+        }
+        return Buffer.concat(bufs, total);
+      case 28:
+        switch (b.readUInt8(1) & 0xc0) {
+          case 0x80: // Start
+            return Buffer.concat([
+              zzzOne,
+              new Buffer([(b.readUInt8(0) & 0x60) | (b.readUInt8(1) & 0x1f)]),
+              b.slice(2)], b.length + 3);
+          case 0x40: // end
+            return b.slice(2);
+          default: // middle
+            return b.slice(2);
+        }
+      default:
+        return Buffer.concat([zzzOne, b], b.length + 4);
+    }
+  });
+};
+
 module.exports = {
-  compact : compact6184
+  compact : compact6184,
+  backToAVC : backToAVC
 };
