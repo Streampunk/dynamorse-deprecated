@@ -156,7 +156,7 @@ module.exports = function (RED) {
     var grainTimer = process.hrtime();
     function pushGrain (g, next) {
       console.log(':-)', process.hrtime(grainTimer));
-      if (is6184) H264.compact(g);
+      if (is6184) H264.compact(g, 1410);
       var masterBuffer = new Buffer(packetsPerGrain*1452);
       var pc = 0;
       grainTimer = process.hrtime();
@@ -185,6 +185,13 @@ module.exports = function (RED) {
       var i = 0, o = 0; y = 0;
       var b = g.buffers[i];
       while (i < g.buffers.length) {
+        if (is6184) {
+          packet.setPayload(b);
+          sendPacket(packet);
+          packet = makePacket(g, remaining, masterBuffer, pc++);
+          b = g.buffers[i++];
+          continue;
+        }
         var t = (!is4175 || !packet.getMarker()) ? remaining - remaining % stride :
           packet.getLineData()[0].length;
         // console.log('HAT', packet.getLineData()[0].lineNo, (b.length - o) % 4800, 4800 - lineStatus.linePos,
