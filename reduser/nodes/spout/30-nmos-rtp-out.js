@@ -23,6 +23,7 @@ var dgram = require('netadon');
 var uuid = require('uuid');
 var Net = require('../../../util/Net.js');
 var util = require('util');
+var H264 = require('../../../util/H264.js');
 
 // TODO add IPv6 support
 
@@ -69,6 +70,7 @@ module.exports = function (RED) {
     var payloadType = 96;
     var rtpTsOffset = (Math.random() * 0xffffffff) >>> 0;
     var is4175 = false;
+    var is6184 = false;
     var width = undefined;
     var height = undefined;
     var byteFactor = undefined;
@@ -114,7 +116,8 @@ module.exports = function (RED) {
           this.srcFlow = f;
           this.tags = f.tags;
           clockRate = +f.tags.clockRate[0];
-          is4175 = f.tags.encodingName[0] === 'raw'; // TODO add pgroup/V210 check
+          is4175 = f.tags.encodingName[0] === 'raw';
+          is6184 = f.tags.encodingName[0].toLowerCase() === 'h264';
           if (is4175) {
             width = +f.tags.width[0];
             height = +f.tags.height[0];
@@ -160,6 +163,7 @@ module.exports = function (RED) {
     var grainTimer = process.hrtime();
     function pushGrain (g, next) {
       console.log(':-)', process.hrtime(grainTimer));
+      if (is6184) H264.compact(g, 1410);
       var masterBuffer = new Buffer(packetsPerGrain*1452);
       var pc = 0;
       grainTimer = process.hrtime();
@@ -199,6 +203,16 @@ module.exports = function (RED) {
       var i = 0, o = 0; y = 0;
       var b = g.buffers[i];
       while (i < g.buffers.length) {
+        if (is6184) {
+          b = g.buffers[i++];
+          if (i < g.buffers.length) {
+            packet.setPayload(b);
+            sendPacket(packet);
+            remaining = 1410;
+            packet = makePacket(g, remaining, masterBuffer, pc++);
+          }
+          continue;
+        }
         var t = (!is4175 || !packet.getMarker()) ? remaining - remaining % stride :
           packet.getLineData()[0].length;
         // console.log('HAT', packet.getLineData()[0].lineNo, (b.length - o) % 4800, 4800 - lineStatus.linePos,

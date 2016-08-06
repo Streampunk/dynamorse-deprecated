@@ -1,0 +1,114 @@
+{
+   "label" : "FIMS",
+   "id" : "11d8d548.ee272b",
+   "nodes" : [
+      {
+         "name" : "Streampunk Media",
+         "z" : "11d8d548.ee272b",
+         "y" : 45,
+         "x" : 122,
+         "type" : "comment",
+         "info" : "Design and deploy professional media workflows with [_Dynamorse_](https://github.com/Streampunk/dynamorse/blob/master/README.md).\n\nFor support, development or further information, please e-mail [Streampunk Media Ltd](http://www.streampunk.media) on [furnace@streampunk.media](mailto: furnace@streampunk.media).\n\nDynamorse depends on [codecadon](https://github.com/Streampunk/codecadon) that incorprates binaries compiled from unmodified [LGPL v3 licensed code](https://github.com/Streampunk/codecadon/tree/master/licenses) from the FFMPEG project.",
+         "id" : "4c797ab2.b38684",
+         "wires" : []
+      },
+      {
+         "width" : 1920,
+         "encodingName" : "raw",
+         "wires" : [
+            [
+               "f1c263cf.83ff5"
+            ]
+         ],
+         "channels" : 0,
+         "interlace" : false,
+         "id" : "5818110d.c30be",
+         "device" : "da7405b8.258bf8",
+         "packing" : "pgroup",
+         "type" : "pcap-reader",
+         "colorimetry" : "BT709-2",
+         "z" : "11d8d548.ee272b",
+         "name" : "NMOS stream",
+         "format" : "video",
+         "file" : "/Volumes/Ormiscraid/media/streampunk/examples/rtp-video-rfc4175-1080i50-sync.pcap",
+         "loop" : false,
+         "height" : 1080,
+         "bitrate" : 0,
+         "maxBuffer" : 10,
+         "sdpURL" : "file:../sdp_rfc4175_10bit_1080i50.sdp",
+         "depth" : 10,
+         "clockRate" : 90000,
+         "regenerate" : false,
+         "description" : "Simulation of an NMOS stream, FIMS controlled.",
+         "x" : 130,
+         "y" : 235,
+         "sampling" : "YCbCr-4:2:2"
+      },
+      {
+         "device" : "da7405b8.258bf8",
+         "id" : "f1c263cf.83ff5",
+         "maxBuffer" : 10,
+         "dstHeight" : 720,
+         "wires" : [
+            [
+               "b7969809.b0ff48"
+            ]
+         ],
+         "z" : "11d8d548.ee272b",
+         "dstFormat" : "420P",
+         "x" : 303,
+         "y" : 308,
+         "dstWidth" : 1280,
+         "name" : "convert 420 8-bit",
+         "type" : "converter",
+         "description" : "Converted from 422 10-bit to 420 8-bit"
+      },
+      {
+         "x" : 407,
+         "y" : 408,
+         "dstFormat" : "h264",
+         "z" : "11d8d548.ee272b",
+         "name" : "encode to H264",
+         "type" : "encoder",
+         "description" : "Compress to H.264 with OpenH264",
+         "maxBuffer" : 10,
+         "id" : "b7969809.b0ff48",
+         "device" : "da7405b8.258bf8",
+         "gopFrames" : 600,
+         "wires" : [
+            [
+               "fdeb9e4c.9bac2"
+            ]
+         ],
+         "bitrate" : 5000000
+      },
+      {
+         "x" : 503,
+         "y" : 494,
+         "toConsole" : false,
+         "z" : "11d8d548.ee272b",
+         "name" : "monitor pipe",
+         "type" : "grain-xray",
+         "maxBuffer" : 10,
+         "showEvery" : "10",
+         "id" : "fdeb9e4c.9bac2",
+         "wires" : [
+            [
+               "cfe37d0d.727f3"
+            ]
+         ]
+      },
+      {
+         "type" : "raw-file-out",
+         "z" : "11d8d548.ee272b",
+         "x" : 655,
+         "y" : 567,
+         "name" : "file output",
+         "file" : "fims.raw",
+         "headers" : "fims.json",
+         "wires" : [],
+         "id" : "cfe37d0d.727f3",
+         "timeout" : "500"
+      }
+   ]
+}

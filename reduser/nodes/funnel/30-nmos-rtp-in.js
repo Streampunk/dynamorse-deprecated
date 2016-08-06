@@ -21,6 +21,7 @@ var udpInlet = require('../../../funnel/udpInlet.js');
 var udpToGrain = require('../../../valve/udpToGrain.js');
 var grainConcater = require('../../../valve/grainConcater.js');
 var Grain = require('../../../model/Grain.js');
+var H264 = require('../../../util/H264.js');
 
 module.exports = function (RED) {
   function NmosRTPIn (config) {
@@ -32,7 +33,7 @@ module.exports = function (RED) {
     var node = this;
     this.tags = {};
     this.exts = {};
-    var client = dgram.createSocket({type  :'udp4', reuseAddr : true});
+    var client = dgram.createSocket({type : 'udp4', reuseAddr : true});
     this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ];
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
@@ -53,7 +54,7 @@ module.exports = function (RED) {
         "urn:x-nmos:format:" + this.tags.format[0], null, null, pipelinesID, null);
       var flow = new ledger.Flow(null, null, localName, localDescription,
         "urn:x-nmos:format:" + this.tags.format[0], this.tags, source.id, null);
-      // console.log(nodeAPI.getStore());
+      var is6184 = f.tags.encodingName[0].toLowerCase() === 'h264';
       nodeAPI.putResource(source, function(err, result) {
         if (err) return node.log(`Unable to register source: ${err}`);
       });
@@ -63,6 +64,7 @@ module.exports = function (RED) {
           udpInlet(client, sdp, config.netif)
           .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
           .map(function (g) {
+            if (is6184) H264.backToAVC(g);
             if (!config.regenerate) {
               return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
                 flow.id, source.id, g.duration);
