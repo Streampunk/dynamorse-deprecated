@@ -75,3 +75,18 @@ test('Bytes roundtrip', function (t) {
   }
   t.end();
 });
+
+test('Three & four roundtrips', function (t) {
+  var g = new Grain([testBytes]);
+  H264.compact(g, 1410);
+  var oneTime = Buffer.contact(g.buffers);
+  H264.backToAVC(g);
+  var twoTimes = Buffer.concat(g.buufers);
+  H264.compact(g);
+  var threeTimes = Buffer.concat(g.buffers);
+  H264.backToAVC(g);
+  var fourTimes = Buffer.concat(g.buffers);
+  t.ok(oneTime.equals(threeTimes), 'buffers match 1st and 3rd.');
+  t.ok(twoTimes.equals(fourTimes), 'buffers match 2nd and 4th.');
+  t.end();
+});
