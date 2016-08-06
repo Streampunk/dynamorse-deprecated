@@ -31,7 +31,7 @@ var sdpToTags = function(sdp, config) {
     this.setTag('sampling', sdp, sdp.getSampling, config);
     this.setTag('depth', sdp, sdp.getDepth, config);
     this.setTag('colorimetry', sdp, sdp.getColorimetry, config);
-    this.setTag('interlace', sdp, sdp.getInterlace, config, false);
+    this.setTag('interlace', sdp, sdp.getInterlace, config);
     this.tags.packing = [ 'pgroup' ];
   } else if (this.tags.format[0].endsWith('audio')) {
     this.setTag('channels', sdp, sdp.getEncodingParameters, config);
@@ -41,12 +41,12 @@ var sdpToTags = function(sdp, config) {
   return this.tags;
 }
 
-var setTag = function (name, sdp, valueFn, config, deflt) {
+var setTag = function (name, sdp, valueFn, config) {
   if (!name) return;
-  var value = (valueFn) ? valueFn.call(sdp, 0) : deflt;
-  if (!value) {
+  var value = (valueFn) ? valueFn.call(sdp, 0) : undefined;
+  if (value === undefined) {
     value = config[name];
-    if (!value) {
+    if (value === undefined) {
       this.warn(`Did not set property ${name} as it is not defined by SDP or config.`);
       return;
     }

@@ -77,10 +77,14 @@ module.exports = function (RED) {
 
             var dstTags = JSON.parse(JSON.stringify(this.srcFlow.tags));
             var encoding = this.srcFlow.tags.encodingName[0];
-            if (("AVCi50" === encoding) || ("AVCi100" === encoding))
+            if (("AVCi50" === encoding) || ("AVCi100" === encoding)) {
               dstTags["packing"] = [ "UYVY10" ];
-            else
+              dstTags["sampling"] = [ "YCbCr-4:2:2" ];
+            }
+            else {
               dstTags["packing"] = [ "420P" ];
+              dstTags["sampling"] = [ "YCbCr-4:2:0" ];
+            }
             if ("AVCi50" === encoding) {
               var srcWidth = +this.srcFlow.tags["width"];
               dstTags["width"] = [ `${srcWidth * 3 / 4}` ];

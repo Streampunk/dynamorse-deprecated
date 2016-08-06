@@ -1,10 +1,7 @@
 PCAP file: /Users/sparkpunk/Documents/Streampunk/nmi-examples/rtp-video-rfc4175-1080i50-sync.pcap
 
-Description: Streampunk Media NAB 2016
+Description: Tata Demo
 
-SDP file: file:/Users/sparkpunk/Documents/Streampunk/nmi-examples/sdp_rfc4175_10bit_1080i50.sdp
+SDP file: file:../sdp_rfc4175_10bit_1080i50.sdp
 
-
-/Users/vizigoth/Documents/streampunk/nmos-in-stream-id-timing/examples/pcap/rtp-audio-l24-2chan.pcap
-
-/Users/vizigoth/Documents/streampunk/nmos-in-stream-id-timing/examples/sdp/sdp_L24_2chan.sdp
+curl -X POST -v -H 'Content-Type: application/json' http://localhost:8000/red/flow -d @tata_demo.json

@@ -62,9 +62,30 @@ module.exports = function (RED) {
         else setTimeout(next, config.timeout - (Date.now() - preWriteTime));
       });
       if (this.headerStream) {
-        this.headerStream.write((this.started ? ',\n' : '') +
-          JSON.stringify(x, null, 2));
-        this.started = true;
+        if (this.started === false) {
+          var contentType = 'application/octet-stream';
+          this.getNMOSFlow(x, function (err, f) {
+            if (err) {
+              this.warn("Failed to resolve NMOS flow.");
+            } else {
+              if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
+                contentType = `video/raw; sampling=${f.tags.sampling}; ` +
+                 `width=${f.tags.width}; height=${f.tags.height}; depth=${f.tags.depth}; ` +
+                 `colorimetry=${f.tags.colorimetry}; interlace=${f.tags.interlace}`;
+              } else {
+                contentType = `${f.tags.format}/${f.tags.encodingName}`;
+                if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate}`;
+                if (f.tags.channels) contentType += `; channels=${f.tags.channels}`;
+              }
+            }
+            var gjson = x.toJSON();
+            gjson.contentType = contentType;
+            this.headerStream.write(JSON.stringify(gjson, null, 2));
+            this.started = true;
+          }.bind(this))
+        } else {
+          this.headerStream.write(',\n' + JSON.stringify(x, null, 2));
+        }
       }
     }.bind(this));
     this.errors(function (e, next) {

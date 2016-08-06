@@ -21,10 +21,30 @@
     defaults: {
       name: { value : '' },
       file : { value : '', required : true },
+      grainSize : { value : 0, validate : RED.validators.number() },
+      grainDuration : { value : "0/1", validate : function (v) {
+        var slashed = v.split('/');
+        return slashed.length === 2 && !isNaN(+slashed[0]) && !isNaN(+slashed[1])
+          && slashed[0] >=0 && slashed[1] > 0;
+      } },
       headers : { value : '' },
+      loop : { value : false },
+      regenerate : { value : false },
       description : { value : '' },
       device : { value : '', type : 'device' },
-      maxBuffer : { value : 10, validate : RED.validators.number() }
+      maxBuffer : { value : 10, validate : RED.validators.number() },
+      sdpURL : { value : "" },
+      encodingName : { value : "raw" },
+      clockRate : { value : 90000, validate : RED.validators.number() },
+      sampling : { value : "YCbCr-4:2:2" },
+      width : { value : 1920, validate : RED.validators.number() },
+      height : { value : 1080, validate : RED.validators.number() },
+      depth : { value : 10, validate : RED.validators.number() },
+      colorimetry : { value : "BT709-2" },
+      interlace : { value : false },
+      packing : { value : "pgroup" },
+      channels : { value : 0, validate : RED.validators.number() },
+      bitrate : { value : 0, validate : RED.validators.number() }
     },
     inputs:0,
     outputs:1,
@@ -43,11 +63,23 @@
   </div>
   <div class="form-row">
     <label for="node-input-file"><i class="fa fa-file"></i> file</label>
-    <input type="text" id="node-input-file" placeholder="dynamorse.wav">
+    <input type="text" id="node-input-file" placeholder="dynamorse.raw">
+  </div>
+  <div class="form-row">
+    <label for="node-input-grainSize"><i class="fa fa-futbol-o" aria-hidden="true"></i> grain size</label>
+    <input type="number" id="node-input-grainSize" placeholder="0" min="0" style="width: 100px">
+    <label for="node-input-grainDuration"><i class="fa fa-tint" aria-hidden="true"></i> duration</label>
+    <input type="text" id="node-input-grainDuration" placeholder="0/1" style="width: 120px">
   </div>
   <div class="form-row">
     <label for="node-input-headers"><i class="fa fa-file-text" aria-hidden="true"></i> headers</label>
-    <input type="text" id="node-input-headers" placeholder="">
+    <input type="text" id="node-input-headers" placeholder="dynamorse.json">
+  </div>
+  <div class="form-row">
+    <label for="node-input-loop"><i class="fa fa-repeat"></i> loop?</label>
+    <input type="checkbox" id="node-input-loop" style="width: 100px">
+    <label for="node-input-regenerate"><i class="fa fa-clock-o"></i> regenerate?</label>
+    <input type="checkbox" id="node-input-regenerate" style="width: 100px">
   </div>
   <div class="form-row">
     <label for="node-input-description"><i class="fa fa-info-circle"></i> description</label>
@@ -61,6 +93,103 @@
     <label for="node-input-maxBuffer"><i class="fa fa-suitcase"></i> max buffer</label>
     <input type="number" id="node-input-maxBuffer" placeholder="10" style="width: 100px">
   </div>
+  <!-- Media-specific properties, either derived from an SDP file or given parameters -->
+  <p>Describe the stream with headers, an SDP file or by providing parameters.</p>
+  <div class="form-row">
+    <label for="node-input-sdpURL"><i class="fa fa-external-link-square"></i> SDP URL</label>
+    <input type="text" id="node-input-sdpURL" placeholder="file:video.sdp">
+  </div>
+  <div class="form-row">
+    <label for="node-input-encodingName" style="width: 120px"><i class="fa fa-map-signs">
+      </i> encoding name</label>
+    <select id="node-input-encodingName">
+      <option value="raw" selected>video/raw</option>
+      <option value="h264">video/H264</option>
+      <option value="L16">audio/L16</option>
+      <option value="L24">audio/L24</option>
+      <option value="smpte291">video/smpte291</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label><i class="fa fa-arrows"></i> dimensions</label>
+    <label for="node-input-width" style="text-align: right">width</label>
+    <input type="number" min="0" id="node-input-width" placeholder="1920"
+      style="width: 80px" list="widths">
+    <label for="node-input-height" style="text-align: right">height</label>
+    <input type="number" min="0" id="node-input-height" placeholder="1080"
+      style="width: 80px" list="heights">
+    <datalist id="widths">
+      <option value="720"/>
+      <option value="800"/>
+      <option value="1024"/>
+      <option value="1280"/>
+      <option value="1440"/>
+      <option value="1600"/>
+      <option value="1920"/>
+      <option value="2560"/>
+      <option value="3840"/>
+    </datalist>
+    <datalist id="heights">
+      <option value="576"/>
+      <option value="600"/>
+      <option value="768"/>
+      <option value="720"/>
+      <option value="900"/>
+      <option value="1080"/>
+      <option value="1440"/>
+      <option value="2160"/>
+    </datalist>
+  </div>
+  <div class="form-row">
+    <label for="node-input-clockRate"><i class="fa fa-heartbeat"></i> clock rate</label>
+    <input type="number" id="node-input-clockRate" min="0" list="rates"
+      placeholder="90000" style="width: 80px">
+    <datalist id="rates">
+      <option value="90000">
+      <option value="48000">
+    </datalist>
+    <label for="node-input-sampling" style="text-align: left">&nbsp;<i class="fa fa-eye"></i> sampling</label>
+    <select id="node-input-sampling" style="width: 120px">
+      <option value="RGB">RGB</option>
+      <option value="RGBA">RGBA</option>
+      <option value="BGR">BGR</option>
+      <option value="BGRA">BGRA</option>
+      <option value="YCbCr-4:4:4">YCbCr-4:4:4</option>
+      <option value="YCbCr-4:2:2" selected>YCbCr-4:2:2</option>
+      <option value="YCbCr-4:2:0">YCbCr-4:2:0</option>
+      <option value="YCbCr-4:1:1">YCbCr-4:1:1</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-depth"><i class="fa fa-picture-o"></i> depth</label>
+    <input type="number" min="8" placeholder="10" id="node-input-depth" style="width: 80px">
+    <label for="node-input-colorimetry" style="text-align: left">
+      &nbsp;<i class="fa fa-pencil-square-o"></i> colorimetry</label>
+    <select id="node-input-colorimetry" style="width: 120px">
+      <option value="BT601-5">BT601-5</option>
+      <option value="BT709-2" selected>BT709-2</option>
+      <option value="SMPTE240M">SMPTE240M</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-interlace"><i class="fa fa-bars"></i> interlace?</label>
+    <input type="checkbox" id="node-input-interlace" style="width: 95px">
+    <label for="node-input-packing" style="text-align: left">
+      &nbsp;<i class="fa fa-briefcase"></i> packing</label>
+    <select id="node-input-packing" style="width: 140px">
+      <option value="V210">V210</option>
+      <option value="pgroup" selected>RFC4175 pgroup</option>
+      <option value="audio">RFC3190 audio</option>
+    </select>
+  </div>
+  <div class="form-row">
+    <label for="node-input-channels"><i class="fa fa-music"></i> channels</label>
+    <input type="number" min="0" placeholder="0" id="node-input-channels" style="width: 80px">
+    <label for="node-input-bitrate" style="text-align: left">
+      &nbsp;<i class="fa fa-long-arrow-right"></i> bitrate</label>
+    <input type="number" min="0" placeholder="0" id="node-input-bitrate" style="width: 80px">
+  </div>
+
 </script>
 
 <style>
@@ -72,13 +201,20 @@
 
 <script type="text/x-red" data-help-name="raw-file-in">
   <h1>Raw file data input</h1>
-  <p>Read a file that is a sequence of concatenated raw data for grains. ither:</p>
+  <p>Read a file that is a sequence of concatenated raw data for grains. Either:</p>
   <ul>
    <li>each of the grains has the same number of bytes;</li>
    <li>a sidecar JSON file is provided with the size of each payload.</li>
   </ul>
   <p>Grain metadata can be read from a sidecar file or regenerated on-the-fly. The input
   file may be looped.</p>
+  <p>Media parameters may be provided by one of the following methods, in order of
+  highest precedence first:</p>
+  <ol>
+   <li>A <code>contentType</code> field found in the sidecar metadata.</li>
+   <li>Information provided in an SDP file.</li>
+   <li>Media parameters provided through the configuration panel of the NMOS node.</li>
+  </ol>
 
   <h3>Parameters</h3>
   <div class="param-table">
@@ -95,9 +231,25 @@
     <td>Path location for the raw input file.</td>
    </tr>
    <tr>
+    <td><i class="fa fa-futbol-o" aria-hidden="true"></i> grain size</td>
+    <td>Size of each element of raw essence. Overriden when headers are present.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tint" aria-hidden="true"></i> duration</td>
+    <td>Duration of each grain as a fraction of a second. Required to regenerate
+    timings when no headers.</td>
+   <tr>
     <td><i class="fa fa-file-text" aria-hidden="true"></i> headers</td>
     <td>Optional path location for the sidecar file containing the grain headers
      and individual grain payload size.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-repeat"></i> loop?</td>
+    <td>Should the PCAP file be repeated indefinitely?</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-clock-o"></i> regenerate?</td>
+    <td>Should the grain metadata be regenerated locally?</td>
    </tr>
    <tr>
     <td><i class="fa fa-info-circle"></i> description</td>
@@ -111,6 +263,49 @@
     <td><i class="fa fa-suitcase"></i> max buffer</td>
     <td>Maximum number of grains to buffer before overflowing.</td>
    </tr>
+   <tr>
+    <td><i class="fa fa-external-link-square"></i> SDP URL</td>
+    <td>URL (<code>file:</code> or <code>http:</code>) to be used to locate the
+    SDP file that describes the stream.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-map-signs"></i> encoding name</td>
+    <td>Encoding name for the media, with <code>raw</code> for uncompressed video,
+    <code>L16</code>/<code>L24</code> for uncompressed audio and <code>smpte291</code>
+    for ancillary data.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-arrows"></i> dimensions</td>
+    <td>Width and height of video.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-heartbeat"></i> clock rate</td>
+    <td>Clock rate used to measure RTP timings.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-eye"></i> sampling</td>
+    <td>Sampling pattern for video.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-picture-o"></i> depth</td>
+    <td>Number of bits per sample for video, typically 8, 10 or 16.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-pencil-square-o"></i> colorimetry</td>
+    <td>Video colorimetry.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-bars"></i> interlace?</td>
+    <td>Is the video signal interlaced?</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-music"></i> channels</td>
+    <td>Number of audio channels.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-long-arrow-right"></i> bitrate</td>
+    <td>Audio bitrate.</td>
+   </tr>
   </table>
   </div>
 
@@ -118,6 +313,6 @@
   started.</p>
 
   <h3>Maturity</h3>
-  <p>Not implemented -
+  <p>Work in progress -
   <a href="https://github.com/Streampunk/dynamorse/issues/6">status</a>.</p>
 </script>
