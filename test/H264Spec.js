@@ -18,7 +18,7 @@ var test = require('tape');
 var fs = require('fs');
 var Grain = require('../model/Grain.js');
 
-var testBytes = fs.readFileSync('data/frame_short.h264');
+var testBytes = fs.readFileSync(__dirname + '/data/frame_short.h264');
 
 const FUA_START = 0;
 const FUA_MIDDLE = 1;
@@ -67,7 +67,7 @@ test('Bytes roundtrip', function (t) {
   t.equals(g.buffers.length, 31, 'result has some number of buffers.');
   t.ok(g.buffers.every(function (b) { return Buffer.isBuffer(b); }),
     'all grain payloads are buffers.');
-  t.equal(g.buffers[0].indexOf(new Buffer(0, 0, 0, 1)), 0,
+  t.equal(g.buffers[0].indexOf(new Buffer([0, 0, 0, 1])), 0,
     'first packet converted to start 0 0 0 1.');
   for ( var x = 1 ; x < g.buffers.length ; x++ ) {
     t.ok(testBytes.indexOf(g.buffers[x].slice(1)) >= 0,
