@@ -95,9 +95,9 @@ module.exports = function (RED) {
           function (res) {
         var count = 0;
         var position = 0;
-        var grainData = new Buffer(+res.headers['content-length']);
         if (res.statusCode === 200) {
-          nextRequest[x] = res.headers['arachnid-origintimestamp'];
+          var grainData = new Buffer(+res.headers['content-length']);
+          nextRequest[x] = res.headers['arachnid-ptporigin'];
           if (!flow) makeFlowAndSource(headers);
           res.on('data', function (data) {
             data.copy(grainData, position);
@@ -107,8 +107,8 @@ module.exports = function (RED) {
           res.on('end', function () {
             grainData = grainData.slice(0, position);
             nextRequest[x] = res.headers['arachnid-nextbythread'];
-            var ptpOrigin = res.headers['arachnid-origintimestamp'];
-            var ptpSync = res.headers['arachnid-synctimestamp'];
+            var ptpOrigin = res.headers['arachnid-ptporigin'];
+            var ptpSync = res.headers['arachnid-ptpsync'];
             var duration = res.headers['arachnid-grainduration'];
             var gFlowID = (config.regenerate) ? flowID : res.headers['arachnid-flowid'];
             var gSourceID = (config.regenerate) ? sourceID : res.headers['arachnid-sourceid'];

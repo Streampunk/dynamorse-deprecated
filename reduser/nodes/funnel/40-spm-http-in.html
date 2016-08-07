@@ -29,7 +29,8 @@
       path : { value : '' },
       port : { value : 8712, validate : RED.validators.number() },
       regenerate : { value : false },
-      parallel : { value : 1, validate : RED.validators.number() }
+      parallel : { value : 1, validate : RED.validators.number() },
+      fragments : { value : 1, validate : RED.validators.number() }
     },
     inputs:0,
     outputs:1,
@@ -85,8 +86,12 @@
 <div class="form-row">
   <label for="node-input-port"><i class="fa fa-ship" aria-hidden="true"></i> port</label>
   <input type="number" id="node-input-port" min="1024" placeholder="8712" style="width: 100px">
-  <label for="node-input-parallel" style="width: 80px">&nbsp;<i class="fa fa-fighter-jet" aria-hidden="true"></i> parallel</label>
-  <input type="number" id="node-input-parallel" min="1" max="6" placeholder="1" style="width: 100px">
+</div>
+<div class="form-row">
+  <label for="node-input-parallel"><i class="fa fa-fighter-jet" aria-hidden="true"></i> parallel</label>
+  <input type="number" id="node-input-parallel" min="1" max="6" placeholder="1" style="width: 80px">
+  <label for="node-input-fragments" style="width: 100px">&nbsp;<i class="fa fa-columns" aria-hidden="true"></i> fragments</label>
+  <input type="number" id="node-input-fragments" min="1" max="8" placeholder="1" style="width: 80px">
 </div>
 </script>
 
@@ -160,6 +165,9 @@
     <td><i class="fa fa-fighter-jet" aria-hidden="true"></i> parallel</td>
     <td>Number of parallel pipelines of HTTP to make or receive.</td>
    </tr>
+   <tr>
+    <td><i class="fa fa-columns" aria-hidden="true"></i> fragments</td>
+    <td>Number of equal-sized fragments to sub-divide each fragment into.</td>
   </table>
   </div>
 
