@@ -30,6 +30,7 @@
       port : { value : 8712, validate : RED.validators.number() },
       regenerate : { value : false },
       parallel : { value : 1, validate : RED.validators.number() },
+      cacheSize : { value : 10, validate : RED.validators.number() },
       fragments : { value : 1, validate : RED.validators.number() }
     },
     inputs:0,
@@ -85,7 +86,9 @@
 </div>
 <div class="form-row">
   <label for="node-input-port"><i class="fa fa-ship" aria-hidden="true"></i> port</label>
-  <input type="number" id="node-input-port" min="1024" placeholder="8712" style="width: 100px">
+  <input type="number" id="node-input-port" min="1024" placeholder="8712" style="width: 80px">
+  <label for="node-input-cacheSize">&nbsp;<i class="fa fa-archive" aria-hidden="true"></i> cache size</label>
+  <input type="number" id="node-input-cacheSize" min="5" placeholder="10" style="width: 80px">
 </div>
 <div class="form-row">
   <label for="node-input-parallel"><i class="fa fa-fighter-jet" aria-hidden="true"></i> parallel</label>
@@ -167,7 +170,8 @@
    </tr>
    <tr>
     <td><i class="fa fa-columns" aria-hidden="true"></i> fragments</td>
-    <td>Number of equal-sized fragments to sub-divide each fragment into.</td>
+    <td>Number of equal-sized fragments to sub-divide each grain into.</td>
+   </tr>
   </table>
   </div>
 
