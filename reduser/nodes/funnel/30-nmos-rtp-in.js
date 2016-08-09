@@ -53,7 +53,6 @@ module.exports = function (RED) {
         "urn:x-nmos:format:" + this.tags.format[0], null, null, pipelinesID, null);
       var flow = new ledger.Flow(null, null, localName, localDescription,
         "urn:x-nmos:format:" + this.tags.format[0], this.tags, source.id, null);
-      // console.log(nodeAPI.getStore());
       nodeAPI.putResource(source, function(err, result) {
         if (err) return node.log(`Unable to register source: ${err}`);
       });

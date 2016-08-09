@@ -75,11 +75,16 @@ var sdpURLReader = function (config, cb) {
     }.bind(this));
   } else if (sdpDetails.protocol.startsWith('http:')) {
     http.get(sdpDetails.href, function (res) {
+      var sdpData = '';
       if (res.statusCode !== 200) return cb(new Error(
         'SDP file request resulted in non-200 response code.'));
       res.setEncoding('utf8');
       res.on('data', function (data) {
-        cb(null, self.sdpToTags(data, config), sdp);
+        sdpData += data;
+      });
+      res.on('end', function () {
+        console.log('*** Aggregated SDP', sdpData);
+        cb(null, self.sdpToTags(sdpData, config), sdp);
       });
     }.bind(this));
   } else {
