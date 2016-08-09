@@ -63,22 +63,28 @@ var setTag = function (name, sdp, valueFn, config) {
 }
 
 var sdpURLReader = function (config, cb) {
+  var self = this;
   var sdpUrl = config.sdpURL;
   if (!sdpUrl || typeof sdpUrl !== 'string' || sdpUrl.length === 0)
-    return cb(null, this.sdpToTags({}, config));
+    return cb(null, self.sdpToTags({}, config));
   var sdpDetails = url.parse(sdpUrl);
   if (sdpDetails.protocol.startsWith('file')) {
     return fs.readFile(sdpDetails.path, 'utf8', function (err, data) {
       if (err) return cb(err);
-      else return cb(null, this.sdpToTags(data, config), sdp);
+      else return cb(null, self.sdpToTags(data, config), sdp);
     }.bind(this));
   } else if (sdpDetails.protocol.startsWith('http:')) {
     http.get(sdpDetails.href, function (res) {
+      var sdpData = '';
       if (res.statusCode !== 200) return cb(new Error(
         'SDP file request resulted in non-200 response code.'));
       res.setEncoding('utf8');
       res.on('data', function (data) {
-        cb(null, this.sdpToTags(data, config), sdp);
+        sdpData += data;
+      });
+      res.on('end', function () {
+        console.log('*** Aggregated SDP', sdpData);
+        cb(null, self.sdpToTags(sdpData, config), sdp);
       });
     }.bind(this));
   } else {

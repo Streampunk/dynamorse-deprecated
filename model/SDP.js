@@ -106,6 +106,7 @@ SDP.prototype.getMediaHeaders = function () {
  * @return [Object.<string, number>] Reverse lookup for extmap tables.
  */
 SDP.prototype.getExtMapReverse = function (i) {
+  console.log(this.m[i]);
   var extMap = this.m[i].a.extmap;
   if (!Array.isArray(extMap)) return {};
   var revMap = {};

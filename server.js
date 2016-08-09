@@ -62,7 +62,7 @@ if (!properties.flowFile.endsWith('.json')) {
 }
 
 var node = new ledger.Node(null, null, `Dynamorse ${shortHostname} ${pid}`,
-  `http://dynamorse-${shortHostname}-${pid}.local:${properties.nodePort}`,
+  `http://dynamorse-${shortHostname}-${pid}.local:${properties.ledgerPort}`,
   `${hostname}`);
 // Externally advertised ... sources etc are registered with discovered registration
 // services
