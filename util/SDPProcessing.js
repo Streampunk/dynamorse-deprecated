@@ -22,19 +22,19 @@ var sdpToTags = function(sdp, config) {
   if (typeof sdp === 'string') {
     sdp = new SDP(sdp);
   }
-  setTag('format', sdp, sdp.getMedia, config);
-  setTag('encodingName', sdp, sdp.getEncodingName, config);
-  setTag('clockRate', sdp, sdp.getClockRate, config);
+  this.setTag('format', sdp, sdp.getMedia, config);
+  this.setTag('encodingName', sdp, sdp.getEncodingName, config);
+  this.setTag('clockRate', sdp, sdp.getClockRate, config);
   if (this.tags.format[0].endsWith('video')) {
-    setTag('height', sdp, sdp.getHeight, config);
-    setTag('width', sdp, sdp.getWidth, config);
-    setTag('sampling', sdp, sdp.getSampling, config);
-    setTag('depth', sdp, sdp.getDepth, config);
-    setTag('colorimetry', sdp, sdp.getColorimetry, config);
-    setTag('interlace', sdp, sdp.getInterlace, config);
+    this.setTag('height', sdp, sdp.getHeight, config);
+    this.setTag('width', sdp, sdp.getWidth, config);
+    this.setTag('sampling', sdp, sdp.getSampling, config);
+    this.setTag('depth', sdp, sdp.getDepth, config);
+    this.setTag('colorimetry', sdp, sdp.getColorimetry, config);
+    this.setTag('interlace', sdp, sdp.getInterlace, config);
     this.tags.packing = [ 'pgroup' ];
   } else if (this.tags.format[0].endsWith('audio')) {
-    setTag('channels', sdp, sdp.getEncodingParameters, config);
+    this.setTag('channels', sdp, sdp.getEncodingParameters, config);
   }
   // console.log(this.tags);
   this.sdpToExt(sdp);
@@ -63,9 +63,10 @@ var setTag = function (name, sdp, valueFn, config) {
 }
 
 var sdpURLReader = function (config, cb) {
+  var self = this;
   var sdpUrl = config.sdpURL;
   if (!sdpUrl || typeof sdpUrl !== 'string' || sdpUrl.length === 0)
-    return cb(null, this.sdpToTags({}, config));
+    return cb(null, self.sdpToTags({}, config));
   var sdpDetails = url.parse(sdpUrl);
   if (sdpDetails.protocol.startsWith('file')) {
     return fs.readFile(sdpDetails.path, 'utf8', function (err, data) {
@@ -78,7 +79,7 @@ var sdpURLReader = function (config, cb) {
         'SDP file request resulted in non-200 response code.'));
       res.setEncoding('utf8');
       res.on('data', function (data) {
-        cb(null, sdpToTags(data, config), sdp);
+        cb(null, tsdpToTags(data, config), sdp);
       });
     }.bind(this));
   } else {
