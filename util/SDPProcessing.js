@@ -22,19 +22,19 @@ var sdpToTags = function(sdp, config) {
   if (typeof sdp === 'string') {
     sdp = new SDP(sdp);
   }
-  this.setTag('format', sdp, sdp.getMedia, config);
-  this.setTag('encodingName', sdp, sdp.getEncodingName, config);
-  this.setTag('clockRate', sdp, sdp.getClockRate, config);
+  setTag('format', sdp, sdp.getMedia, config);
+  setTag('encodingName', sdp, sdp.getEncodingName, config);
+  setTag('clockRate', sdp, sdp.getClockRate, config);
   if (this.tags.format[0].endsWith('video')) {
-    this.setTag('height', sdp, sdp.getHeight, config);
-    this.setTag('width', sdp, sdp.getWidth, config);
-    this.setTag('sampling', sdp, sdp.getSampling, config);
-    this.setTag('depth', sdp, sdp.getDepth, config);
-    this.setTag('colorimetry', sdp, sdp.getColorimetry, config);
-    this.setTag('interlace', sdp, sdp.getInterlace, config);
+    setTag('height', sdp, sdp.getHeight, config);
+    setTag('width', sdp, sdp.getWidth, config);
+    setTag('sampling', sdp, sdp.getSampling, config);
+    setTag('depth', sdp, sdp.getDepth, config);
+    setTag('colorimetry', sdp, sdp.getColorimetry, config);
+    setTag('interlace', sdp, sdp.getInterlace, config);
     this.tags.packing = [ 'pgroup' ];
   } else if (this.tags.format[0].endsWith('audio')) {
-    this.setTag('channels', sdp, sdp.getEncodingParameters, config);
+    setTag('channels', sdp, sdp.getEncodingParameters, config);
   }
   // console.log(this.tags);
   this.sdpToExt(sdp);
