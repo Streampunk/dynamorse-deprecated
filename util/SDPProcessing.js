@@ -78,7 +78,7 @@ var sdpURLReader = function (config, cb) {
         'SDP file request resulted in non-200 response code.'));
       res.setEncoding('utf8');
       res.on('data', function (data) {
-        cb(null, this.sdpToTags(data, config), sdp);
+        cb(null, sdpToTags(data, config), sdp);
       });
     }.bind(this));
   } else {
