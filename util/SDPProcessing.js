@@ -38,6 +38,7 @@ var sdpToTags = function(sdp, config) {
   }
   // console.log(this.tags);
   this.sdpToExt(sdp);
+  this.sdp = sdp;
   return this.tags;
 }
 
@@ -77,7 +78,7 @@ var sdpURLReader = function (config, cb) {
     http.get(sdpDetails.href, function (res) {
       var sdpData = '';
       if (res.statusCode !== 200) return cb(new Error(
-        'SDP file request resulted in non-200 response code.'));
+        `SDP file request resulted in non-200 response code of ${res.status}.`));
       res.setEncoding('utf8');
       res.on('data', function (data) {
         sdpData += data;

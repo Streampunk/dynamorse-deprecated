@@ -23,8 +23,8 @@
       maxBuffer : { value : 10, validate : RED.validators.number() },
       description : { value : '' },
       device : { value : '', type : 'device' },
-      sender : { value : '', validate : function (v) { return v.length > 0 || this.sdpURL.length > 0; } },
-      sdpURL : { value : '', validate : function (v) { return v.length > 0 || this.sender.length > 0; } },
+      sender : { value : '', validate : function (v) { return v || v.length > 0 || this.sdpURL.length > 0; } },
+      sdpURL : { value : '', validate : function (v) { return v || v.length > 0 || this.sender.length > 0; } },
       netif : { value : '0.0.0.0', validate : RED.validators.regex(/((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/) },
       regenerate : { value : false }
     },
