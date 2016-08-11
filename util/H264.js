@@ -164,11 +164,14 @@ const zzzOne = new Buffer([0, 0, 0, 1]);
 
 function backToAVC (g) {
   g.buffers = g.buffers.map(function (b) {
+    if (b.length === 0) return 0;
     if (b.readUInt8(0) & 0x80 !== 0) {
       console.error('Forbidden zero bit in an H.264 stream is one!');
       return b;
     }
     switch (b.readUInt8(0) & 0x1f) {
+      case 12:
+        return new Buffer(0);
       case 24:
         var pos = 1;
         var bufs = [];

@@ -150,7 +150,8 @@ module.exports = function (RED) {
       var is6184 = this.tags.encodingName[0].toLowerCase() === 'h264';
       this.highland(
         udpInlet(client, this.sdp, config.netif)
-        .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
+        .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video') &&
+          this.tags.encodingName[0] === 'raw'))
         .map(function (g) {
           if (is6184) H264.backToAVC(g);
           if (!config.regenerate) {
