@@ -48,7 +48,7 @@ function compact6184 (g, payloadSize) {
         nals.pps = nal;
         break;
       case 6:
-        nals.sei.push(nal);
+        nals.seis.push(nal);
         break;
       case 5:
         nals.slices.push(nal);

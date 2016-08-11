@@ -28,6 +28,7 @@ module.exports = function (exts, pgroup) {
     grain_flags, sync_timestamp, grain_duration;
   var payloads = [];
   var ex = exts;
+  var started = false;
   var udpConsumer = function (err, x, push, next) {
     if (err) {
       push(err);
@@ -57,6 +58,7 @@ module.exports = function (exts, pgroup) {
         }
         rtpCounter = nextCounter;
         if (rtp.isStart(ex.grain_flags_id)) {
+          started = true;
           payloads = (pushLines) ? rtp.getLineData().map(function (x) {
             return x.data }) : [ rtp.getPayload() ];
           var rtpex = rtp.getExtensions();
@@ -66,7 +68,7 @@ module.exports = function (exts, pgroup) {
           smpte_tc = rtpex['id' + ex.smpte_tc_id];
           flow_id = rtpex['id' + ex.flow_id_id];
           source_id = rtpex['id' + ex.source_id_id];
-        } else if (rtp.isEnd(ex.grain_flags_id)) {
+        } else if (started === true && rtp.isEnd(ex.grain_flags_id)) {
           if (pushLines) {
             rtp.getLineData().forEach(function (x) { payloads.push(x.data); })
           } else {
@@ -74,7 +76,7 @@ module.exports = function (exts, pgroup) {
           }
           push(null, new Grain(payloads, sync_timestamp, origin_timestamp,
             smpte_tc, flow_id, source_id, grain_duration));
-        } else {
+        } else if (started == true) {
           if (pushLines) {
             rtp.getLineData().forEach(function (x) { payloads.push(x.data); })
           } else {
@@ -82,7 +84,7 @@ module.exports = function (exts, pgroup) {
           }
         }
       } else {
-        console.log(x);
+        if (started === true) console.log(x);
         // push(new Error('Unknown data type pushed through udp-to-grain.'));
       }
       next();
