@@ -23,6 +23,7 @@ var fs = require('fs');
 var Grain = require('../../../model/Grain.js');
 
 const variation = 1; // Grain timing requests may vary +-1ms
+const nineZeros = '000000000';
 
 function statusError(status, message) {
   var e = new Error(message);
@@ -42,6 +43,19 @@ module.exports = function (RED) {
     var grainCache = [];
     var clientCache = {};
     config.path = (config.path.endsWith('/')) ? config.path.slice(-1) : config.path;
+    var contentType = '';
+    this.getNMOSFlow(x, function (err, f) {
+      if (err) return node.warn("Failed to resolve NMOS flow.");
+      if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
+        contentType = `video/raw; sampling=${f.tags.sampling}; ` +
+         `width=${f.tags.width}; height=${f.tags.height}; depth=${f.tags.depth}; ` +
+         `colorimetry=${f.tags.colorimetry}; interlace=${f.tags.interlace}`;
+      } else {
+        contentType = `${f.tags.format}/${f.tags.encodingName}`;
+        if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate}`;
+        if (f.tags.channels) contentType += `; channels=${f.tags.channels}`;
+      };
+    });
     this.each(function (x, next) {
       if (Grain.isGrain(x)) {
         grainCache.push(x);
@@ -66,7 +80,7 @@ module.exports = function (RED) {
           var secs = +tsMatch[1]|0;
           var nanos = +tsMatch[2]|0;
           var rangeCheck = secs * 1000 + nanos / 1000000|0;
-          g = grainCache.find(function (y) {
+          g = grainCache.find(function (y) { // FIXME busted maths?
             var grCheck = (y.ptpOrigin.readUIntBE(0, 6) * 1000) +
               y.ptpOrigin.readUInt32BE(6) / 1000000|0;
             return (rangeCheck >= grCheck - variation) &&
@@ -81,12 +95,12 @@ module.exports = function (RED) {
           if (!clientCache[clientID]) {
             clientCache[clientID] = {
               created : Date.now(),
-              items : grainCache.slice(-totalConcurrent);
+              items : grainCache.slice(-totalConcurrent)
             };
-          }
+          };
           var items = clientCache[clientID].items;
           g = items[items.length - ts - 1];
-        }
+        };
         res.setHeader('Arachnid-ThreadNumber', threadNumber);
         res.setHeader('Arachnid-TotalConcurrent', totalConcurrent);
         if (clientID)
@@ -98,12 +112,24 @@ module.exports = function (RED) {
         if (g.timecode)
           res.setHeader('Arachnid-Timecode',
             Grain.prototype.formatTimecode(g.timecode));
-        if (g.duration)
+        if (g.duration) {
           res.setHeader('Arachnid-GrainDuration',
             Grain.prototype.formatDuration(g.duration));
-        res.setHeader('Content-Type', 'video/raw'); // FIXME
+        } else {
+          node.error('Arachnid requires a grain duration to function (for now).');
+        }
+        res.setHeader('Content-Type', contentType);
         res.setHeader('Content-Length', g.buffers[0].length);
-        res.setHeader('Arachnid-NextByThread', )
+        // FIXME this will not work without a grain duration
+        var durArray = g.getDuration();
+        var originArray = g.getOriginTimestamp();
+        originArray[1] = originArray[1] +
+          totalConcurrent * durArray[0] * 1000000 / durArray[1]|0;
+        if (originArray[1] > 1000000000)
+          originArray[0] = originArray[0] + originArray[1] / 1000000000|0;
+        var nanos = origin[1].toString();
+        res.setHeader('Arachnid-NextByThread',
+          `${originArray[0]}:${nineZeros.slice(nanos.length)}${nanos}`);
         res.send(g.buffers[0]);
       });
 
@@ -119,16 +145,16 @@ module.exports = function (RED) {
             code: 500,
             error: (err.message) ? err.message : 'Internal server error. No message available.',
             debug: (err.stack) ? err.stack : 'No stack available.'
-          })
+          });
         }
       });
 
       app.use(function (req, res, next) {
         res.status(404).json({
-            code : 404,
-            error : `Could not find the requested resource '${req.path}'.`,
-            debug : req.path
-          });
+          code : 404,
+          error : `Could not find the requested resource '${req.path}'.`,
+          debug : req.path
+        });
       });
     } else {
       // TODO implement push mode
@@ -139,7 +165,7 @@ module.exports = function (RED) {
       var now = Date.now();
       Object.keys(clientCache).forEach(function (k) {
         if (clientCache[k].created - now > 5000) toDelete.push(k);
-      }
+      });
       toDelete.forEach(function (k) { delete clientCache[k]; });
     }, 1000);
   }

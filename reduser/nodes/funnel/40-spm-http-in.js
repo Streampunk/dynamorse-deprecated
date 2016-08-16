@@ -37,6 +37,9 @@ function compareVersions(l, r) {
   return 0;
 }
 
+const mimeMatch = /^\s*(\w+)\/(\w+)/;
+const paramMatch = /\b(\w+)=(\S+)\b/g;
+
 module.exports = function (RED) {
   function SpmHTTPIn (config) {
     RED.nodes.createNode(this, config);
@@ -57,7 +60,6 @@ module.exports = function (RED) {
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
     var nodeAPI = this.context().global.get('nodeAPI');
-    var ledger = this.context().global.get('ledger');
     var localName = config.name || `${config.type}-${config.id}`;
     var localDescription = config.description || `${config.type}-${config.id}`;
     var pipelinesID = config.device ?
@@ -65,27 +67,39 @@ module.exports = function (RED) {
       this.context().global.get('pipelinesID');
     var sourceID = uuid.v4();
     var flowID = uuid.v4();
-    var flow = null; var source = null;
-    var mimeMatch = /(\S+)\/([^\s;]+)(\s*;?\s*)(.*)/;
+    var flow = null; var source = null; var recvr = null;
+    var tags = {};
 
     function makeFlowAndSource (headers) {
-      var m = headers['content-type'].match(mimeMap);
-      var tags = { format : m[1], encodingName : m[2] };
-      m[4].split(/\s*;\s*/).forEach(function (param) {
-        var nameValue = param.split(/=/);
-        tags[nameValue[0]] = [ nameValue[1] ];
+      var contentType = headers['content-type'];
+      var mime = contentType.match(mimeMatch);
+      tags = { format : [ mime[1] ], encodingName : [ mime[2] ] };
+      var parameters = contentType.match(paramMatch);
+      parameters.forEach(function (p) {
+         var splitP = p.split('=');
+         if (splitP[0] === 'rate') splitP[0] = 'clockRate';
+         tags[splitP[0]] = [ splitP[1] ];
       });
       if (headers['x-arachnid-fourcc']) {
-        tags.packing = [ headers['x-arachnid-fourcc'] ]; }
-      var source = new ledger.Source(null, null, localName, localDescription,
-        "urn:x-nmos:format:" + this.tags.format[0], null, null, pipelinesID, null);
-      var flow = new ledger.Flow(null, null, localName, localDescription,
-        "urn:x-nmos:format:" + this.tags.format[0], this.tags, source.id, null);
-      nodeAPI.putResource(source).catch(function(err) {
-        node.log(`Unable to register source: ${err}`);
-      });
-      nodeAPI.putResource(flow).catch(function (err) {
-        node.log(`Unable to register flow: ${err}`);
+        tags.packing = [ headers['x-arachnid-fourcc'] ];
+      } else if (tags.encodingName[0] === 'raw') {
+        tags.clockRate = [ '90000' ];
+        tags.packing = [ 'pgroup' ];
+      }
+      source = new ledger.Source(null, null, localName, localDescription,
+        "urn:x-nmos:format:" + tags.format[0], null, null, pipelinesID, null);
+      flow = new ledger.Flow(null, null, localName, localDescription,
+        "urn:x-nmos:format:" + tags.format[0], this.tags, source.id, null);
+      recvr = new ledger.Receiver(null, null, localName, localDescription,
+        "urn:x-nmos:format:" + tags.format[0], null, tags,
+        pipelinesID, ledger.transports.dash, null);
+      nodeAPI.putResource(source)
+      .then(function () {
+        return nodeAPI.putResource(flow);
+      }).then(function () {
+        return nodeAPI.putResource(recvr);
+      }).catch(function (err) {
+        node.error(`Unable to register resource : ${err}`);
       });
     };
 
@@ -151,8 +165,21 @@ module.exports = function (RED) {
       .sort(compareVersions)
       .forEach(function (gts) {
         delete grainQueue[gts];
-        // TODO regenerate time here
-        push(null, grainQueue[gts]);
+        if (!config.regenerate) {
+          push(null, grainQueue[gts]);
+        } else {
+          var g = grainQueue[gts];
+          var grainTime = new Buffer(10);
+          grainTime.writeUIntBE(this.baseTime[0], 0, 6);
+          grainTime.writeUInt32BE(this.baseTime[1], 6);
+          var grainDuration = g.getDuration();
+          this.baseTime[1] = ( this.baseTime[1] +
+            grainDuration[0] * 1000000000 / grainDuration[1]|0 );
+          this.baseTime = [ this.baseTime[0] + this.baseTime[1] / 1000000000|0,
+            this.baseTime[1] % 1000000000];
+          push(null, new Grain(g.buffers, grainTime, g.ptpOrigin, g.timecode,
+            flow.id, source.id, g.duration));
+        };
         highWaterMark = gts;
       });
     };

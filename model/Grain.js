@@ -88,7 +88,7 @@ Grain.prototype.checkTimestamp = function (t) {
   return undefined;
 }
 
-var nineZeros = '000000000';
+const nineZeros = '000000000';
 
 Grain.prototype.formatTimestamp = function (t) {
   if (t === null || t === undefined) return undefined;
@@ -164,6 +164,10 @@ Grain.prototype.getDuration = function () {
   } else {
     return [ NaN, NaN ];
   }
+}
+
+Grain.prototype.getOriginTimestamp = function () {
+  return [ this.ptpOrigin.readUInt32BE(0, 6), this.ptpOrigin.readUInt32BE(6) ];
 }
 
 Grain.isGrain = function (x) {
