@@ -21,6 +21,7 @@ var http = require('http');
 var https = require('https');
 var fs = require('fs');
 var Grain = require('../../../model/Grain.js');
+var uuid = require('uuid');
 
 const variation = 1; // Grain timing requests may vary +-1ms
 const nineZeros = '000000000';
@@ -44,35 +45,51 @@ module.exports = function (RED) {
     var clientCache = {};
     config.path = (config.path.endsWith('/')) ? config.path.slice(-1) : config.path;
     var contentType = '';
-    this.getNMOSFlow(x, function (err, f) {
-      if (err) return node.warn("Failed to resolve NMOS flow.");
-      if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
-        contentType = `video/raw; sampling=${f.tags.sampling}; ` +
-         `width=${f.tags.width}; height=${f.tags.height}; depth=${f.tags.depth}; ` +
-         `colorimetry=${f.tags.colorimetry}; interlace=${f.tags.interlace}`;
-      } else {
-        contentType = `${f.tags.format}/${f.tags.encodingName}`;
-        if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate}`;
-        if (f.tags.channels) contentType += `; channels=${f.tags.channels}`;
-      };
-    });
+    var started = false;
+    var app = null;;
     this.each(function (x, next) {
+      if (started === false) {
+        node.getNMOSFlow(x, function (err, f) {
+          if (err) return node.warn("Failed to resolve NMOS flow.");
+          if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
+            contentType = `video/raw; sampling=${f.tags.sampling}; ` +
+             `width=${f.tags.width}; height=${f.tags.height}; depth=${f.tags.depth}; ` +
+             `colorimetry=${f.tags.colorimetry}; interlace=${f.tags.interlace}`;
+          } else {
+            contentType = `${f.tags.format}/${f.tags.encodingName}`;
+            if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate}`;
+            if (f.tags.channels) contentType += `; channels=${f.tags.channels}`;
+          };
+        });
+        node.log(`content type ${contentType}`);
+        if (app) {
+          app.listen(config.port, function(err) {
+            if (err) node.error(`Failed to start arachnid HTTP server: ${err}`);
+            node.log(`Gonzales listening on port ${config.port}.`);
+          });
+        }
+        started = true;
+      };
       if (Grain.isGrain(x)) {
         grainCache.push(x);
-        if (grainCache.length > config.cacheSize)
+        if (grainCache.length > config.cacheSize) {
           grainCache = grainCache.slice(grainCache.length - config.cacheSize);
-        next(); // TODO timeout
+        }
+        setTimeout(next, config.timeout); // TODO timeout
       } else {
         node.warn(`HTTP out received something that is not a grain.`);
         next();
       }
     });
+
     if (config.mode === 'pull') {
-      var app = express();
+      app = express();
       app.use(bodyParser.raw({ limit : config.payloadLimit || 6000000 }));
-      app.get(config.path + "/:ts", function (req, res) {
+      app.get(config.path + "/:ts", function (req, res, next) {
         var threadNumber = req.headers['arachnid-threadnumber'];
+        threadNumber = (isNaN(+threadNumber)) ? 0 : +threadNumber;
         var totalConcurrent = req.headers['arachnid-totalconcurrent'];
+        totalConcurrent = (isNaN(+totalConcurrent)) ? 1 : +totalConcurrent;
         var clientID = req.headers['arachnid-clientid'];
         var g = null;
         var tsMatch = req.params.ts.match(/([0-9]+):([0-9]{9})/);
@@ -123,11 +140,12 @@ module.exports = function (RED) {
         // FIXME this will not work without a grain duration
         var durArray = g.getDuration();
         var originArray = g.getOriginTimestamp();
+        res.setHeader('DEBUG-TS', `${originArray} ${totalConcurrent * durArray[0] * 1000000000 / durArray[1]|0}`);
         originArray[1] = originArray[1] +
-          totalConcurrent * durArray[0] * 1000000 / durArray[1]|0;
+          totalConcurrent * durArray[0] * 1000000000 / durArray[1]|0;
         if (originArray[1] > 1000000000)
           originArray[0] = originArray[0] + originArray[1] / 1000000000|0;
-        var nanos = origin[1].toString();
+        var nanos = originArray[1].toString();
         res.setHeader('Arachnid-NextByThread',
           `${originArray[0]}:${nineZeros.slice(nanos.length)}${nanos}`);
         res.send(g.buffers[0]);
@@ -168,6 +186,11 @@ module.exports = function (RED) {
       });
       toDelete.forEach(function (k) { delete clientCache[k]; });
     }, 1000);
+
+    this.done(function () {
+      node.log('Closing the app!');
+      if (app) app.close();
+    });
   }
   util.inherits(SpmHTTPOut, redioactive.Spout);
   RED.nodes.registerType("spm-http-out", SpmHTTPOut);

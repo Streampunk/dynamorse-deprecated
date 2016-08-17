@@ -167,7 +167,7 @@ Grain.prototype.getDuration = function () {
 }
 
 Grain.prototype.getOriginTimestamp = function () {
-  return [ this.ptpOrigin.readUInt32BE(0, 6), this.ptpOrigin.readUInt32BE(6) ];
+  return [ this.ptpOrigin.readUIntBE(0, 6), this.ptpOrigin.readUInt32BE(6) ];
 }
 
 Grain.isGrain = function (x) {

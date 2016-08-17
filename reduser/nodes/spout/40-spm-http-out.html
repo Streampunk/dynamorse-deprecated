@@ -30,7 +30,8 @@
       regenerate : { value : false },
       parallel : { value : 1, validate : RED.validators.number() },
       cacheSize : { value : 10, validate : RED.validators.number() },
-      fragments : { valie : 1, validate : RED.validators.number() }
+      fragments : { value : 1, validate : RED.validators.number() },
+      timeout : { value : 0, validate : RED.validators.number() }
     },
     inputs:1,
     outputs:0,
@@ -91,6 +92,11 @@
     <label for="node-input-fragments" style="width: 100px">&nbsp;<i class="fa fa-columns" aria-hidden="true"></i> fragments</label>
     <input type="number" id="node-input-fragments" min="1" max="8" placeholder="1" style="width: 80px">
 </div>
+<div class="form-row">
+  <label for="node-input-timeout"><i class="fa fa-clock-o"></i> timeout</label>
+  <input type="number" min="0" id="node-input-timeout" placeholder="0" style="width: 80px">
+</div>
+
 </script>
 
 <style>
@@ -166,6 +172,10 @@
    <tr>
     <td><i class="fa fa-columns" aria-hidden="true"></i> fragments</td>
     <td>Number of equal-sized fragments to sub-divide each grain into.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-clock-o"></i> timeout</td>
+    <td>Time to wait between writing each grain. Controls the back-pressure.</td>
    </tr>
   </table>
   </div>
