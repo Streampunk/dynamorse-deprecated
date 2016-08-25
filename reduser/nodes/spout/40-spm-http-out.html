@@ -23,7 +23,7 @@
       description : { value : "" },
       device : { value : "", type : "device" },
       protocol : { value : 'HTTP' },
-      mode : { value : 'push' },
+      mode : { value : 'pull' },
       pushURL : { value : '' },
       path : { value : '' },
       port : { value : 8712, validate : RED.validators.number() },
@@ -31,7 +31,8 @@
       parallel : { value : 1, validate : RED.validators.number() },
       cacheSize : { value : 10, validate : RED.validators.number() },
       fragments : { value : 1, validate : RED.validators.number() },
-      timeout : { value : 0, validate : RED.validators.number() }
+      timeout : { value : 0, validate : RED.validators.number() },
+      backpressure : { value : false }
     },
     inputs:1,
     outputs:0,
@@ -68,8 +69,8 @@
     </select>
     <label for="node-input-mode" style="width: 80px">&nbsp;<i class="fa fa-arrows-h" aria-hidden="true"></i> mode</label>
     <select id="node-input-mode" style="width: 110px">
-      <option value="push" selected>push</option>
-      <option value="pull">pull</option>
+      <option value="push">push</option>
+      <option value="pull" selected>pull</option>
     </select>
   </div>
   <div class="form-row">
@@ -95,6 +96,8 @@
 <div class="form-row">
   <label for="node-input-timeout"><i class="fa fa-clock-o"></i> timeout</label>
   <input type="number" min="0" id="node-input-timeout" placeholder="0" style="width: 80px">
+  <label for="node-input-backpressure" style="width: 120px">&nbsp;<i class="fa fa-hand-o-left" aria-hidden="true"></i> back pressure?</label>
+  <input type="checkbox" id="node-input-backpressure" style="width: 80px">
 </div>
 
 </script>
@@ -176,6 +179,11 @@
    <tr>
     <td><i class="fa fa-clock-o"></i> timeout</td>
     <td>Time to wait between writing each grain. Controls the back-pressure.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-hand-o-left" aria-hidden="true"></i> back pressure?</td>
+    <td>Select to use the pull rate from a single client to apply back pressure, otherwise
+    the timeout is used and the connection can be shared.</td>
    </tr>
   </table>
   </div>

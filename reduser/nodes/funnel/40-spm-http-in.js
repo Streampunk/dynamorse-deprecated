@@ -46,7 +46,7 @@ module.exports = function (RED) {
     redioactive.Funnel.call(this, config);
 
     if (!this.context().global.get('updated'))
-      return this.log('Waiting for global context updated.');
+      return this.log('Waiting for global context to be updated.');
 
     var protocol = (config.protocol === 'HTTP') ? http : https;
     var node = this;

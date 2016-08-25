@@ -24,7 +24,7 @@
       description : { value : "" },
       device : { value : "", type : "device" },
       protocol : { value : 'HTTP' },
-      mode : { value : 'push' },
+      mode : { value : 'pull' },
       pullURL : { value : '' },
       path : { value : '' },
       port : { value : 8712, validate : RED.validators.number() },
@@ -72,8 +72,8 @@
   </select>
   <label for="node-input-mode" style="width: 80px">&nbsp;<i class="fa fa-arrows-h" aria-hidden="true"></i> mode</label>
   <select id="node-input-mode" style="width: 110px">
-    <option value="push" selected>push</option>
-    <option value="pull">pull</option>
+    <option value="push">push</option>
+    <option value="pull" selected>pull</option>
   </select>
 </div>
 <div class="form-row">

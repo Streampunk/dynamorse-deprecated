@@ -33,20 +33,24 @@ function statusError(status, message) {
 }
 
 module.exports = function (RED) {
+  var count = 0;
   function SpmHTTPOut (config) {
     RED.nodes.createNode(this, config);
     redioactive.Spout.call(this, config);
-    var node = this;
+    var node = this
+    if (!this.context().global.get('updated'))
+      return this.log('Waiting for global context to be updated.');
     var srcFlow = null;
     this.on('error', function (err) {
       node.warn(`Error transporting flow over HTTP '${config.path}': ${err}`)
     });
     var grainCache = [];
     var clientCache = {};
-    config.path = (config.path.endsWith('/')) ? config.path.slice(-1) : config.path;
+    config.path = (config.path.endsWith('/')) ? config.path.slice(0, -1) : config.path;
     var contentType = '';
     var started = false;
-    var app = null;;
+    var app = null;
+    var getNext = null;
     this.each(function (x, next) {
       if (started === false) {
         node.getNMOSFlow(x, function (err, f) {
@@ -72,19 +76,19 @@ module.exports = function (RED) {
       };
       if (Grain.isGrain(x)) {
         grainCache.push(x);
+        getNext = next;
         if (grainCache.length > config.cacheSize) {
           grainCache = grainCache.slice(grainCache.length - config.cacheSize);
         }
-        setTimeout(next, config.timeout); // TODO timeout
+        if (config.backpressure === false) setTimeout(next, config.timeout); // TODO accurate timeout
       } else {
         node.warn(`HTTP out received something that is not a grain.`);
         next();
       }
     });
-
     if (config.mode === 'pull') {
       app = express();
-      app.use(bodyParser.raw({ limit : config.payloadLimit || 6000000 }));
+      // app.use(bodyParser.raw({ limit : config.payloadLimit || 6000000 }));
       app.get(config.path + "/:ts", function (req, res, next) {
         var threadNumber = req.headers['arachnid-threadnumber'];
         threadNumber = (isNaN(+threadNumber)) ? 0 : +threadNumber;
@@ -107,16 +111,22 @@ module.exports = function (RED) {
           if (!clientID)
             return next(statusError(400, 'When using relative timings, a client ID header must be provided.'));
           var ts = (req.params.ts) ? +req.params.ts : NaN;
+          threadNumber = totalConcurrent + ts - 1;
           if (isNaN(ts) || ts > 0 || ts <= -totalConcurrent)
             return next(statusError(400, `Timestamp must be a number between ${-totalConcurrent + 1} and 0.`));
-          if (!clientCache[clientID]) {
+          if (!clientCache[clientID] ||
+              Date.now() - clientCache[clientID].created > 5000) { // allow for backpressure restart
             clientCache[clientID] = {
               created : Date.now(),
               items : grainCache.slice(-totalConcurrent)
             };
           };
+          if (config.backpressure === true && Object.keys(clientCache).length > 1) {
+            delete clientCache[clientID];
+            return next(statusError(400, `Only one client at a time is possible with back pressure enabled.`));
+          }
           var items = clientCache[clientID].items;
-          g = items[items.length - ts - 1];
+          g = items[items.length + ts - 1];
         };
         res.setHeader('Arachnid-ThreadNumber', threadNumber);
         res.setHeader('Arachnid-TotalConcurrent', totalConcurrent);
@@ -136,11 +146,12 @@ module.exports = function (RED) {
           node.error('Arachnid requires a grain duration to function (for now).');
         }
         res.setHeader('Content-Type', contentType);
-        res.setHeader('Content-Length', g.buffers[0].length);
+        var data = new Buffer(5184000); //g.buffers[0];
+        res.setHeader('Content-Length', data.length);
         // FIXME this will not work without a grain duration
         var durArray = g.getDuration();
         var originArray = g.getOriginTimestamp();
-        res.setHeader('DEBUG-TS', `${originArray} ${totalConcurrent * durArray[0] * 1000000000 / durArray[1]|0}`);
+  //      res.setHeader('DEBUG-TS', `${originArray} ${totalConcurrent * durArray[0] * 1000000000 / durArray[1]|0}`);
         originArray[1] = originArray[1] +
           totalConcurrent * durArray[0] * 1000000000 / durArray[1]|0;
         if (originArray[1] > 1000000000)
@@ -148,7 +159,33 @@ module.exports = function (RED) {
         var nanos = originArray[1].toString();
         res.setHeader('Arachnid-NextByThread',
           `${originArray[0]}:${nineZeros.slice(nanos.length)}${nanos}`);
-        res.send(g.buffers[0]);
+        var startSend = process.hrtime();
+        var written = 0;
+        var last = 0;
+        var count = 0; var drains = 0;
+        write();
+        function write() {
+          console.log('Writing', drains++, written, written-last, count);
+          last = written;
+          var ok = true;
+          while (written < data.length && ok) {
+            ok = res.write(data.slice(written, written + 8192));
+            written += 8192; count++;
+          }
+          if (written < data.length) {
+            res.once('drain', write);
+          } else {
+            res.end(function() { console.log(process.hrtime(startSend), count, drains); });
+          }
+        }
+        // console.log('WRITE', res.write(new Buffer(5184000/2)));
+        // res.end(function () {
+        //   console.log('SSS', config.backpressure, process.hrtime(startSend));
+        //   if (config.backpressure === true && getNext) getNext();
+        // });
+        // res.send(new Buffer(5184000));
+        // res.end(function() { console.log(process.hrtime(startSend)); });
+        // console.log(process.hrtime(startSend));
       });
 
       app.use(function (err, req, res, next) {
@@ -178,19 +215,26 @@ module.exports = function (RED) {
       // TODO implement push mode
     }
 
-    setInterval(function () {
-      var toDelete = [];
-      var now = Date.now();
-      Object.keys(clientCache).forEach(function (k) {
-        if (clientCache[k].created - now > 5000) toDelete.push(k);
-      });
-      toDelete.forEach(function (k) { delete clientCache[k]; });
-    }, 1000);
+    this.clearDown = null;
+    if (config.backpressure === false && this.clearDown === null) {
+      this.clearDown = setInterval(function () {
+        var toDelete = [];
+        var now = Date.now();
+        Object.keys(clientCache).forEach(function (k) {
+          if (now - clientCache[k].created > 5000) toDelete.push(k);
+        });
+        toDelete.forEach(function (k) {
+          node.log(`Clearing clientID '${k}' from the client cache.`);
+          delete clientCache[k];
+        });
+      }, 1000);
+    };
 
     this.done(function () {
       node.log('Closing the app!');
+      clearInterval(this.clearDown); this.clearDown = null;
       if (app) app.close();
-    });
+    }.bind(this));
   }
   util.inherits(SpmHTTPOut, redioactive.Spout);
   RED.nodes.registerType("spm-http-out", SpmHTTPOut);
