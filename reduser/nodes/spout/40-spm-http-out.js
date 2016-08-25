@@ -146,7 +146,7 @@ module.exports = function (RED) {
           node.error('Arachnid requires a grain duration to function (for now).');
         }
         res.setHeader('Content-Type', contentType);
-        var data = new Buffer(5184000); //g.buffers[0];
+        var data = g.buffers[0];
         res.setHeader('Content-Length', data.length);
         // FIXME this will not work without a grain duration
         var durArray = g.getDuration();

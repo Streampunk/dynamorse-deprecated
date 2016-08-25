@@ -19,6 +19,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var http = require('http');
 var https = require('https');
+var uuid = require('uuid');
 var fs = require('fs');
 var Grain = require('../../../model/Grain.js');
 
@@ -51,10 +52,12 @@ module.exports = function (RED) {
     var protocol = (config.protocol === 'HTTP') ? http : https;
     var node = this;
     var total = 0;
-    config.pullUrl = (config.pullUrl.endsWith('/')) ?
-      config.pullUrl.slice(-1) : config.pullUrl;
+    config.pullURL = (config.pullURL.endsWith('/')) ?
+      config.pullURL.slice(0, -1) : config.pullURL;
+    config.pullURL = (config.pullURL.startsWith(config.protocol.toLowerCase())) ?
+      config.pullURL.slice(config.protocol.length + 3) : config.pullURL;
     config.path = (config.path.endsWith('/')) ?
-      config.path.slice(-1) : config.path;
+      config.path.slice(0, -1) : config.path;
     var clientID = Date.now();
     this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ];
     var nodeAPI = this.context().global.get('nodeAPI');
@@ -104,15 +107,23 @@ module.exports = function (RED) {
     };
 
     var runNext = function (x, push, next) {
-      var req = protocol.get(
-          `${config.pullUrl}/${config.path}/${nextRequest[x]}`,
+      var req = protocol.request({
+          hostname: config.pullURL,
+          port: config.port,
+          path: `${config.path}/${nextRequest[x]}`,
+          method: 'GET',
+          headers: {
+            'Arachnid-ThreadNumber': x,
+            'Arachnid-TotalConcurrent': config.parallel,
+            'Arachnid-ClientID': clientID
+          }},
           function (res) {
         var count = 0;
         var position = 0;
         if (res.statusCode === 200) {
           var grainData = new Buffer(+res.headers['content-length']);
           nextRequest[x] = res.headers['arachnid-ptporigin'];
-          if (!flow) makeFlowAndSource(headers);
+          if (!flow) makeFlowAndSource(res.headers);
           res.on('data', function (data) {
             data.copy(grainData, position);
             position += data.length;
@@ -130,6 +141,7 @@ module.exports = function (RED) {
             var g = new Grain([ grainData ], ptpSync, ptpOrigin, tc, gFlowID,
               gSourceID, duration); // regenerate time as emitted
             pushGrains(g, push);
+            activeThreads[x] = false;
             next();
           });
         };
@@ -146,15 +158,14 @@ module.exports = function (RED) {
         activeThreads[x] = false;
         next();
       });
-      req.setHeader('Arachnid-ThreadNumber', x);
-      req.setHeader('Arachnid-TotalConcurrent', config.parallel);
-      req.setHeader('Arachnid-ClientID', clientID);
+      req.end();
     };
 
     var grainQueue = { };
     var highWaterMark = '0:0';
     // Push every grain older than what is in nextRequest, send grains in order
     function pushGrains(g, push) {
+      console.log('***', g);
       grainQueue[g.formatTimestamp(g.ptpOrigin)] = g;
       var nextMin = nextRequest.reduce(function (a, b) {
         return compareVersions(a, b) <= 0 ? a : b;
@@ -164,7 +175,6 @@ module.exports = function (RED) {
       })
       .sort(compareVersions)
       .forEach(function (gts) {
-        delete grainQueue[gts];
         if (!config.regenerate) {
           push(null, grainQueue[gts]);
         } else {
@@ -180,6 +190,7 @@ module.exports = function (RED) {
           push(null, new Grain(g.buffers, grainTime, g.ptpOrigin, g.timecode,
             flow.id, source.id, g.duration));
         };
+        delete grainQueue[gts];
         highWaterMark = gts;
       });
     };
@@ -208,12 +219,15 @@ module.exports = function (RED) {
       // });
     } else { // config.mode is set to pull
       this.generator(function (push, next) {
-        for ( var i = 0 ; i < activeThreads.length ; i++ ) {
-          if (!activeThreads[i]) {
-            runNext.call(this, i, push, next);
-            activeThreads[i] = true;
+        console.log('GENERATION!');
+        setTimeout(function() {
+          for ( var i = 0 ; i < activeThreads.length ; i++ ) {
+            if (!activeThreads[i]) {
+              runNext.call(this, i, push, next);
+              activeThreads[i] = true;
+            };
           };
-        };
+        }, 1000);
       });
     }
 
