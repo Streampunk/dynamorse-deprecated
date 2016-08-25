@@ -49,7 +49,7 @@ module.exports = function (RED) {
     config.path = (config.path.endsWith('/')) ? config.path.slice(0, -1) : config.path;
     var contentType = '';
     var started = false;
-    var app = null;
+    var app = null; var server = null;
     var getNext = null;
     this.each(function (x, next) {
       if (started === false) {
@@ -67,7 +67,7 @@ module.exports = function (RED) {
         });
         node.log(`content type ${contentType}`);
         if (app) {
-          app.listen(config.port, function(err) {
+          server = app.listen(config.port, function(err) {
             if (err) node.error(`Failed to start arachnid HTTP server: ${err}`);
             node.log(`Gonzales listening on port ${config.port}.`);
           });
@@ -75,7 +75,7 @@ module.exports = function (RED) {
         started = true;
       };
       if (Grain.isGrain(x)) {
-        grainCache.push(x);
+        grainCache.push({ grain : x, nextFn : next});
         getNext = next;
         if (grainCache.length > config.cacheSize) {
           grainCache = grainCache.slice(grainCache.length - config.cacheSize);
@@ -102,8 +102,8 @@ module.exports = function (RED) {
           var nanos = +tsMatch[2]|0;
           var rangeCheck = secs * 1000 + nanos / 1000000|0;
           g = grainCache.find(function (y) { // FIXME busted maths?
-            var grCheck = (y.ptpOrigin.readUIntBE(0, 6) * 1000) +
-              y.ptpOrigin.readUInt32BE(6) / 1000000|0;
+            var grCheck = (y.grain.ptpOrigin.readUIntBE(0, 6) * 1000) +
+              y.grain.ptpOrigin.readUInt32BE(6) / 1000000|0;
             return (rangeCheck >= grCheck - variation) &&
               (rangeCheck <= grCheck + variation);
           });
@@ -126,7 +126,7 @@ module.exports = function (RED) {
             return next(statusError(400, `Only one client at a time is possible with back pressure enabled.`));
           }
           var items = clientCache[clientID].items;
-          g = items[items.length + ts - 1];
+          g = items[items.length + ts - 1].grain;
         };
         res.setHeader('Arachnid-ThreadNumber', threadNumber);
         res.setHeader('Arachnid-TotalConcurrent', totalConcurrent);
@@ -161,12 +161,10 @@ module.exports = function (RED) {
           `${originArray[0]}:${nineZeros.slice(nanos.length)}${nanos}`);
         var startSend = process.hrtime();
         var written = 0;
-        var last = 0;
         var count = 0; var drains = 0;
         write();
         function write() {
-          console.log('Writing', drains++, written, written-last, count);
-          last = written;
+          drains++;
           var ok = true;
           while (written < data.length && ok) {
             ok = res.write(data.slice(written, written + 8192));
@@ -175,17 +173,14 @@ module.exports = function (RED) {
           if (written < data.length) {
             res.once('drain', write);
           } else {
-            res.end(function() { console.log(process.hrtime(startSend), count, drains); });
+            res.end(function() {
+              node.log(`Sending grain took ${(function (a) {
+                return a[0]*1000 + a[1]/1000000; })(process.hrtime(startSend))}ms ` +
+                `in ${count} writes chunked into ${drains} parts.`);
+              if (getNext) getNext();
+            });
           }
         }
-        // console.log('WRITE', res.write(new Buffer(5184000/2)));
-        // res.end(function () {
-        //   console.log('SSS', config.backpressure, process.hrtime(startSend));
-        //   if (config.backpressure === true && getNext) getNext();
-        // });
-        // res.send(new Buffer(5184000));
-        // res.end(function() { console.log(process.hrtime(startSend)); });
-        // console.log(process.hrtime(startSend));
       });
 
       app.use(function (err, req, res, next) {
@@ -233,7 +228,7 @@ module.exports = function (RED) {
     this.done(function () {
       node.log('Closing the app!');
       clearInterval(this.clearDown); this.clearDown = null;
-      if (app) app.close();
+      if (server) server.close();
     }.bind(this));
   }
   util.inherits(SpmHTTPOut, redioactive.Spout);
