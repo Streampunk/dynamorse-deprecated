@@ -24,6 +24,7 @@ var fs = require('fs');
 var Grain = require('../../../model/Grain.js');
 
 // Maximum drift between high water mark and next request in ms
+// TODO calculate this from grain rate
 var maxDrift = 40 * 8;
 
 function extractVersions(v) {
@@ -71,8 +72,10 @@ module.exports = function (RED) {
     var total = 0;
     config.pullURL = (config.pullURL.endsWith('/')) ?
       config.pullURL.slice(0, -1) : config.pullURL;
-    config.pullURL = (config.pullURL.startsWith(config.protocol.toLowerCase())) ?
-      config.pullURL.slice(config.protocol.length + 3) : config.pullURL;
+    config.pullURL = (config.pullURL.toLowerCase().startsWith('http://')) ?
+      config.pullURL.slice(7) : config.pullURL;
+    config.pullURL = (config.pullURL.toLowerCase().startsWith('https://')) ?
+      config.pullURL.slice(8) : config.pullURL;
     config.path = (config.path.endsWith('/')) ?
       config.path.slice(0, -1) : config.path;
     var clientID = 'cid' + Date.now();
@@ -125,6 +128,7 @@ module.exports = function (RED) {
 
     var runNext = function (x, push, next) {
       var req = protocol.request({
+          rejectUnauthorized: false,
           hostname: config.pullURL,
           port: config.port,
           path: `${config.path}/${nextRequest[x]}`,

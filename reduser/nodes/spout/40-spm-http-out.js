@@ -47,8 +47,13 @@ module.exports = function (RED) {
       return this.log('Waiting for global context to be updated.');
     var srcFlow = null;
     this.on('error', function (err) {
-      node.warn(`Error transporting flow over HTTP '${config.path}': ${err}`)
+      node.warn(`Error transporting flow over ${config.protocol} '${config.path}': ${err}`)
     });
+    var protocol = (config.protocol === 'HTTP') ? http : https;
+    var options = (config.protocol === 'HTTP') ? {} : {
+      key : fs.readFileSync('../certs/dynamorse-key.pem'),
+      cert : fs.readFileSync('../certs/dynamorse-cert.pem')
+    };
     var grainCache = [];
     var clientCache = {};
     config.path = (config.path.endsWith('/')) ? config.path.slice(0, -1) : config.path;
@@ -72,9 +77,11 @@ module.exports = function (RED) {
         });
         node.log(`content type ${contentType}`);
         if (app) {
-          server = app.listen(config.port, function(err) {
+          server = ((config.protocol === 'HTTP') ?
+            protocol.createServer(app) : protocol.createServerion(options, app))
+          .listen(config.port, function(err) {
             if (err) node.error(`Failed to start arachnid HTTP server: ${err}`);
-            node.log(`Gonzales listening on port ${config.port}.`);
+            node.log(`Arachnid pull ${config.protocol} server listening on port ${config.port}.`);
           });
         }
         for ( var x = 1 ; x < config.parallel ; x++ ) { next(); } // Make sure cache has enough on start
