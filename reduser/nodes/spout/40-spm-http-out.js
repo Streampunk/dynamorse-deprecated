@@ -32,6 +32,11 @@ function statusError(status, message) {
   return e;
 }
 
+function msOriginTs(g) {
+  return (g.ptpOrigin.readUIntBE(0, 6) * 1000) +
+    g.ptpOrigin.readUInt32BE(6) / 1000000|0;
+}
+
 module.exports = function (RED) {
   var count = 0;
   function SpmHTTPOut (config) {
@@ -88,8 +93,20 @@ module.exports = function (RED) {
     });
     if (config.mode === 'pull') {
       app = express();
-      // app.use(bodyParser.raw({ limit : config.payloadLimit || 6000000 }));
+      app.get(config.path, function (req, res) {
+        res.json({
+          maxCacheSize : config.cacheSize,
+          currentCacheSize : grainCache.length,
+          flow_id : (grainCache.length > 0) ? uuid.unparse(grainCache[0].grain.flow_id) : '',
+          source_id : (grainCache.length > 0) ? uuid.unparse(grainCache[0].grain.source_id) : '',
+          cacheTS : grainCache.map(function (g) {
+            return Grain.prototype.formatTimestamp(g.grain.ptpOrigin);
+          }),
+          clients : Object.keys(clientCache)
+        });
+      });
       app.get(config.path + "/:ts", function (req, res, next) {
+        console.log('*** Received HTTP GET', req.params.ts);
         var threadNumber = req.headers['arachnid-threadnumber'];
         threadNumber = (isNaN(+threadNumber)) ? 0 : +threadNumber;
         var totalConcurrent = req.headers['arachnid-totalconcurrent'];
@@ -97,16 +114,28 @@ module.exports = function (RED) {
         var clientID = req.headers['arachnid-clientid'];
         var g = null;
         var tsMatch = req.params.ts.match(/([0-9]+):([0-9]{9})/);
+        var nextGrain = grainCache[grainCache.length - 1].nextFn;
         if (tsMatch) {
           var secs = +tsMatch[1]|0;
           var nanos = +tsMatch[2]|0;
           var rangeCheck = secs * 1000 + nanos / 1000000|0;
           g = grainCache.find(function (y) { // FIXME busted maths?
-            var grCheck = (y.grain.ptpOrigin.readUIntBE(0, 6) * 1000) +
-              y.grain.ptpOrigin.readUInt32BE(6) / 1000000|0;
+            var grCheck = msOriginTs(y.grain);
             return (rangeCheck >= grCheck - variation) &&
               (rangeCheck <= grCheck + variation);
           });
+          if (g) {
+            nextGrain = g.nextFn;
+            g = g.grain;
+          } else {
+            if (rangeCheck < msOriginTs(grainCache[0].grain)) {
+              return next(statusError(410, 'Request for a grain with a timestamp that lies before the available window.'));
+            } else {
+              nextGrain();
+              console.log('!!! Responding not found.');
+              return next(statusError(404, 'Request for a grain that lies beyond those currently available. More have been requested - please try again.'));
+            }
+          }
         } else {
           if (!clientID)
             return next(statusError(400, 'When using relative timings, a client ID header must be provided.'));
@@ -126,7 +155,9 @@ module.exports = function (RED) {
             return next(statusError(400, `Only one client at a time is possible with back pressure enabled.`));
           }
           var items = clientCache[clientID].items;
-          g = items[items.length + ts - 1].grain;
+          g = items[items.length + ts - 1];
+          nextGrain = g.nextFn;
+          g = g.grain;
         };
         res.setHeader('Arachnid-ThreadNumber', threadNumber);
         res.setHeader('Arachnid-TotalConcurrent', totalConcurrent);
@@ -156,9 +187,10 @@ module.exports = function (RED) {
           totalConcurrent * durArray[0] * 1000000000 / durArray[1]|0;
         if (originArray[1] > 1000000000)
           originArray[0] = originArray[0] + originArray[1] / 1000000000|0;
-        var nanos = originArray[1].toString();
+        var nanos = (originArray[1]%1000000000).toString();
         res.setHeader('Arachnid-NextByThread',
           `${originArray[0]}:${nineZeros.slice(nanos.length)}${nanos}`);
+        if (req.method === 'HEAD') return res.end();
         var startSend = process.hrtime();
         var written = 0;
         var count = 0; var drains = 0;
@@ -177,7 +209,7 @@ module.exports = function (RED) {
               node.log(`Sending grain took ${(function (a) {
                 return a[0]*1000 + a[1]/1000000; })(process.hrtime(startSend))}ms ` +
                 `in ${count} writes chunked into ${drains} parts.`);
-              if (getNext) getNext();
+              nextGrain();
             });
           }
         }
@@ -211,7 +243,7 @@ module.exports = function (RED) {
     }
 
     this.clearDown = null;
-    if (config.backpressure === false && this.clearDown === null) {
+    if (this.clearDown === null) {
       this.clearDown = setInterval(function () {
         var toDelete = [];
         var now = Date.now();
@@ -228,7 +260,7 @@ module.exports = function (RED) {
     this.done(function () {
       node.log('Closing the app!');
       clearInterval(this.clearDown); this.clearDown = null;
-      if (server) server.close();
+      server.close();
     }.bind(this));
   }
   util.inherits(SpmHTTPOut, redioactive.Spout);

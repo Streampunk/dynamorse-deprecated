@@ -58,7 +58,7 @@ module.exports = function (RED) {
       config.pullURL.slice(config.protocol.length + 3) : config.pullURL;
     config.path = (config.path.endsWith('/')) ?
       config.path.slice(0, -1) : config.path;
-    var clientID = Date.now();
+    var clientID = 'cid' + Date.now();
     this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ];
     var nodeAPI = this.context().global.get('nodeAPI');
     var ledger = this.context().global.get('ledger');
@@ -92,7 +92,7 @@ module.exports = function (RED) {
       source = new ledger.Source(null, null, localName, localDescription,
         "urn:x-nmos:format:" + tags.format[0], null, null, pipelinesID, null);
       flow = new ledger.Flow(null, null, localName, localDescription,
-        "urn:x-nmos:format:" + tags.format[0], this.tags, source.id, null);
+        "urn:x-nmos:format:" + tags.format[0], tags, source.id, null);
       recvr = new ledger.Receiver(null, null, localName, localDescription,
         "urn:x-nmos:format:" + tags.format[0], null, tags,
         pipelinesID, ledger.transports.dash, null);
@@ -227,7 +227,7 @@ module.exports = function (RED) {
               activeThreads[i] = true;
             };
           };
-        }, 1000);
+        }, (flow === null) ? 1000 : 0);
       });
     }
 
