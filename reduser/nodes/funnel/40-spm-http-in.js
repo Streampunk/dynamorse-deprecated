@@ -24,7 +24,8 @@ var fs = require('fs');
 var Grain = require('../../../model/Grain.js');
 
 function extractVersions(v) {
-  var m = v.match(/^([0-9]+):([0-9]+)$/)
+  var m = v.match(/^([0-9]+):([0-9]+)$/);
+  if (m === null) return [Number.MAX_SAFE_INTEGER, 0];
   return [+m[1], +m[2]];
 }
 
@@ -120,6 +121,13 @@ module.exports = function (RED) {
           function (res) {
         var count = 0;
         var position = 0;
+        if (res.statusCode === 404) {
+          node.warn(`Received not found in thread ${x}, request ${config.path}/${nextRequest[x]} - may be ahead of the game. Retrying.`);
+          setTimeout(function () {
+            runNext(x, push, next);
+          }, 5);
+          return;
+        }
         if (res.statusCode === 200) {
           var grainData = new Buffer(+res.headers['content-length']);
           nextRequest[x] = res.headers['arachnid-ptporigin'];
@@ -165,8 +173,8 @@ module.exports = function (RED) {
     var highWaterMark = '0:0';
     // Push every grain older than what is in nextRequest, send grains in order
     function pushGrains(g, push) {
-      console.log('***', g);
       grainQueue[g.formatTimestamp(g.ptpOrigin)] = g;
+      console.log('QQQ', nextRequest);
       var nextMin = nextRequest.reduce(function (a, b) {
         return compareVersions(a, b) <= 0 ? a : b;
       });
@@ -176,6 +184,7 @@ module.exports = function (RED) {
       .sort(compareVersions)
       .forEach(function (gts) {
         if (!config.regenerate) {
+          console.log('>>> PUSHING', gts);
           push(null, grainQueue[gts]);
         } else {
           var g = grainQueue[gts];
@@ -221,6 +230,7 @@ module.exports = function (RED) {
       this.generator(function (push, next) {
         console.log('GENERATION!');
         setTimeout(function() {
+          console.log('+++ SMELLY THREADS', activeThreads);
           for ( var i = 0 ; i < activeThreads.length ; i++ ) {
             if (!activeThreads[i]) {
               runNext.call(this, i, push, next);

@@ -77,6 +77,7 @@ module.exports = function (RED) {
             node.log(`Gonzales listening on port ${config.port}.`);
           });
         }
+        for ( var x = 1 ; x < config.parallel ; x++ ) { next(); } // Make sure cache has enough on start
         started = true;
       };
       if (Grain.isGrain(x)) {
@@ -106,15 +107,16 @@ module.exports = function (RED) {
         });
       });
       app.get(config.path + "/:ts", function (req, res, next) {
-        console.log('*** Received HTTP GET', req.params.ts);
         var threadNumber = req.headers['arachnid-threadnumber'];
         threadNumber = (isNaN(+threadNumber)) ? 0 : +threadNumber;
+        console.log('*** Received HTTP GET', req.params.ts, 'thread', threadNumber);
         var totalConcurrent = req.headers['arachnid-totalconcurrent'];
         totalConcurrent = (isNaN(+totalConcurrent)) ? 1 : +totalConcurrent;
+        var nextGrain = grainCache[grainCache.length - 1].nextFn;
+        console.log('BUMMM', grainCache.length, totalConcurrent); // while (grainCache.length < totalConcurrent) nextGrain();
         var clientID = req.headers['arachnid-clientid'];
         var g = null;
         var tsMatch = req.params.ts.match(/([0-9]+):([0-9]{9})/);
-        var nextGrain = grainCache[grainCache.length - 1].nextFn;
         if (tsMatch) {
           var secs = +tsMatch[1]|0;
           var nanos = +tsMatch[2]|0;
@@ -248,11 +250,17 @@ module.exports = function (RED) {
         var toDelete = [];
         var now = Date.now();
         Object.keys(clientCache).forEach(function (k) {
-          if (now - clientCache[k].created > 5000) toDelete.push(k);
+          if (clientCache[k].items && now - clientCache[k].created > 5000)
+            toDelete.push(k);
         });
         toDelete.forEach(function (k) {
-          node.log(`Clearing clientID '${k}' from the client cache.`);
-          delete clientCache[k];
+          if (config.backpressure === true) {
+            node.log(`Clearing items from clientID '${k}' to free related memory.`);
+            delete clientCache[k].items;
+          } else {
+            node.log(`Clearing clientID '${k}' from the client cache.`);
+            delete clientCache[k];
+          }
         });
       }, 1000);
     };
