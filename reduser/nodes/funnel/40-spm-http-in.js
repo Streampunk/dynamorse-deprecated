@@ -23,9 +23,12 @@ var uuid = require('uuid');
 var fs = require('fs');
 var Grain = require('../../../model/Grain.js');
 
+// Maximum drift between high water mark and next request in ms
+var maxDrift = 40 * 8;
+
 function extractVersions(v) {
   var m = v.match(/^([0-9]+):([0-9]+)$/);
-  if (m === null) return [Number.MAX_SAFE_INTEGER, 0];
+  if (m === null) { console.log(v, [Number.MAX_SAFE_INTEGER, 0]); return [Number.MAX_SAFE_INTEGER, 0]; }
   return [+m[1], +m[2]];
 }
 
@@ -37,6 +40,19 @@ function compareVersions(l, r) {
   if (lm[1] < rm[1]) return -1;
   if (lm[1] > rm[1]) return 1;
   return 0;
+}
+
+function versionToMs (v) {
+  var e = extractVersions(v);
+  if (e[0] === Number.MAX_SAFE_INTEGER) return e[0];
+  return (e[0] * 1000) + (e[1] / 1000000|0);
+}
+
+function versionDiffMs (smaller, bigger) {
+  var smMs = versionToMs(smaller);
+  var bgMs = versionToMs(bigger);
+  if (smMs === Number.MAX_SAFE_INTEGER || bgMs === Number.MAX_SAFE_INTEGER) return 0;
+  return bgMs - smMs;
 }
 
 const mimeMatch = /^\s*(\w+)\/(\w+)/;
@@ -128,6 +144,14 @@ module.exports = function (RED) {
           }, 5);
           return;
         }
+        if (res.statusCode === 410) {
+          node.error(`BANG! Cache miss when reading audio stream ${config.path}/${nextRequest[x]} on thread ${x}.`);
+          push(`Request for grain ${config.path}/${nextRequest[x]} that has already gone on thread ${x}. Resetting.`);
+          nextRequest =
+            [ '-5', '-4', '-3', '-2', '-1', '0' ].slice(-config.parallel);
+          activeThreads[x] = false;
+          return;
+        }
         if (res.statusCode === 200) {
           var grainData = new Buffer(+res.headers['content-length']);
           nextRequest[x] = res.headers['arachnid-ptporigin'];
@@ -170,7 +194,7 @@ module.exports = function (RED) {
     };
 
     var grainQueue = { };
-    var highWaterMark = '0:0';
+    var highWaterMark = Number.MAX_SAFE_INTEGER + ':0';
     // Push every grain older than what is in nextRequest, send grains in order
     function pushGrains(g, push) {
       grainQueue[g.formatTimestamp(g.ptpOrigin)] = g;
@@ -228,14 +252,17 @@ module.exports = function (RED) {
       // });
     } else { // config.mode is set to pull
       this.generator(function (push, next) {
-        console.log('GENERATION!');
         setTimeout(function() {
           console.log('+++ SMELLY THREADS', activeThreads);
           for ( var i = 0 ; i < activeThreads.length ; i++ ) {
             if (!activeThreads[i]) {
-              runNext.call(this, i, push, next);
-              activeThreads[i] = true;
-            };
+              if (versionDiffMs(highWaterMark, nextRequest[i]) < maxDrift) {
+                runNext.call(this, i, push, next);
+                activeThreads[i] = true;
+              } else {
+                node.error(`Not progressing thread ${i} this time due to a drift of ${versionDiffMs(highWaterMark, nextRequest[i])}.`);
+              }
+            }
           };
         }, (flow === null) ? 1000 : 0);
       });

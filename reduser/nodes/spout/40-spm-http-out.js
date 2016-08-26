@@ -34,7 +34,7 @@ function statusError(status, message) {
 
 function msOriginTs(g) {
   return (g.ptpOrigin.readUIntBE(0, 6) * 1000) +
-    g.ptpOrigin.readUInt32BE(6) / 1000000|0;
+    (g.ptpOrigin.readUInt32BE(6) / 1000000|0);
 }
 
 module.exports = function (RED) {
@@ -113,15 +113,17 @@ module.exports = function (RED) {
         var totalConcurrent = req.headers['arachnid-totalconcurrent'];
         totalConcurrent = (isNaN(+totalConcurrent)) ? 1 : +totalConcurrent;
         var nextGrain = grainCache[grainCache.length - 1].nextFn;
-        console.log('BUMMM', grainCache.length, totalConcurrent); // while (grainCache.length < totalConcurrent) nextGrain();
         var clientID = req.headers['arachnid-clientid'];
         var g = null;
         var tsMatch = req.params.ts.match(/([0-9]+):([0-9]{9})/);
         if (tsMatch) {
           var secs = +tsMatch[1]|0;
           var nanos = +tsMatch[2]|0;
-          var rangeCheck = secs * 1000 + nanos / 1000000|0;
-          g = grainCache.find(function (y) { // FIXME busted maths?
+          var rangeCheck = (secs * 1000) + (nanos / 1000000|0);
+          console.log('<-> Range checking, across the universe', rangeCheck,
+            msOriginTs(grainCache[0].grain),
+            msOriginTs(grainCache[grainCache.length - 1].grain));
+          g = grainCache.find(function (y) {
             var grCheck = msOriginTs(y.grain);
             return (rangeCheck >= grCheck - variation) &&
               (rangeCheck <= grCheck + variation);
