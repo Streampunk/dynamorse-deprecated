@@ -15,7 +15,9 @@
 
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
-var macadam = require('macadam');
+var macadam;
+try { macadam = require('macadam'); } catch(err) { console.log('SDI-In: ' + err); } 
+
 var Grain = require('../../../model/Grain.js');
 
 function fixBMDCodes(code) {
