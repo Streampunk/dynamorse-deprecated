@@ -17,7 +17,7 @@ var test = require('tape');
 var fs = require('fs');
 var path = require('path');
 
-var userNodeDir = "../reduser/nodes";
+var userNodeDir = __dirname + "/../reduser/nodes";
 
 function listFiles(dir, ext, cb) {
   fs.readdir(dir, function(err, files) {
@@ -51,7 +51,7 @@ test('Check all nodes in user folder', function(t) {
     }
     else {
       function testFile() { require(file); }
-      t.doesNotThrow(testFile, file);    
+      t.doesNotThrow(testFile, file);
     }
   });
   t.end();
