@@ -23,6 +23,7 @@ var grainConcater = require('../../../valve/grainConcater.js');
 var Grain = require('../../../model/Grain.js');
 var util = require('util');
 var SDPProcessing = require('../../../util/SDPProcessing.js');
+var H264 = require('../../../util/H264.js');
 
 module.exports = function (RED) {
   function PCAPReader (config) {
@@ -61,10 +62,13 @@ module.exports = function (RED) {
         if (err) return node.log(`Unable to register source: ${err}`);
       });
       nodeAPI.putResource(flow).then(function () {
+        var is6184 = this.tags.encodingName[0].toLowerCase() === 'h264';
         this.highland(
           pcapInlet(config.file, config.loop)
-          .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
+          .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video') &&
+            this.tags.encodingName[0] === 'raw'))
           .map(function (g) {
+            if (is6184) H264.backToAVC(g);
             if (!config.regenerate) {
               return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
                 flow.id, source.id, g.duration);

@@ -23,6 +23,7 @@ var dgram = require('netadon');
 var uuid = require('uuid');
 var Net = require('../../../util/Net.js');
 var util = require('util');
+var H264 = require('../../../util/H264.js');
 
 // TODO add IPv6 support
 
@@ -69,6 +70,7 @@ module.exports = function (RED) {
     var payloadType = 96;
     var rtpTsOffset = (Math.random() * 0xffffffff) >>> 0;
     var is4175 = false;
+    var is6184 = false;
     var width = undefined;
     var height = undefined;
     var byteFactor = undefined;
@@ -109,13 +111,13 @@ module.exports = function (RED) {
       if (!Grain.isGrain(g)) return node.warn('Received a non-grain on the input.');
       if (!this.tags) {
         this.getNMOSFlow(g, function (err, f) {
-          if (err) return push("Failed to resolve NMOS flow.");
+          if (err) return node.warn(`Failed to resolve NMOS flow ${uuid.unparse(g.flow_id)}: ${err}`);
           this.srcFlow = f;
           this.tags = f.tags;
           clockRate = +f.tags.clockRate[0];
-          is4175 = f.tags.encodingName[0] === 'raw'; // TODO add pgroup/V210 check
+          is4175 = f.tags.encodingName[0] === 'raw';
+          is6184 = f.tags.encodingName[0].toLowerCase() === 'h264';
           if (is4175) {
-            console.log(f.tags);
             width = +f.tags.width[0];
             height = +f.tags.height[0];
             byteFactor = getByteFactor(f.tags);
@@ -124,6 +126,11 @@ module.exports = function (RED) {
             packetsPerGrain = width * height * byteFactor * 1.1 / 1452|0;
           } else {
             Packet = RTPPacket;
+            contentType = `${f.tags.format[0]}/${f.tags.encodingName[0]}`;
+            if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate[0]}`;
+            if (f.tags.channels) contentType += `; channels=${f.tags.channels[0]}`;
+            // TODO something less arbitrary - problem is first H264 packet is small
+            packetsPerGrain = (is6184) ? 1000 : g.getPayloadSize() / 1400|0 + 5;
           }
           stride = getStride(f.tags);
           source = new ledger.Source(null, null, localName, localDescription,
@@ -153,6 +160,7 @@ module.exports = function (RED) {
     var grainTimer = process.hrtime();
     function pushGrain (g, next) {
       console.log(':-)', process.hrtime(grainTimer));
+      if (is6184) H264.compact(g, 1410);
       var masterBuffer = new Buffer(packetsPerGrain*1452);
       var pc = 0;
       grainTimer = process.hrtime();
@@ -181,6 +189,16 @@ module.exports = function (RED) {
       var i = 0, o = 0; y = 0;
       var b = g.buffers[i];
       while (i < g.buffers.length) {
+        if (is6184) {
+          b = g.buffers[i++];
+          if (i < g.buffers.length) {
+            packet.setPayload(b);
+            sendPacket(packet);
+            remaining = 1410;
+            packet = makePacket(g, remaining, masterBuffer, pc++);
+          }
+          continue;
+        }
         var t = (!is4175 || !packet.getMarker()) ? remaining - remaining % stride :
           packet.getLineData()[0].length;
         // console.log('HAT', packet.getLineData()[0].lineNo, (b.length - o) % 4800, 4800 - lineStatus.linePos,

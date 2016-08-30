@@ -21,6 +21,7 @@ var udpInlet = require('../../../funnel/udpInlet.js');
 var udpToGrain = require('../../../valve/udpToGrain.js');
 var grainConcater = require('../../../valve/grainConcater.js');
 var Grain = require('../../../model/Grain.js');
+var H264 = require('../../../util/H264.js');
 var http = require('http');
 var Promise = require('promise');
 var mdns = null;
@@ -146,10 +147,13 @@ module.exports = function (RED) {
     })
     .then(function () {
       console.log('Starting highland pipeline.');
+      var is6184 = this.tags.encodingName[0].toLowerCase() === 'h264';
       this.highland(
         udpInlet(client, this.sdp, config.netif)
-        .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video')))
+        .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video') &&
+          this.tags.encodingName[0] === 'raw'))
         .map(function (g) {
+          if (is6184) H264.backToAVC(g);
           if (!config.regenerate) {
             return new Grain(g.buffers, g.ptpSync, g.ptpOrigin, g.timecode,
               flow.id, source.id, g.duration);
