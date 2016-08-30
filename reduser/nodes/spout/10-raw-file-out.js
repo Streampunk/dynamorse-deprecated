@@ -69,13 +69,13 @@ module.exports = function (RED) {
               this.warn("Failed to resolve NMOS flow.");
             } else {
               if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
-                contentType = `video/raw; sampling=${f.tags.sampling}; ` +
-                 `width=${f.tags.width}; height=${f.tags.height}; depth=${f.tags.depth}; ` +
-                 `colorimetry=${f.tags.colorimetry}; interlace=${f.tags.interlace}`;
+                contentType = `video/raw; sampling=${f.tags.sampling[0]}; ` +
+                 `width=${f.tags.width[0]}; height=${f.tags.height[0]}; depth=${f.tags.depth[0]}; ` +
+                 `colorimetry=${f.tags.colorimetry[0]}; interlace=${f.tags.interlace[0]}`;
               } else {
                 contentType = `${f.tags.format}/${f.tags.encodingName}`;
-                if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate}`;
-                if (f.tags.channels) contentType += `; channels=${f.tags.channels}`;
+                if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate[0]}`;
+                if (f.tags.channels) contentType += `; channels=${f.tags.channels[0]}`;
               }
             }
             var gjson = x.toJSON();

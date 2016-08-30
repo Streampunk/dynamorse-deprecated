@@ -22,6 +22,7 @@ var https = require('https');
 var fs = require('fs');
 var Grain = require('../../../model/Grain.js');
 var uuid = require('uuid');
+var Net = require('../../../util/Net.js');
 
 const variation = 1; // Grain timing requests may vary +-1ms
 const nineZeros = '000000000';
@@ -51,36 +52,52 @@ module.exports = function (RED) {
     });
     var protocol = (config.protocol === 'HTTP') ? http : https;
     var options = (config.protocol === 'HTTP') ? {} : {
-      key : fs.readFileSync('../certs/dynamorse-key.pem'),
-      cert : fs.readFileSync('../certs/dynamorse-cert.pem')
+      key : fs.readFileSync(__dirname + '/../../../certs/dynamorse-key.pem'),
+      cert : fs.readFileSync(__dirname + '/../../../certs/dynamorse-cert.pem')
     };
     var grainCache = [];
     var clientCache = {};
     config.path = (config.path.endsWith('/')) ? config.path.slice(0, -1) : config.path;
-    var contentType = '';
+    var contentType = 'application/octet-stream';
     var started = false;
     var app = null; var server = null;
     var getNext = null;
+    var sender = null; var flow = null;
+    var senderID = uuid.v4();
+    var ledger = this.context().global.get('ledger');
+    var nodeAPI = this.context().global.get('nodeAPI');
+    var genericID = this.context().global.get('genericID');
     this.each(function (x, next) {
       if (started === false) {
         node.getNMOSFlow(x, function (err, f) {
           if (err) return node.warn("Failed to resolve NMOS flow.");
-          if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
-            contentType = `video/raw; sampling=${f.tags.sampling}; ` +
-             `width=${f.tags.width}; height=${f.tags.height}; depth=${f.tags.depth}; ` +
-             `colorimetry=${f.tags.colorimetry}; interlace=${f.tags.interlace}`;
-          } else {
-            contentType = `${f.tags.format}/${f.tags.encodingName}`;
-            if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate}`;
-            if (f.tags.channels) contentType += `; channels=${f.tags.channels}`;
-          };
+          else {
+            flow = f;
+            if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
+              contentType = `video/raw; sampling=${f.tags.sampling[0]}; ` +
+               `width=${f.tags.width[0]}; height=${f.tags.height[0]}; depth=${f.tags.depth[0]}; ` +
+               `colorimetry=${f.tags.colorimetry[0]}; interlace=${f.tags.interlace[0]}`;
+            } else {
+              contentType = `${f.tags.format[0]}/${f.tags.encodingName[0]}`;
+              if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate[0]}`;
+              if (f.tags.channels) contentType += `; channels=${f.tags.channels[0]}`;
+            };
+          }
+          var localName = config.name || `${config.type}-${config.id}`;
+          var localDescription = config.description || `${config.type}-${config.id}`;
+          // TODO support regeneration of flows
+          sender = new ledger.Sender(senderID, null, localName, localDescription,
+            (flow) ? flow.id : null, "urn:x-nmos:transport:dash", // TODO add arachnid-specific transport
+            genericID, // TODO do better at binding to an address
+            `http://${Net.getFirstRealIP4Interface().address}:${config.port}/${config.path}`);
+          nodeAPI.putResource(sender).catch(node.warn);
         });
         node.log(`content type ${contentType}`);
         if (app) {
           server = ((config.protocol === 'HTTP') ?
-            protocol.createServer(app) : protocol.createServerion(options, app))
+            protocol.createServer(app) : protocol.createServer(options, app))
           .listen(config.port, function(err) {
-            if (err) node.error(`Failed to start arachnid HTTP server: ${err}`);
+            if (err) node.error(`Failed to start arachnid ${config.protocol} server: ${err}`);
             node.log(`Arachnid pull ${config.protocol} server listening on port ${config.port}.`);
           });
         }
@@ -107,6 +124,7 @@ module.exports = function (RED) {
           currentCacheSize : grainCache.length,
           flow_id : (grainCache.length > 0) ? uuid.unparse(grainCache[0].grain.flow_id) : '',
           source_id : (grainCache.length > 0) ? uuid.unparse(grainCache[0].grain.source_id) : '',
+          sender_id : (sender) ? sender.id : '',
           cacheTS : grainCache.map(function (g) {
             return Grain.prototype.formatTimestamp(g.grain.ptpOrigin);
           }),
@@ -178,6 +196,7 @@ module.exports = function (RED) {
         res.setHeader('Arachnid-PTPSync', Grain.prototype.formatTimestamp(g.ptpSync));
         res.setHeader('Arachnid-FlowID', uuid.unparse(g.flow_id));
         res.setHeader('Arachnid-SourceID', uuid.unparse(g.source_id));
+        res.setHeader('Arachnid-SenderID', senderID);
         if (g.timecode)
           res.setHeader('Arachnid-Timecode',
             Grain.prototype.formatTimecode(g.timecode));

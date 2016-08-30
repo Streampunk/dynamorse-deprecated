@@ -188,11 +188,15 @@
   </table>
   </div>
 
-  <p>Using HTTPS will create more processor load than using HTTP.</p>
+  <p>Using HTTPS will create more processor load than using HTTP. To use HTTPS
+  more securely, please replace the default certificates in the <em>certs</em>
+  folder. This is prototype software and user authorization is not supported.
+  See the <a href="https://nodejs.org/api/tls.html">Node.js TLS/SSL documentation
+  </a> for information on how to generate keys and certificates.</p>
 
   <h3>Maturity</h3>
-  <p>Work in progress. A prototype implementation of
-  <a href="http://github.com/Streampunk/arachnid">arachnid</a>
-  exists and is being ported into dynamorse. Implementation
+  <p>Work in progress. A first version has been merged onto the master branch
+  for initial testing and feedback, supporting pull mode only and with known
+  serialization issues in HTTPS mode. Fragments are not yet supported. Implementation
   <a href="https://github.com/Streampunk/dynamorse/issues/15">status</a>.</p>
 </script>

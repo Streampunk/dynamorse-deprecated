@@ -103,19 +103,21 @@ module.exports = function (RED) {
          if (splitP[0] === 'rate') splitP[0] = 'clockRate';
          tags[splitP[0]] = [ splitP[1] ];
       });
-      if (headers['x-arachnid-fourcc']) {
-        tags.packing = [ headers['x-arachnid-fourcc'] ];
+      if (headers['arachnid-fourcc']) {
+        tags.packing = [ headers['arachnid-fourcc'] ];
       } else if (tags.encodingName[0] === 'raw') {
         tags.clockRate = [ '90000' ];
         tags.packing = [ 'pgroup' ];
       }
+      var senderID = headers['arachnid-senderid'];
+      senderID = (senderID === undefined) ? null : { sender_id : senderID };
       source = new ledger.Source(null, null, localName, localDescription,
         "urn:x-nmos:format:" + tags.format[0], null, null, pipelinesID, null);
       flow = new ledger.Flow(null, null, localName, localDescription,
         "urn:x-nmos:format:" + tags.format[0], tags, source.id, null);
       recvr = new ledger.Receiver(null, null, localName, localDescription,
         "urn:x-nmos:format:" + tags.format[0], null, tags,
-        pipelinesID, ledger.transports.dash, null);
+        pipelinesID, ledger.transports.dash, senderID);
       nodeAPI.putResource(source)
       .then(function () {
         return nodeAPI.putResource(flow);
@@ -257,7 +259,7 @@ module.exports = function (RED) {
     } else { // config.mode is set to pull
       this.generator(function (push, next) {
         setTimeout(function() {
-          console.log('+++ SMELLY THREADS', activeThreads);
+          console.log('+++ DEBUG THREADS', activeThreads);
           for ( var i = 0 ; i < activeThreads.length ; i++ ) {
             if (!activeThreads[i]) {
               if (versionDiffMs(highWaterMark, nextRequest[i]) < maxDrift) {
