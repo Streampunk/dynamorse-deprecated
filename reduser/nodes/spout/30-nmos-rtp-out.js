@@ -130,9 +130,9 @@ module.exports = function (RED) {
               `colorimetry=${this.tags.colorimetry}; interlace=${this.tags.interlace}`;
           } else {
             Packet = RTPPacket;
-            contentType = `${f.tags.format}/${f.tags.encodingName}`;
-            if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate}`;
-            if (f.tags.channels) contentType += `; channels=${f.tags.channels}`;
+            contentType = `${f.tags.format[0}/${f.tags.encodingName[0]}`;
+            if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate[0]}`;
+            if (f.tags.channels) contentType += `; channels=${f.tags.channels[0]}`;
             packetsPerGrain = g.getPayloadSize() / 1400|0 + 5;
           }
           stride = getStride(f.tags);
