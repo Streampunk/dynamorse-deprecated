@@ -166,6 +166,14 @@ Grain.prototype.getDuration = function () {
   }
 }
 
+Grain.prototype.getPayloadSize = function () {
+  if (Array.isArray(this.buffers)) {
+    if (this.buffers.length === 1) return this.buffers[0].length;
+    return this.buffers.reduce(function (l, r) { return l + r.length; }, 0);
+  }
+  return Buffer.isBuffer(this.buffers) ? this.buffers.length : 0;
+}
+
 Grain.prototype.getOriginTimestamp = function () {
   return [ this.ptpOrigin.readUIntBE(0, 6), this.ptpOrigin.readUInt32BE(6) ];
 }

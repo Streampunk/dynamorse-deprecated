@@ -126,11 +126,11 @@ module.exports = function (RED) {
             packetsPerGrain = width * height * byteFactor * 1.1 / 1452|0;
           } else {
             Packet = RTPPacket;
-            contentType = `${f.tags.format[0]}/${f.tags.encodingName[0]}`;
-            if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate[0]}`;
-            if (f.tags.channels) contentType += `; channels=${f.tags.channels[0]}`;
+            // contentType = `${f.tags.format[0]}/${f.tags.encodingName[0]}`;
+            // if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate[0]}`;
+            // if (f.tags.channels) contentType += `; channels=${f.tags.channels[0]}`;
             // TODO something less arbitrary - problem is first H264 packet is small
-            packetsPerGrain = (is6184) ? 1000 : g.getPayloadSize() / 1400|0 + 5;
+            packetsPerGrain = (is6184) ? 1000 : (g.getPayloadSize() / 1400|0) + 5;
           }
           stride = getStride(f.tags);
           source = new ledger.Source(null, null, localName, localDescription,
