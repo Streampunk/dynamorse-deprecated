@@ -19,40 +19,33 @@ var path = require('path');
 
 var userNodeDir = __dirname + "/../reduser/nodes";
 
+// Use sync file functions so that the test output parses easily
 function listFiles(dir, ext, cb) {
-  fs.readdir(dir, function(err, files) {
-    if (err)
-      cb(err);
-
-    files.forEach(function(file, index) {
-      var nodePath = path.join(dir, file);
-      fs.stat(nodePath, function(error, stat) {
-        if (error) {
-          cb(error);
-          return;
-        }
-
-        if (stat.isFile()) {
-          if (ext === path.extname(nodePath))
-            cb(null, nodePath);
-          return;
-        }
-        else if (stat.isDirectory())
-          listFiles(nodePath, ext, cb);
-      });
-    });
+  var files = fs.readdirSync(dir);
+  files.forEach(function(file, index) {
+    var nodePath = path.join(dir, file);
+    var stat = fs.statSync(nodePath);
+    if (stat.isFile()) {
+      if (ext === path.extname(nodePath))
+        cb(null, nodePath);
+    }
+    else if (stat.isDirectory())
+      listFiles(nodePath, ext, cb);
   });
 }
 
 test('Check all nodes in user folder', function(t) {
-  listFiles(userNodeDir, '.js', function(err, file) {
-    if (err) {
-      t.fail(err);
-    }
-    else {
-      function testFile() { require(file); }
-      t.doesNotThrow(testFile, file);
-    }
-  });
+  function testFiles() {
+    listFiles(userNodeDir, '.js', function(err, file) {
+      if (err) {
+        t.fail(err);
+      }
+      else {
+        function testFile() { require(file); }
+        t.doesNotThrow(testFile, file);
+      }
+    });
+  }
+  t.doesNotThrow(testFiles, 'Path: ' + userNodeDir);
   t.end();
 });
