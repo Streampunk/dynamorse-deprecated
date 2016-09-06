@@ -16,7 +16,7 @@
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
 var SDPProcessing = require('../../../util/SDPProcessing.js');
-var dgram = require('dgram');
+var dgram = require('netadon');
 var udpInlet = require('../../../funnel/udpInlet.js');
 var udpToGrain = require('../../../valve/udpToGrain.js');
 var grainConcater = require('../../../valve/grainConcater.js');
@@ -149,7 +149,7 @@ module.exports = function (RED) {
       console.log('Starting highland pipeline.');
       var is6184 = this.tags.encodingName[0].toLowerCase() === 'h264';
       this.highland(
-        udpInlet(client, this.sdp, config.netif)
+        udpInlet(client, this.sdp, 0, config.netif)
         .pipe(udpToGrain(this.exts, this.tags.format[0].endsWith('video') &&
           this.tags.encodingName[0] === 'raw'))
         .map(function (g) {
