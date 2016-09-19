@@ -15,7 +15,7 @@
 -->
 
 <script type="text/javascript">
-    RED.nodes.registerType('converter',{
+    RED.nodes.registerType('multiviewer',{
       category: 'valve',
       color: '#AF4830',
       defaults: {
@@ -26,19 +26,19 @@
         dstWidth: { value : 1280, validate : RED.validators.number() },
         dstHeight: { value : 720, validate : RED.validators.number() },
         dstFormat: { value : "420P" },
-        multiviewSetup: { value : "", type : "multiview setup", required : false, }
+        multiviewSetup: { value : "", type : "multiview setup", required : true, }
       },
       inputs:1,
       outputs:1,
       icon: "valve.png",
       label: function() {
-        return this.name || "converter";
+        return this.name || "multiviewer";
       }
     });
 </script>
 
-<script type="text/x-red" data-template-name="converter">
-  <!-- Common to all funnel nodes -->
+<script type="text/x-red" data-template-name="multiviewer">
+  <!-- Common to all valve nodes -->
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> Name</label>
     <input type="text" id="node-input-name" placeholder="Name">
@@ -84,9 +84,9 @@
 }
 </style>
 
-<script type="text/x-red" data-help-name="converter">
-  <h1>Video Scaler and Packer</h1>
-  <p>Modifies a video grain by scaling it and changing pixel format, creating a new NMOS flow with the correct attributes.</p>
+<script type="text/x-red" data-help-name="multiviewer">
+  <h1>Multiview stream creator</h1>
+  <p>Composits a set of video grains, creating a new NMOS flow with appropriate attributes.</p>
 
   <h3>Parameters</h3>
   <div class="param-table">
@@ -112,11 +112,11 @@
    </tr>
    <tr>
     <td><i class="fa fa-arrows-h"></i> dest width</td>
-    <td>Select the desired picture width of the converter output.</td>
+    <td>Select the desired picture width of the multiviewer output.</td>
    </tr>
    <tr>
     <td><i class="fa fa-arrows-v"></i> dest height</td>
-    <td>Select the desired picture height of the converter output.</td>
+    <td>Select the desired picture height of the multiviewer output.</td>
    </tr>
    <tr>
     <td><i class="fa fa-paw"></i> dest format</td>
@@ -124,7 +124,7 @@
    </tr>
    <tr>
     <td><i class="fa fa-paw"></i> multiview setup</td>
-    <td>Overrides parameters when node is used to feed a multiviewer.</td>
+    <td>Config node setup for parameters requred to make streams to feed into this node.</td>
    </tr>
   </table>
   </div>
@@ -132,6 +132,5 @@
   <p>Metadata from the source flow will be passed through to the new flow with relevant modifications concerning the scaling and packing format selected.</p>
 
   <h3>Maturity</h3>
-  <p>Implemented and partially tested. Awaiting automated testing -
-  <a href="https://github.com/Streampunk/dynamorse/issues/5">status</a>.
+  <p>Not implemented.
 </script>

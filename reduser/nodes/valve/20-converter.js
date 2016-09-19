@@ -29,6 +29,16 @@ module.exports = function (RED) {
     if (!this.context().global.get('updated'))
       return this.log('Waiting for global context updated.');
 
+    this.multiviewSetup = RED.nodes.getNode(config.multiviewSetup);
+
+    if (this.multiviewSetup) {
+      console.log ("Multiview setup - tiles: " + this.multiviewSetup.tiles + ", size: " + this.multiviewSetup.tileWidth + "x" + this.multiviewSetup.tileHeight);
+      config.dstWidth = +this.multiviewSetup.tileWidth;
+      config.dstHeight = +this.multiviewSetup.tileHeight;
+      config.dstFormat = this.multiviewSetup.tileFormat;
+      console.log ("Converter size: " + config.dstWidth + "x" + config.dstHeight + ", format: " + config.dstFormat);
+    }
+
     var converter = new codecadon.ScaleConverter(function() {
       console.log('Converter exiting');
     });
