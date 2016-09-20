@@ -20,14 +20,10 @@ var Grain = require('../../../model/Grain.js');
 var uuid = require('uuid');
 
 function Queue() {
-  this.stack = new Array();
+  this.stack = [];
   this.entry = function(i) {
-    var queueEntry = 0;
-    var curLength = this.length(); 
     // flip so that the stack appears to be a fifo not a lifo!!
-    if (curLength > i)
-      queueEntry = curLength - i - 1;
-    return this.stack[queueEntry]; 
+    return this.stack[this.length() - i - 1];
   } 
   this.front = function() {
     return this.entry(0); 
@@ -53,8 +49,9 @@ function dstTile(dstBufBytes, numSlots) {
   this.numEmptySlots = numSlots;
 }
 
-dstTile.prototype.setTileDone = function() {
-  --this.numEmptySlots;
+dstTile.prototype.setSlotDone = function() {
+  if (this.numEmptySlots > 0)
+    --this.numEmptySlots;
 }
 
 dstTile.prototype.forceAllDone = function() {
@@ -102,20 +99,22 @@ multiviewSlots.prototype.addSrcSlot = function(x, slotNum) {
   return curDstTile;
 }
 
-multiviewSlots.prototype.setSlotDone = function(dstSlot) {
-  dstSlot.setTileDone();
+multiviewSlots.prototype.setSlotDone = function(dstTile) {
+  dstTile.setSlotDone();
 
   var doneDstTile = null;
   frontDstTile = this.dstTiles.front();
-  if ((this.dstTiles.length() > this.maxQueue) && !frontDstTile.isDone()) {
-    console.log("Forcing flush of partially complete multiviewer tile");
-    frontDstTile.forceAllDone();
-  }
+  if (frontDstTile) {
+    if ((this.dstTiles.length() > this.maxQueue) && !frontDstTile.isDone()) {
+      console.log("Forcing flush of partially complete multiviewer tile");
+      frontDstTile.forceAllDone();
+    }
   
-  if (frontDstTile.isDone()) {
-    doneDstTile = this.dstTiles.dequeue();
-    for (var i=0; i<this.numSlots; ++i) {
-      this.slotQueue[i].dequeue();
+    if (frontDstTile.isDone()) {
+      doneDstTile = this.dstTiles.dequeue();
+      for (var i=0; i<this.numSlots; ++i) {
+        this.slotQueue[i].dequeue();
+      }
     }
   }
 
