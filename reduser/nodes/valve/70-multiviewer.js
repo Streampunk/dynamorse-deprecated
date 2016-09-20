@@ -22,7 +22,12 @@ var uuid = require('uuid');
 function Queue() {
   this.stack = new Array();
   this.entry = function(i) {
-    return this.stack[i]; 
+    var queueEntry = 0;
+    var curLength = this.length(); 
+    // flip so that the stack appears to be a fifo not a lifo!!
+    if (curLength > i)
+      queueEntry = curLength - i - 1;
+    return this.stack[queueEntry]; 
   } 
   this.front = function() {
     return this.entry(0); 
@@ -81,12 +86,12 @@ multiviewSlots.prototype.addSrcSlot = function(x, slotNum) {
   var curQueue = this.slotQueue[slotNum];
   var curSrcSlot = new srcSlot(x, slotNum);
 
-  var curDstSlot = null;
+  var curDstTile = null;
   var curIndex = curQueue.length();
   if (this.dstTiles.length() === curIndex)
     curDstTile = this.addDstTile();
   else
-    curDstSlot = this.dstTiles.entry(curIndex);
+    curDstTile = this.dstTiles.entry(curIndex);
 
   if (0 === curDstTile.numEmptySlots) {
     console.log("Discarding srcSlot tile " + slotNum + " - dstTile marked as full!!");
