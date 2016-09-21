@@ -73,20 +73,21 @@ function multiviewSlots(numSlots, maxQueue, dstBufBytes) {
     this.slotQueue[i] = new Queue();
 }
 
-multiviewSlots.prototype.addDstTile = function() {
+multiviewSlots.prototype.addDstTile = function(preWipe) {
   var newDstTile = new dstTile(this.dstBufBytes, this.numSlots);
+  preWipe(newDstTile.dstBuf); // wipe is queued but will be completed before any other operation
   this.dstTiles.enqueue(newDstTile);
   return newDstTile;
 }
 
-multiviewSlots.prototype.addSrcSlot = function(x, slotNum) {
+multiviewSlots.prototype.addSrcSlot = function(x, slotNum, preWipe) {
   var curQueue = this.slotQueue[slotNum];
   var curSrcSlot = new srcSlot(x, slotNum);
 
   var curDstTile = null;
   var curIndex = curQueue.length();
   if (this.dstTiles.length() === curIndex)
-    curDstTile = this.addDstTile();
+    curDstTile = this.addDstTile(preWipe);
   else
     curDstTile = this.dstTiles.entry(curIndex);
 
@@ -179,8 +180,19 @@ module.exports = function (RED) {
       }
     }
 
+    function preWipe(dstBuf) {
+      var paramTags = {
+        wipeRect:[0, 0, +config.dstWidth, +config.dstHeight],
+        wipeCol:[0.0, 0.0, 0.0]
+      };
+      stamper.wipe(dstBuf, paramTags, function(err, result) {
+        if (err)
+          console.log(err);
+      });
+    }
+
     function processGrain(x, slotNum, push, next) {
-      var dstTile = node.mv.addSrcSlot(x, slotNum);
+      var dstTile = node.mv.addSrcSlot(x, slotNum, preWipe);
       if (!dstTile) { next(); return; }
 
       var paramTags = { dstOrg:node.dstOrgs[slotNum] };
@@ -217,7 +229,6 @@ module.exports = function (RED) {
             this.srcFlows[slotNum] = f;
 
             if (firstGrain) {
-              console.log("New dest flow");
               var dstTags = JSON.parse(JSON.stringify(f.tags));
               dstTags["width"] = [ `${config.dstWidth}` ];
               dstTags["height"] = [ `${config.dstHeight}` ];
