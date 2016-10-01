@@ -68,11 +68,13 @@ module.exports = function (RED) {
     var nodeAPI = this.context().global.get('nodeAPI');
     var genericID = this.context().global.get('genericID');
     this.each(function (x, next) {
+      console.log('WHIP', x, started);
       if (started === false) {
         node.getNMOSFlow(x, function (err, f) {
           if (err) return node.warn("Failed to resolve NMOS flow.");
           else {
             flow = f;
+            console.log('FLOW', f);
             if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
               contentType = `video/raw; sampling=${f.tags.sampling[0]}; ` +
                `width=${f.tags.width[0]}; height=${f.tags.height[0]}; depth=${f.tags.depth[0]}; ` +
@@ -91,8 +93,8 @@ module.exports = function (RED) {
             genericID, // TODO do better at binding to an address
             `http://${Net.getFirstRealIP4Interface().address}:${config.port}/${config.path}`);
           nodeAPI.putResource(sender).catch(node.warn);
+          node.log(`content type ${contentType}`);
         });
-        node.log(`content type ${contentType}`);
         if (app) {
           server = ((config.protocol === 'HTTP') ?
             protocol.createServer(app) : protocol.createServer(options, app))
@@ -101,7 +103,7 @@ module.exports = function (RED) {
             node.log(`Arachnid pull ${config.protocol} server listening on port ${config.port}.`);
           });
         }
-        for ( var x = 1 ; x < config.parallel ; x++ ) { next(); } // Make sure cache has enough on start
+        for ( var u = 1 ; u < config.parallel ; u++ ) { next(); } // Make sure cache has enough on start
         started = true;
       };
       if (Grain.isGrain(x)) {
@@ -112,7 +114,7 @@ module.exports = function (RED) {
         }
         if (config.backpressure === false) setTimeout(next, config.timeout); // TODO accurate timeout
       } else {
-        node.warn(`HTTP out received something that is not a grain.`);
+        node.warn(`HTTP out received something that is not a grain: ${x}`);
         next();
       }
     });

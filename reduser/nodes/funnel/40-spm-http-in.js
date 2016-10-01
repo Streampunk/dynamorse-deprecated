@@ -173,8 +173,9 @@ module.exports = function (RED) {
             var ptpOrigin = res.headers['arachnid-ptporigin'];
             var ptpSync = res.headers['arachnid-ptpsync'];
             var duration = res.headers['arachnid-grainduration'];
-            var gFlowID = (config.regenerate) ? flowID : res.headers['arachnid-flowid'];
-            var gSourceID = (config.regenerate) ? sourceID : res.headers['arachnid-sourceid'];
+            // TODO fix up regeneration
+            var gFlowID = flowID; //(config.regenerate) ? flowID : res.headers['arachnid-flowid'];
+            var gSourceID = sourceID; // (config.regenerate) ? sourceID : res.headers['arachnid-sourceid'];
             var tc = res.headers['arachnid-timecode'];
             var g = new Grain([ grainData ], ptpSync, ptpOrigin, tc, gFlowID,
               gSourceID, duration); // regenerate time as emitted
