@@ -1,6 +1,6 @@
 {
   "name": "dynamorse",
-  "version": "0.1.20",
+  "version": "0.1.21",
   "description": "IT swiss army knife for professional media infrastructure and production.",
   "main": "server.js",
   "scripts": {
@@ -30,10 +30,8 @@
     "express": "^4.13.4",
     "fastqueue": "^0.1.0",
     "highland": "^2.5.1",
-    "macadam": "^0.1.7",
     "mdns-js": "^0.5.0",
     "mp4-stream": "^2.0.1",
-    "netadon": "^0.0.3",
     "nmos-ledger": "^1.0.16",
     "node-red": "^0.13.1",
     "promise": "^7.1.1",
@@ -44,7 +42,8 @@
     "codecadon": "^0.0.7",
     "macadam": "^0.1.7",
     "netadon" : "^0.0.4",
-    "kelvinadon" : "^0.1.2"
+    "kelvinadon" : "^0.1.2",
+    "naudiodon" : "^0.0.4"
   },
   "bin": {
     "dynamorse": "./server.js"

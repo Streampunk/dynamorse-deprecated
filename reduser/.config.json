@@ -296,6 +296,15 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/gauges.js"
     },
+    "multiviewSetup": {
+     "name": "multiviewSetup",
+     "types": [
+      "multiview setup"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/config/multiviewSetup.js"
+    },
     "rtp-ext": {
      "name": "rtp-ext",
      "types": [
@@ -647,6 +656,15 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/spout/50-sdi-out.js"
     },
+    "speaker": {
+     "name": "speaker",
+     "types": [
+      "speaker"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/spout/60-speaker.js"
+    },
     "funnelOne": {
      "name": "funnelOne",
      "types": [
@@ -746,6 +764,15 @@
      "module": "node-red",
      "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/50-graphics.js"
     },
+    "multiviewer": {
+     "name": "multiviewer",
+     "types": [
+      "multiviewer"
+     ],
+     "enabled": true,
+     "module": "node-red",
+     "file": "/Users/vizigoth/Documents/streampunk/dynamorse/reduser/nodes/valve/70-multiviewer.js"
+    },
     "grain-xray": {
      "name": "grain-xray",
      "types": [
@@ -759,7 +786,7 @@
   },
   "node-red-node-email": {
    "name": "node-red-node-email",
-   "version": "0.1.6",
+   "version": "0.1.11",
    "nodes": {
     "email": {
      "name": "email",

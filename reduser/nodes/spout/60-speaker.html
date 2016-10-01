@@ -1,0 +1,88 @@
+<!--
+  Copyright 2016 Streampunk Media Ltd.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/javascript">
+  RED.nodes.registerType('speaker',{
+    category: 'spout',
+    color: '#C39E60',
+    defaults: {
+      name : { value : "" },
+      deviceIndex : { value : -1, validate: RED.validators.number() }
+    },
+    inputs:1,
+    outputs:0,
+    align: 'right',
+    icon: "spout.png",
+    label: function() {
+      return this.name ||  "speaker";
+    }
+  });
+</script>
+
+<script type="text/x-red" data-template-name="speaker">
+  <div class="form-row">
+    <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
+    <input type="text" id="node-input-name" placeholder="name">
+  </div>
+  <div class="form-row">
+    <label for="node-input-deviceIndex"><i class="fa fa-headphones" aria-hidden="true"></i> device</label>
+    <input type="number" id="node-input-deviceIndex" min="-1" placeholder="-1" style="width: 100px">
+    &nbsp;&nbsp;Set to <code>-1</code> for the default device.
+  </div>
+</script>
+
+<style>
+.param-table table, th, td {
+  vertical-align: top;
+  padding: 3px;
+}
+</style>
+
+<script type="text/x-red" data-help-name="speaker">
+  <h1>Speaker</h1>
+  <p>Listen to an audio stream on an audio device connected to the node-red
+  server. Back pressure is provided by the draining of the audio buffers.</p>
+
+  <h3>Parameters</h3>
+  <div class="param-table">
+  <table>
+   <tr>
+    <th>parameter</th><th>description</th>
+   </tr>
+   <tr>
+    <td><i class="fa fa-tag" aria-hidden="true"></i> name</td>
+    <td>Name of the node.</td>
+   </tr>
+   <tr>
+    <td><i class="fa fa-headphones" aria-hidden="true"></i> device</td>
+    <td>Identifier for the audio output device. Leave as <code>-1</code> to
+    select the default device.</td>
+   </tr>
+  </table>
+  </div>
+
+  <p>Audio output uses the <a href="http://www.portaudio.com">PortAudio</a>
+  library through the <a href="https://github.com/Streampunk/naudiodon">naudiodon</a>
+  native wrapper.</p>
+
+  <p>Note that by experience on the Raspberry Pi, it was necessary to set the audio
+  device to <code>0</code> for the headphone port and <code>1</code> for the HDMI audio
+  output. Where the <code>default</code> sound device goes, nobody knows!</p>
+
+  <h3>Maturity</h3>
+  <p>Implementation in progress.</p>
+
+</script>
