@@ -111,9 +111,9 @@ module.exports = function (RED) {
       }
       var senderID = headers['arachnid-senderid'];
       senderID = (senderID === undefined) ? null : { sender_id : senderID };
-      source = new ledger.Source(null, null, localName, localDescription,
+      source = new ledger.Source(sourceID, null, localName, localDescription,
         "urn:x-nmos:format:" + tags.format[0], null, null, pipelinesID, null);
-      flow = new ledger.Flow(null, null, localName, localDescription,
+      flow = new ledger.Flow(flowID, null, localName, localDescription,
         "urn:x-nmos:format:" + tags.format[0], tags, source.id, null);
       recvr = new ledger.Receiver(null, null, localName, localDescription,
         "urn:x-nmos:format:" + tags.format[0], null, tags,
