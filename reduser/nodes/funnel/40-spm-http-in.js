@@ -128,7 +128,7 @@ module.exports = function (RED) {
       });
     };
 
-    var keepAliveAgent = new http.Agent({keepAlive : true });
+    var keepAliveAgent = new protocol.Agent({keepAlive : true });
     var runNext = function (x, push, next) {
       var requestTimer = process.hrtime();
       var req = protocol.request({
