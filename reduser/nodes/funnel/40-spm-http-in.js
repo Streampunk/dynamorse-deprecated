@@ -285,7 +285,7 @@ module.exports = function (RED) {
           }, (flow === null) ? 1000 : 0);
         });
       }
-    });
+    }.bind(this));
 
   }
   util.inherits(SpmHTTPIn, redioactive.Funnel);
