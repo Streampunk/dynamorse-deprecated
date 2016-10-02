@@ -217,7 +217,7 @@ module.exports = function (RED) {
   //      res.setHeader('DEBUG-TS', `${originArray} ${totalConcurrent * durArray[0] * 1000000000 / durArray[1]|0}`);
         originArray[1] = originArray[1] +
           totalConcurrent * durArray[0] * 1000000000 / durArray[1]|0;
-        if (originArray[1] > 1000000000)
+        if (originArray[1] >= 1000000000)
           originArray[0] = originArray[0] + originArray[1] / 1000000000|0;
         var nanos = (originArray[1]%1000000000).toString();
         res.setHeader('Arachnid-NextByThread',
