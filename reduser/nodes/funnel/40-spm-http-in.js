@@ -22,6 +22,8 @@ var https = require('https');
 var uuid = require('uuid');
 var fs = require('fs');
 var Grain = require('../../../model/Grain.js');
+var dns = require('dns');
+var url = require('url');
 
 // Maximum drift between high water mark and next request in ms
 // TODO calculate this from grain rate
@@ -72,12 +74,10 @@ module.exports = function (RED) {
     var total = 0;
     config.pullURL = (config.pullURL.endsWith('/')) ?
       config.pullURL.slice(0, -1) : config.pullURL;
-    config.pullURL = (config.pullURL.toLowerCase().startsWith('http://')) ?
-      config.pullURL.slice(7) : config.pullURL;
-    config.pullURL = (config.pullURL.toLowerCase().startsWith('https://')) ?
-      config.pullURL.slice(8) : config.pullURL;
     config.path = (config.path.endsWith('/')) ?
       config.path.slice(0, -1) : config.path;
+    var fullPath = config.pullURL + config.path;
+    var fullURL = url.parse(fullPath);
     var clientID = 'cid' + Date.now();
     this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ];
     var nodeAPI = this.context().global.get('nodeAPI');
@@ -133,9 +133,9 @@ module.exports = function (RED) {
       var requestTimer = process.hrtime();
       var req = protocol.request({
           rejectUnauthorized: false,
-          hostname: config.pullURL,
-          port: config.port,
-          path: `${config.path}/${nextRequest[x]}`,
+          hostname: fullURL.hostname,
+          port: fullURL.port,
+          path: `${fullURL.path}/${nextRequest[x]}`,
           method: 'GET',
           agent: keepAliveAgent,
           headers: {
@@ -247,40 +247,45 @@ module.exports = function (RED) {
     var nextRequest =
       [ '-5', '-4', '-3', '-2', '-1', '0' ].slice(-config.parallel);
 
-    if (config.mode === 'push') { // TODO push mode
-      // var app = express();
-      // app.use(bodyParser.raw({ limit : config.payloadLimit || 6000000 }));
-      //
-      // app.post(config.path, function (req, res) {
-      //   console.log(pushCount++, process.hrtime(star
-      //     tTime), req.body.length);
-      //   res.json({ length : req.body.length }); // Need to add back pressure concept
-      // });
-      //
-      // var server = protocol.createServer((config.protocol === 'HTTP') ? {} : {
-      //   key : fs.readFileSync('./certs/dynamorse-key.pem'),
-      //   cert : fs.readFileSync('./certs/dynamorse-cert.pem')
-      // }, app).listen(config.port);
-      // server.on('listening', function () {
-      //   this.log(`Dynamorse ${config.protocol} server listening on port ${config.port}.`);
-      // });
-    } else { // config.mode is set to pull
-      this.generator(function (push, next) {
-        setTimeout(function() {
-          console.log('+++ DEBUG THREADS', activeThreads);
-          for ( var i = 0 ; i < activeThreads.length ; i++ ) {
-            if (!activeThreads[i]) {
-              if (versionDiffMs(highWaterMark, nextRequest[i]) < maxDrift) {
-                runNext.call(this, i, push, next);
-                activeThreads[i] = true;
-              } else {
-                node.error(`Not progressing thread ${i} this time due to a drift of ${versionDiffMs(highWaterMark, nextRequest[i])}.`);
+    dns.lookup(fullURL.hostname, function (err, addr, family) {
+      if (err) return this.preFlightError(`Unable to resolve DNS for ${fullURL.hostname}: ${err}`);
+      node.log(`Resolved URL hostname ${fullURL.hostname} to ${addr}.`);
+      fullURL.hostname = addr;
+      if (config.mode === 'push') { // TODO push mode
+        // var app = express();
+        // app.use(bodyParser.raw({ limit : config.payloadLimit || 6000000 }));
+        //
+        // app.post(config.path, function (req, res) {
+        //   console.log(pushCount++, process.hrtime(star
+        //     tTime), req.body.length);
+        //   res.json({ length : req.body.length }); // Need to add back pressure concept
+        // });
+        //
+        // var server = protocol.createServer((config.protocol === 'HTTP') ? {} : {
+        //   key : fs.readFileSync('./certs/dynamorse-key.pem'),
+        //   cert : fs.readFileSync('./certs/dynamorse-cert.pem')
+        // }, app).listen(config.port);
+        // server.on('listening', function () {
+        //   this.log(`Dynamorse ${config.protocol} server listening on port ${config.port}.`);
+        // });
+      } else { // config.mode is set to pull
+        this.generator(function (push, next) {
+          setTimeout(function() {
+            console.log('+++ DEBUG THREADS', activeThreads);
+            for ( var i = 0 ; i < activeThreads.length ; i++ ) {
+              if (!activeThreads[i]) {
+                if (versionDiffMs(highWaterMark, nextRequest[i]) < maxDrift) {
+                  runNext.call(this, i, push, next);
+                  activeThreads[i] = true;
+                } else {
+                  node.error(`Not progressing thread ${i} this time due to a drift of ${versionDiffMs(highWaterMark, nextRequest[i])}.`);
+                }
               }
-            }
-          };
-        }, (flow === null) ? 1000 : 0);
-      });
-    }
+            };
+          }, (flow === null) ? 1000 : 0);
+        });
+      }
+    });
 
   }
   util.inherits(SpmHTTPIn, redioactive.Funnel);
