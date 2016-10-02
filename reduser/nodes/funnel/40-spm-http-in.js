@@ -76,7 +76,7 @@ module.exports = function (RED) {
       config.pullURL.slice(0, -1) : config.pullURL;
     config.path = (config.path.endsWith('/')) ?
       config.path.slice(0, -1) : config.path;
-    var fullPath = config.pullURL + config.path;
+    var fullPath = `${config.pullURL}:${config.port}${config.path}`;
     var fullURL = url.parse(fullPath);
     var clientID = 'cid' + Date.now();
     this.baseTime = [ Date.now() / 1000|0, (Date.now() % 1000) * 1000000 ];
@@ -129,6 +129,7 @@ module.exports = function (RED) {
     };
 
     var keepAliveAgent = new protocol.Agent({keepAlive : true });
+    var endCount = 0;
     var runNext = function (x, push, next) {
       var requestTimer = process.hrtime();
       var req = protocol.request({
@@ -198,6 +199,16 @@ module.exports = function (RED) {
         });
       });
       req.on('error', function (e) {
+        // Check for flow !== null is so that shutdown does not happen too early
+        if (flow !== null && e.message.indexOf('ECONNREFUSED') >= 0) {
+          node.log(`Received connection refused on thread ${x}. Assuming end.`);
+          activeThreads[x] = true; // Don't make another request.
+          endCount++;
+          if (endCount === activeThreads.length) {
+            push(null, redioactive.end);
+          }
+          return;
+        }
         node.warn(`Received error when requesting frame from server on thread ${x}: ${e}`);
         push(`Received error when requesting frame from server on thread ${x}: ${e}`);
         activeThreads[x] = false;
