@@ -128,19 +128,23 @@ module.exports = function (RED) {
       });
     };
 
+    var keepAliveAgent = new http.Agent({keepAlive : true, maxSockets : 1 });
     var runNext = function (x, push, next) {
+      var requestTimer = process.hrtime();
       var req = protocol.request({
           rejectUnauthorized: false,
           hostname: config.pullURL,
           port: config.port,
           path: `${config.path}/${nextRequest[x]}`,
           method: 'GET',
+          agent: keepAliveAgent,
           headers: {
             'Arachnid-ThreadNumber': x,
             'Arachnid-TotalConcurrent': config.parallel,
             'Arachnid-ClientID': clientID
           }},
           function (res) {
+        // console.log('Response received after', process.hrtime(requestTimer));
         var count = 0;
         var position = 0;
         if (res.statusCode === 404) {
@@ -166,8 +170,10 @@ module.exports = function (RED) {
             data.copy(grainData, position);
             position += data.length;
             count++;
+            // console.log(`Data received for ${count} at`, process.hrtime(requestTimer));
           });
           res.on('end', function () {
+            console.log('Request time until end', process.hrtime(requestTimer));
             grainData = grainData.slice(0, position);
             nextRequest[x] = res.headers['arachnid-nextbythread'];
             var ptpOrigin = res.headers['arachnid-ptporigin'];
@@ -198,6 +204,7 @@ module.exports = function (RED) {
         next();
       });
       req.end();
+      requestTimer = process.hrtime();
     };
 
     var grainQueue = { };
