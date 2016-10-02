@@ -128,7 +128,7 @@ module.exports = function (RED) {
       });
     };
 
-    var keepAliveAgent = new http.Agent({keepAlive : true, maxSockets : 1 });
+    var keepAliveAgent = new http.Agent({keepAlive : true });
     var runNext = function (x, push, next) {
       var requestTimer = process.hrtime();
       var req = protocol.request({
@@ -266,7 +266,6 @@ module.exports = function (RED) {
       // });
     } else { // config.mode is set to pull
       this.generator(function (push, next) {
-        console.log("flow === null", (flow === null));
         setTimeout(function() {
           console.log('+++ DEBUG THREADS', activeThreads);
           for ( var i = 0 ; i < activeThreads.length ; i++ ) {
