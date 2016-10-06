@@ -15,12 +15,85 @@
 
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
+var Promise = require('Promise');
+var macadam = require('macadam');
+var Grain = require('../../../model/Grain.js');
 
 module.exports = function (RED) {
   function SDIOut (config) {
     RED.nodes.createNode(this, config);
     redioactive.Spout.call(this, config);
-    // Go figure!
+
+    this.srcFlow = null;
+    var count = 0;
+    var playback = null;
+    var node = this;
+
+    this.each(function (x, next) {
+      if (!Grain.isGrain(x)) {
+        node.warn('Received non-Grain payload.');
+        return next();
+      }
+      var nextJob = (node.srcFlow) ?
+        Promise.resolve(x) :
+        (Promise.denodeify(node.getNMOSFlow, 1))(x)
+        .then(function (f) {
+          node.srcFlow = f;
+          if (f.tags.format[0] !== 'video') {
+            return node.preFlightError('Only video sources supported for SDI out.');
+          }
+          var bmMode = macadam.bmdModeHD1080i50;
+          var bmFormat = macadam.bmdFormat8BitYUV;
+          // switch (+f.tags.height[0]) {
+          //   case 2160:
+          //   case 1080:
+          //     switch (x.getDuration()[0]) {
+          //       case
+          //     }
+          //     break;
+          //   case 720:
+          //   case 576:
+          //   case 486:
+          //   default:
+          //     node.preFlightError('Could not establish Blackmagic mode.');
+          // }
+          console.log('***', bmMode, bmFormat);
+          playback = new macadam.Playback(config.deviceIndex,
+            bmMode, bmFormat);
+          playback.on('error', function (e) {
+            node.warn(`Received playback error from Blackmagic card: ${e}`);
+            next();
+          });
+          return x;
+        });
+      nextJob.then(function (g) {
+        if (count < config.frameCache) {
+          playback.frame(g.buffers[0]);
+          next();
+        } else {
+          playback.once('playback', function () {
+            playback.frame(g.buffers[0]);
+            next();
+          });
+        };
+      })
+      .catch(function (err) {
+        node.error(`Failed to play video on device '${config.deviceIndex}': ${err}`);
+      });
+    });
+
+    node.errors(function (e, next) {
+      node.warn(`Received unhandled error: ${e.message}.`);
+      setImmediate(next);
+    });
+    node.done(function () {
+      node.log('No more to see here!');
+      playback.stop();
+    });
+    node.close(function () {
+      node.log('Closing the speaker - too loud!');
+      playback.stop();
+    });
   }
   util.inherits(SDIOut, redioactive.Spout);
   RED.nodes.registerType("sdi-out", SDIOut);
