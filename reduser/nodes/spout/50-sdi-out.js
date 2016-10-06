@@ -15,7 +15,7 @@
 
 var redioactive = require('../../../util/Redioactive.js');
 var util = require('util');
-var Promise = require('Promise');
+var Promise = require('promise');
 var macadam = require('macadam');
 var Grain = require('../../../model/Grain.js');
 
