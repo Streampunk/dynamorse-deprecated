@@ -42,7 +42,7 @@
     "macadam": "^0.1.9",
     "netadon" : "^0.0.5",
     "kelvinadon" : "^0.1.2",
-    "naudiodon" : "^0.0.5"
+    "naudiodon" : "^0.0.8"
   },
   "bin": {
     "dynamorse": "./server.js"
