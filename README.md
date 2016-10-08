@@ -15,7 +15,7 @@ IT swiss army knife for professional media infrastructure and production. This i
 
 The name _dynamorse_ is a reference to dynamic morse code - still a stream of information but conveyed and controlled dynamically. With dynamorse, you can create streaming workflows on-the-fly by building pipelines that connect inputs (_funnels_) to outputs (_spouts_) via transformations (_valves_) under the control of _fittings_. Everything is measured in real time by a set of _gauges_. Everything that flows down a dynamorse pipe is an NMOS _grain_ and every pipe contains an NMOS _flow_.
 
-Watch the video to find out how to install dynamorse and get started with building virtual infrastructure.
+Dynamorse can now be installed on a Raspberry Pi.
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
