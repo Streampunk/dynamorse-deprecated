@@ -44,7 +44,7 @@ module.exports = function (RED) {
             return node.preFlightError('Only video sources supported for SDI out.');
           }
           var bmMode = macadam.bmdModeHD1080i50;
-          var bmFormat = macadam.bmdFormat8BitYUV;
+          var bmFormat = macadam.bmdFormat10BitYUV;
           // switch (+f.tags.height[0]) {
           //   case 2160:
           //   case 1080:
@@ -58,7 +58,6 @@ module.exports = function (RED) {
           //   default:
           //     node.preFlightError('Could not establish Blackmagic mode.');
           // }
-          console.log('***', bmMode, bmFormat);
           playback = new macadam.Playback(config.deviceIndex,
             bmMode, bmFormat);
           playback.on('error', function (e) {
@@ -68,12 +67,20 @@ module.exports = function (RED) {
           return x;
         });
       nextJob.then(function (g) {
-        if (count < config.frameCache) {
+        if (count < +config.frameCache) {
+          node.log(`Caching frame ${count}/${typeof config.frameCache}.`);
           playback.frame(g.buffers[0]);
+          count++;
+          if (count === +config.frameCache) {
+            node.log('Starting playback.');
+            playback.start();
+          }
           next();
         } else {
-          playback.once('playback', function () {
+          playback.once('played', function () {
+            node.log(`Playing frame ${count}.`);
             playback.frame(g.buffers[0]);
+            count++;
             next();
           });
         };
@@ -92,8 +99,14 @@ module.exports = function (RED) {
       playback.stop();
     });
     node.close(function () {
-      node.log('Closing the speaker - too loud!');
+      node.log('Closing the video - too bright!');
       playback.stop();
+    });
+    process.on('exit', function () {
+      if (playback) playback.stop();
+    });
+    process.on('SIGINT', function () {
+      if (playback) playback.stop();
     });
   }
   util.inherits(SDIOut, redioactive.Spout);
