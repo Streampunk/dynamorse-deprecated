@@ -139,7 +139,7 @@ module.exports = function (RED) {
             tags.format = [ mime[1] ];
             tags.encodingName = [ mime[2] ];
             if (mime[1] === 'video') {
-              if (mime[2] === 'raw' || mime[2] === 'x-v210')) {
+              if (mime[2] === 'raw' || mime[2] === 'x-v210') {
                 tags.clockRate = [ '90000' ];
               }
               tags.packing = ( mime[2] === 'x-v210' ) ? [ 'v210' ] : [ 'pgroup' ];
