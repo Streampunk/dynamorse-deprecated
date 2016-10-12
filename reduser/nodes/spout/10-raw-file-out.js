@@ -68,8 +68,10 @@ module.exports = function (RED) {
             if (err) {
               this.warn("Failed to resolve NMOS flow.");
             } else {
-              if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
-                contentType = `video/raw; sampling=${f.tags.sampling[0]}; ` +
+              if (f.tags.packing[0].toLowerCase() === 'v210') f.tags.encodingName = [ 'x-v210' ];
+              if (f.tags.format[0] === 'video' &&
+                  (f.tags.encodingName[0] === 'raw' || f.tags.encodingName[0] === 'x-v210')) {
+                contentType = `video/${f.tags.encodingName[0]}; sampling=${f.tags.sampling[0]}; ` +
                  `width=${f.tags.width[0]}; height=${f.tags.height[0]}; depth=${f.tags.depth[0]}; ` +
                  `colorimetry=${f.tags.colorimetry[0]}; interlace=${f.tags.interlace[0]}`;
               } else {
