@@ -110,7 +110,7 @@ module.exports = function (RED) {
       if (this.headerStream) {
         this.headerStream.end(']');
       }
-    });
+    }.bind(this));
   }
   util.inherits(RawFileOut, redioactive.Spout);
   RED.nodes.registerType("raw-file-out", RawFileOut);
