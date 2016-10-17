@@ -76,7 +76,7 @@ module.exports = function (RED) {
             flow = f;
             console.log('FLOW', f);
             var encodingName = f.tags.encodingName[0];
-            if (f.tags.packing[0].toLowerCase() === 'v210') encodingName = 'x-v210';
+            if (f.tags.packing && f.tags.packing[0].toLowerCase() === 'v210') encodingName = 'x-v210';
             if (f.tags.format[0] === 'video' &&
                 (encodingName === 'raw' || encodingName === 'x-v210')) {
               contentType = `video/${encodingName}; sampling=${f.tags.sampling[0]}; ` +
