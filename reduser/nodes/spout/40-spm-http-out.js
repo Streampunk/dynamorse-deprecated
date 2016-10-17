@@ -75,10 +75,11 @@ module.exports = function (RED) {
           else {
             flow = f;
             console.log('FLOW', f);
-            if (f.tags.packing[0].toLowerCase() === 'v210') f.tags.encodingName = [ 'x-v210' ];
+            var encodingName = f.tags.encodingName[0];
+            if (f.tags.packing[0].toLowerCase() === 'v210') encodingName = 'x-v210';
             if (f.tags.format[0] === 'video' &&
-                (f.tags.encodingName[0] === 'raw' || f.tags.encodingName === 'x-v210')) {
-              contentType = `video/${f.tags.encodingName[0]}; sampling=${f.tags.sampling[0]}; ` +
+                (encodingName === 'raw' || encodingName === 'x-v210')) {
+              contentType = `video/${encodingName}; sampling=${f.tags.sampling[0]}; ` +
                `width=${f.tags.width[0]}; height=${f.tags.height[0]}; depth=${f.tags.depth[0]}; ` +
                `colorimetry=${f.tags.colorimetry[0]}; interlace=${f.tags.interlace[0]}`;
             } else {
