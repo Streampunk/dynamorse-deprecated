@@ -68,10 +68,15 @@ module.exports = function (RED) {
             if (err) {
               this.warn("Failed to resolve NMOS flow.");
             } else {
-              if (f.tags.format[0] === 'video' && f.tags.encodingName[0] === 'raw') {
-                contentType = `video/raw; sampling=${f.tags.sampling[0]}; ` +
-                 `width=${f.tags.width[0]}; height=${f.tags.height[0]}; depth=${f.tags.depth[0]}; ` +
-                 `colorimetry=${f.tags.colorimetry[0]}; interlace=${f.tags.interlace[0]}`;
+              var encodingName = f.tags.encodingName[0];
+              if ((f.tags.packing[0]).toLowerCase() === 'v210') {
+                encodingName = 'x-v210';
+              }
+              if (f.tags.format[0] === 'video' &&
+                  (encodingName === 'raw' || encodingName === 'x-v210')) {
+                contentType = `video/${encodingName}; sampling=${f.tags.sampling[0]}; ` +
+                  `width=${f.tags.width[0]}; height=${f.tags.height[0]}; depth=${f.tags.depth[0]}; ` +
+                  `colorimetry=${f.tags.colorimetry[0]}; interlace=0`; //${f.tags.interlace[0]}`;
               } else {
                 contentType = `${f.tags.format}/${f.tags.encodingName}`;
                 if (f.tags.clockRate) contentType += `; rate=${f.tags.clockRate[0]}`;
@@ -95,6 +100,12 @@ module.exports = function (RED) {
     }.bind(this));
     this.done(function () {
       this.log('Thank goodness that is over!');
+      this.essenceStream.end();
+      if (this.headerStream) {
+        this.headerStream.end(']');
+      }
+    }.bind(this));
+    process.on('SIGINT', function() {
       this.essenceStream.end();
       if (this.headerStream) {
         this.headerStream.end(']');

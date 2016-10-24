@@ -103,12 +103,14 @@ module.exports = function (RED) {
          if (splitP[0] === 'rate') splitP[0] = 'clockRate';
          tags[splitP[0]] = [ splitP[1] ];
       });
-      if (headers['arachnid-fourcc']) {
-        tags.packing = [ headers['arachnid-fourcc'] ];
+      if (tags.encodingName[0] === 'x-v210') {
+        tags.clockRate = [ '90000' ];
+        tags.packing = [ 'v210' ];
       } else if (tags.encodingName[0] === 'raw') {
         tags.clockRate = [ '90000' ];
         tags.packing = [ 'pgroup' ];
       }
+      if (tags.packing === 'v210') tags.encodingName = [ 'raw' ];
       var senderID = headers['arachnid-senderid'];
       senderID = (senderID === undefined) ? null : { sender_id : senderID };
       source = new ledger.Source(sourceID, null, localName, localDescription,

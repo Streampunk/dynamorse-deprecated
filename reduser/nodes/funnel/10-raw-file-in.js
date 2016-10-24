@@ -135,12 +135,15 @@ module.exports = function (RED) {
           if (node.headers.length > 0 && node.headers[0].contentType) {
             var contentType = node.headers[0].contentType;
             var tags = {};
-            var mime = contentType.match(/^\s*(\w+)\/(\w+)/);
+            var mime = contentType.match(/^\s*(\w+)\/([\w\-]+)/);
             tags.format = [ mime[1] ];
             tags.encodingName = [ mime[2] ];
-            if (mime[1] === 'video' && mime[2] === 'raw') {
-              tags.clockRate = [ '90000' ];
-              tags.packing = [ 'pgroup' ];
+            if (mime[1] === 'video') {
+              if (mime[2] === 'raw' || mime[2] === 'x-v210') {
+                tags.clockRate = [ '90000' ];
+              }
+              tags.packing = ( mime[2] === 'x-v210' ) ? [ 'v210' ] : [ 'pgroup' ];
+              console.log('***!!!£££ tags.packing = ', tags.packing, mime[2]);
             }
             var parameters = contentType.match(/\b(\w+)=(\S+)\b/g);
             parameters.forEach(function (p) {
@@ -148,6 +151,8 @@ module.exports = function (RED) {
               if (splitP[0] === 'rate') splitP[0] = 'clockRate';
               tags[splitP[0]] = [ splitP[1] ];
             });
+            if (tags.packing === 'v210') tags.encodingName = [ 'raw' ];
+            console.log('TAGS', tags);
             return tags;
           }
           return null;
