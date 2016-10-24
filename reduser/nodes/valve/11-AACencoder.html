@@ -15,7 +15,7 @@
 -->
 
 <script type="text/javascript">
-    RED.nodes.registerType('encoder',{
+    RED.nodes.registerType('AAC encoder',{
       category: 'valve',
       color: '#A09D45',
       defaults: {
@@ -23,21 +23,20 @@
         maxBuffer : { value : 10, validate : RED.validators.number() },
         description : { value : "" },
         device : { value : "", type : "device", required : true },
-        dstFormat: { value : "h264" },
-        bitrate : { value : 5000000, validate : RED.validators.number() },
-        gopFrames : { value : 90, validate : RED.validators.number() }
+        dstFormat: { value : "AAC" },
+        bitrate : { value : 128000, validate : RED.validators.number() },
       },
       inputs:1,
       outputs:1,
       icon: "valve.png",
       label: function() {
-        return this.name || "encoder";
+        return this.name || "AAC encoder";
       }
     });
 </script>
 
-<script type="text/x-red" data-template-name="encoder">
-  <!-- Common to all funnel nodes -->
+<script type="text/x-red" data-template-name="AAC encoder">
+  <!-- Common to all valve nodes -->
   <div class="form-row">
     <label for="node-input-name"><i class="fa fa-tag"></i> name</label>
     <input type="text" id="node-input-name" placeholder="name">
@@ -58,17 +57,12 @@
   <div class="form-row">
     <label for="node-input-dstFormat"><i class="fa fa-paw"></i> dest format</label>
     <select name="node-input-dstFormat" id="node-input-dstFormat">
-      <option value="h264" selected>h264</option>
-      <option value="vp8">VP8</option>
+      <option value="AAC" selected>AAC</option>
     </select>
   </div>
   <div class="form-row">
     <label for="node-input-bitrate"><i class="fa fa-signal"></i> bitrate</label>
-    <input type="number" id="node-input-bitrate" placeholder="5000000" style="width: 100px">
-  </div>
-  <div class="form-row">
-    <label for="node-input-gopFrames"><i class="fa fa-clone"></i> GOP frames</label>
-    <input type="number" id="node-input-gopFrames" placeholder="600" style="width: 100px">
+    <input type="number" id="node-input-bitrate" placeholder="128000" style="width: 100px">
   </div>
 </script>
 
@@ -79,9 +73,9 @@
 }
 </style>
 
-<script type="text/x-red" data-help-name="encoder">
+<script type="text/x-red" data-help-name="AAC encoder">
   <h1>Video encoder</h1>
-  <p>Encodes uncompressed grains to the specified format, creating a new NMOS flow
+  <p>Encodes uncompressed audio grains to the specified format, creating a new NMOS flow
   with the correct attributes.</p>
 
   <h3>Parameters</h3>
@@ -112,11 +106,7 @@
    </tr>
    <tr>
     <td><i class="fa fa-signal"></i> bitrate</td>
-    <td>Select the target encoded bitrate in Mb/s.</td>
-   </tr>
-   <tr>
-    <td><i class="fa fa-clone"></i> GOP frames</td>
-    <td>Select the encoded GOP length in frames.</td>
+    <td>Select the target encoded bitrate in bits/s.</td>
    </tr>
   </table>
   </div>

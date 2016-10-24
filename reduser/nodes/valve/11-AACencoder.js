@@ -19,21 +19,22 @@ var codecadon = require('codecadon');
 var Grain = require('../../../model/Grain.js');
 
 module.exports = function (RED) {
-  function Encoder (config) {
+  function AACEncoder (config) {
     RED.nodes.createNode(this, config);
     redioactive.Valve.call(this, config);
     this.srcFlow = null;
     var dstFlow = null;
     var dstBufLen = 0;
+    var numChannels = 2;
 
     if (!this.context().global.get('updated'))
       return this.log('Waiting for global context updated.');
 
     var encoder = new codecadon.Encoder(function() {
-      console.log('Encoder exiting');
+      console.log('AAC Encoder exiting');
     });
     encoder.on('error', function(err) {
-      console.log('Encoder error: ' + err);
+      console.log('AAC Encoder error: ' + err);
     });
 
     var node = this;
@@ -48,17 +49,37 @@ module.exports = function (RED) {
     var source = new ledger.Source(null, null, localName, localDescription,
       ledger.formats.video, null, null, pipelinesID, null);
 
+    var packetNumBytes = 8192;
+    var lastBuf = Buffer.alloc(0);
+
     function processGrain(x, dstBufLen, push, next) {
-      var dstBuf = new Buffer(dstBufLen);
-      var numQueued = encoder.encode(x.buffers, dstBuf, function(err, result) {
-        if (err) {
-          push(err);
-        } else if (result) {
-          push(null, new Grain(result, x.ptpSync, x.ptpOrigin,
-                               x.timecode, dstFlow.id, source.id, x.duration));
-        }
+      var curStart = 0;
+      var numSrcPkts = 0;
+      var numDstPkts = 0;
+ 
+      while (curStart + packetNumBytes - lastBuf.length < x.buffers[0].length) {
+        var packet = Buffer.concat([lastBuf, x.buffers[0].slice(curStart, curStart + packetNumBytes - lastBuf.length)], packetNumBytes);
+        curStart += packetNumBytes - lastBuf.length;
+        if (lastBuf.length)
+          lastBuf = Buffer.alloc(0);
+        numSrcPkts++;
+
+        var dstBuf = new Buffer(dstBufLen);
+        var numQueued = encoder.encode([packet], dstBuf, function(err, result) {
+          numDstPkts++;
+          if (err) {
+            push(err);
+          } else if (result) {
+            push(null, new Grain(result, x.ptpSync, x.ptpOrigin,
+                                 x.timecode, dstFlow.id, source.id, x.duration));
+          }
+          if (numDstPkts === numSrcPkts)
+            next();
+        });
+      }
+      lastBuf = Buffer.concat([lastBuf, x.buffers[0].slice(curStart, x.buffers[0].length)], lastBuf.length + x.buffers[0].length - curStart);
+      if (!numSrcPkts) // this grain didn't fill the encode packet 
         next();
-      });
     }
 
     this.consume(function (err, x, push, next) {
@@ -74,29 +95,34 @@ module.exports = function (RED) {
           this.getNMOSFlow(x, function (err, f) {
             if (err) return push("Failed to resolve NMOS flow.");
             this.srcFlow = f;
+            var srcTags = this.srcFlow.tags;
+            if (srcTags.format[0] === "video") {
+              push("Video grain not supported by AAC encoder!!");
+              next();
+              return;
+            }
 
             var dstTags = JSON.parse(JSON.stringify(this.srcFlow.tags));
-            dstTags["packing"] = [ `${config.dstFormat}` ];
-            dstTags["encodingName"] = [ `${config.dstFormat}` ];
-            dstTags["sampling"] = [ "YCbCr-4:2:0" ];
-
             var encodeTags = {};
+            dstTags["encodingName"] = [ "AAC" ];
             encodeTags["bitrate"] = [ `${config.bitrate}` ];
-            encodeTags["gopFrames"] = [ `${config.gopFrames}` ];
+            var numChannels = +srcTags.channels[0];
+            var bitsPerSample = +srcTags.encodingName[0].substring(1);
+            packetNumBytes = 1024 * numChannels * (((bitsPerSample+7) / 8) >>> 0);
 
-            var formattedDstTags = JSON.stringify(dstTags, null, 2);
+            var formattedDstTags = "flow: " + JSON.stringify(dstTags, null, 2) + ", encode settings: " + JSON.stringify(encodeTags, null, 2);
             RED.comms.publish('debug', {
               format: "Encoder output flow tags:",
               msg: formattedDstTags
             }, true);
 
             dstFlow = new ledger.Flow(null, null, localName, localDescription,
-              ledger.formats.video, dstTags, source.id, null);
+              ledger.formats.audio, dstTags, source.id, null);
 
             nodeAPI.putResource(source).catch(function(err) {
               push(`Unable to register source: ${err}`);
             });
-            nodeAPI.putResource(dstFlow).then(function () {
+            nodeAPI.putResource(dstFlow).then(function() {
               dstBufLen = encoder.setInfo(this.srcFlow.tags, dstTags, x.duration, encodeTags);
               processGrain(x, dstBufLen, push, next);
             }.bind(this), function (err) {
@@ -113,6 +139,6 @@ module.exports = function (RED) {
     }.bind(this));
     this.on('close', this.close);
   }
-  util.inherits(Encoder, redioactive.Valve);
-  RED.nodes.registerType("encoder", Encoder);
+  util.inherits(AACEncoder, redioactive.Valve);
+  RED.nodes.registerType("AAC encoder", AACEncoder);
 }
