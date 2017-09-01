@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Streampunk/dynamorse.git"
+    "url": "git+https://github.com/Streampunk/dynamorse-deprecated.git"
   },
   "author": "Streampunk Media Ltd",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/Streampunk/dynamorse/issues"
+    "url": "https://github.com/Streampunk/dynamorse-deprecated/issues"
   },
   "keywords": [
     "AMWA",
@@ -23,7 +23,7 @@
     "JT-NM",
     "NMOS"
   ],
-  "homepage": "https://github.com/Streampunk/dynamorse#readme",
+  "homepage": "https://github.com/Streampunk/dynamorse-deprecated#readme",
   "dependencies": {
     "body-parser": "^1.15.0",
     "express": "^4.13.4",
