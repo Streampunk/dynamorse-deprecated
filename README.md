@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/Streampunk/dynamorse.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/Streampunk/dynamorse)
 # Dynamorse
 
-This project is **deprecated** and no longer maintained due to the addition of the manage palette feature and significantly improved module loading support in [Node-RED](https://nodered.ord/). Dynamorse is now a collection of capability-specific modules that all depend on the [core module](/Streampunk/node-red-contrib-dynamorse-core). The documentation here is being moved into the core module and updated.
+This project is **deprecated** and no longer maintained due to the addition of the manage palette feature and significantly improved module loading support in [Node-RED](https://nodered.ord/). Dynamorse is now a collection of capability-specific modules that all depend on the [core module](https://github.com/Streampunk/node-red-contrib-dynamorse-core). The documentation here is being moved into the core module and updated.
 
 ![overview graphic](images/overview.png)
 
