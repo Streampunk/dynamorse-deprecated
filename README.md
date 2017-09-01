@@ -1,9 +1,7 @@
 [![CircleCI](https://circleci.com/gh/Streampunk/dynamorse.svg?style=shield&circle-token=:circle-token)](https://circleci.com/gh/Streampunk/dynamorse)
 # Dynamorse
 
-[Click here for EBU NTS 2016 demo crib sheet.](doc/ebu_nts_demo_crib.md)
-
-[Click here for AMWA Tech Together London 2016 crib sheet.](doc/amwa_techtogether_crib.md)
+This project is **deprecated** and no longer maintained due to the addition of the manage palette feature and significantly improved module loading support in [Node-RED](https://nodered.ord/). Dynamorse is now a collection of capability-specific modules that all depend on the [core module](/Streampunk/node-red-contrib-dynamorse-core). The documentation here is being moved into the core module and updated.
 
 ![overview graphic](images/overview.png)
 
